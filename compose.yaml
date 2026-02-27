@@ -7,6 +7,12 @@ services:
       - 'MONGO_INITDB_ROOT_USERNAME=root'
     ports:
       - '27017:27017'
+    healthcheck:
+      test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   postgres:
     image: 'postgres:latest'
     environment:
@@ -15,6 +21,11 @@ services:
       - 'POSTGRES_USER=myuser'
     ports:
       - '5432:5432'
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U myuser -d mydatabase" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
   pgadmin:
     image: dpage/pgadmin4
@@ -25,3 +36,19 @@ services:
       - '5050:80'
     depends_on:
       - postgres
+
+  api:
+    build: .
+    ports:
+      - '8080:8080'
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mydatabase
+      - SPRING_DATASOURCE_USERNAME=myuser
+      - SPRING_DATASOURCE_PASSWORD=secret
+      - SPRING_DATA_MONGODB_URI=mongodb://root:secret@mongodb:27017/mydatabase?authSource=admin
+      - SPRING_DOCKER_COMPOSE_ENABLED=false
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
