@@ -38,6 +38,11 @@ public class UserAdapter implements UserRepository {
     }
 
     @Override
+    public List<User> findByHouseholdId(String householdId) {
+        return userMapper.toDomainList(userJpaRepository.findByHouseholdId(householdId));
+    }
+
+    @Override
     public void deleteById(String id) {
         userJpaRepository.deleteById(id);
     }

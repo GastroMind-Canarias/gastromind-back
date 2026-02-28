@@ -39,6 +39,14 @@ public interface UserRepository {
     void deleteById(String id);
 
     /**
+     * Lista todos los User de una unidad familiar
+     *
+     * @param householdId Id de la unidad familiar
+     * @return Lista con todos los usuarios de la unidad familiar
+     */
+    List<User> findByHouseholdId(String householdId);
+
+    /**
      * Lista todos los User
      * 
      * @return Lista con todos los usuarios

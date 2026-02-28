@@ -6,9 +6,12 @@ import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.U
 
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface UserJpaRepository extends JpaRepository<UserEntity, String>{
+public interface UserJpaRepository extends JpaRepository<UserEntity, String> {
     Optional<UserEntity> findByName(String name);
+
+    List<UserEntity> findByHouseholdId(String householdId);
 }
