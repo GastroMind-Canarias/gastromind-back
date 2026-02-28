@@ -2,12 +2,14 @@ package com.gastromind.api.application.services;
 
 import com.gastromind.api.domain.exceptions.ForbiddenException;
 import com.gastromind.api.domain.exceptions.NotFoundException;
+import com.gastromind.api.domain.models.Fridge;
 import com.gastromind.api.domain.models.HouseHold;
 import com.gastromind.api.domain.models.HouseholdAppliance;
 import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.enums.Appliance;
 import com.gastromind.api.domain.models.enums.Role;
 import com.gastromind.api.domain.ports.in.IHouseHoldService;
+import com.gastromind.api.domain.ports.out.FridgeRepository;
 import com.gastromind.api.domain.ports.out.HouseHoldRepository;
 import com.gastromind.api.domain.ports.out.HouseholdApplianceRepository;
 import com.gastromind.api.domain.ports.out.UserRepository;
@@ -22,12 +24,14 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
     private final HouseHoldRepository repository;
     private final UserRepository userRepository;
     private final HouseholdApplianceRepository applianceRepository;
+    private final FridgeRepository fridgeRepository;
 
     public HouseHoldServiceImpl(HouseHoldRepository repository, UserRepository userRepository,
-            HouseholdApplianceRepository applianceRepository) {
+            HouseholdApplianceRepository applianceRepository, FridgeRepository fridgeRepository) {
         this.repository = repository;
         this.userRepository = userRepository;
         this.applianceRepository = applianceRepository;
+        this.fridgeRepository = fridgeRepository;
     }
 
     @Override
@@ -42,7 +46,15 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
 
     @Override
     public HouseHold create(HouseHold houseHold) {
-        return repository.save(houseHold);
+        HouseHold savedHouseHold = repository.save(houseHold);
+        createFridge(savedHouseHold);
+        return savedHouseHold;
+    }
+
+    private void createFridge(HouseHold houseHold) {
+        Fridge fridge = new Fridge();
+        fridge.setHouseHold_id(houseHold);
+        fridgeRepository.save(fridge);
     }
 
     @Override
@@ -61,6 +73,7 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
     @Override
     public HouseHold createWithCreator(HouseHold houseHold, String creatorUserId) {
         HouseHold savedHouseHold = repository.save(houseHold);
+        createFridge(savedHouseHold);
         User creator = userRepository.findById(creatorUserId)
                 .orElseThrow(() -> new NotFoundException("Usuario creador no encontrado"));
         creator.setHouseHold_id(savedHouseHold);

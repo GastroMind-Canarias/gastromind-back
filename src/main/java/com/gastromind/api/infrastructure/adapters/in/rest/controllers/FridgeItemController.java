@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.gastromind.api.application.services.FridgeItemServiceImpl;
-import com.gastromind.api.domain.models.FridgeItem;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.FridgeItemRequest;
@@ -65,14 +64,56 @@ public class FridgeItemController {
     @PostMapping
     public ResponseEntity<FridgeItemResponse> create(@RequestBody FridgeItemRequest fridgeItem) {
         return ResponseEntity.status(HttpStatus.CREATED).body(
-                fridgeItemRestMapper.toResponse(fridgeItemService.create(fridgeItemRestMapper.toDomain(fridgeItem))));
+                fridgeItemRestMapper.toResponse(fridgeItemService.addProductToFridge(
+                        fridgeItem.fridgeId(),
+                        fridgeItem.productId(),
+                        fridgeItem.quantity(),
+                        fridgeItem.expirationDate())));
     }
 
     @Operation(summary = "Actualizar stock de un item", description = "Modifica la cantidad o estado de un producto existente (ej. tras cocinar).")
     @ApiStandardDoc
     @PutMapping("/{id}")
-    public ResponseEntity<FridgeItemResponse> update(@PathVariable String id, @RequestBody FridgeItemRequest fridgeItem) {
-        return ResponseEntity.ok(fridgeItemRestMapper.toResponse(fridgeItemService.update(id,fridgeItemRestMapper.toDomain(fridgeItem))));
+    public ResponseEntity<FridgeItemResponse> update(@PathVariable String id,
+            @RequestBody FridgeItemRequest fridgeItem) {
+        return ResponseEntity.ok(fridgeItemRestMapper
+                .toResponse(fridgeItemService.update(id, fridgeItemRestMapper.toDomain(fridgeItem))));
+    }
+
+    @Operation(summary = "Consumir parte de un item", description = "Descuenta una cantidad específica del stock disponible.")
+    @ApiStandardDoc
+    @PutMapping("/{id}/consume")
+    public ResponseEntity<FridgeItemResponse> consumePartially(
+            @PathVariable String id,
+            @Parameter(description = "Cantidad a consumir", example = "0.5") @RequestBody java.math.BigDecimal quantity) {
+        return ResponseEntity.ok(fridgeItemRestMapper.toResponse(fridgeItemService.consumePartially(id, quantity)));
+    }
+
+    @Operation(summary = "Marcar como consumido", description = "Marca un item con estado consumido y cantidad cero.")
+    @ApiStandardDoc
+    @PutMapping("/{id}/mark-consumed")
+    public ResponseEntity<Void> markAsConsumed(@PathVariable String id) {
+        fridgeItemService.markAsConsumed(id);
+        return ResponseEntity.ok().build();
+    }
+
+    @Operation(summary = "Listar items por caducar", description = "Recupera los productos próximos a caducar para una nevera específica.")
+    @ApiStandardDoc
+    @GetMapping("/fridge/{fridgeId}/expiring")
+    public ResponseEntity<List<FridgeItemResponse>> getExpiring(
+            @PathVariable String fridgeId,
+            @Parameter(description = "Número de días de antelación", example = "5") @org.springframework.web.bind.annotation.RequestParam(defaultValue = "7") int days) {
+        return ResponseEntity
+                .ok(fridgeItemRestMapper.toResponseList(fridgeItemService.getExpiringItems(fridgeId, days)));
+    }
+
+    @Operation(summary = "Filtrar por categoría", description = "Devuelve el inventario de una nevera filtrado por una categoría de producto específica.")
+    @ApiStandardDoc
+    @GetMapping("/fridge/{fridgeId}/category/{categoryId}")
+    public ResponseEntity<List<FridgeItemResponse>> getByCategory(@PathVariable String fridgeId,
+            @PathVariable String categoryId) {
+        return ResponseEntity.ok(
+                fridgeItemRestMapper.toResponseList(fridgeItemService.getInventoryByCategory(fridgeId, categoryId)));
     }
 
     @Operation(summary = "Eliminar item", description = "Borra un producto del inventario (consumido o desechado).")

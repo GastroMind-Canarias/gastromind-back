@@ -14,4 +14,8 @@ public interface FridgeItemRepository {
     void deleteById(String id);
 
     List<FridgeItem> findAll();
+
+    List<FridgeItem> findExpiringItems(String fridgeId, java.time.LocalDate thresholdDate);
+
+    List<FridgeItem> findByFridgeIdAndCategoryId(String fridgeId, String categoryId);
 }
