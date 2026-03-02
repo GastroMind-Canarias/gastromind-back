@@ -11,6 +11,7 @@ import com.gastromind.api.domain.ports.out.UserFavoritesRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.UserFavoritesEntity;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.UserFavoritesJpaRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers.UserFavoritesMapper;
+
 @Component
 public class UserFavoritesAdapter implements UserFavoritesRepository {
 
@@ -22,7 +23,7 @@ public class UserFavoritesAdapter implements UserFavoritesRepository {
 
     @Override
     public UserFavorites save(UserFavorites userFavorites) {
-         UserFavoritesEntity entity = userFavoritesMapper.toEntity(userFavorites);
+        UserFavoritesEntity entity = userFavoritesMapper.toEntity(userFavorites);
         return userFavoritesMapper.toDomain(userFavoritesJpaRepository.save(entity));
     }
 
@@ -38,8 +39,23 @@ public class UserFavoritesAdapter implements UserFavoritesRepository {
 
     @Override
     public List<UserFavorites> findAll() {
-        List<UserFavoritesEntity> userFavoritesEntities = userFavoritesJpaRepository.findAll();
-        return userFavoritesMapper.toDomainList(userFavoritesEntities);
+        List<UserFavoritesEntity> entities = userFavoritesJpaRepository.findAll();
+        return userFavoritesMapper.toDomainList(entities);
     }
 
-   }
+    @Override
+    public List<UserFavorites> findByUserId(String userId) {
+        return userFavoritesMapper.toDomainList(userFavoritesJpaRepository.findByUserId(userId));
+    }
+
+    @Override
+    public Optional<UserFavorites> findByUserIdAndRecipeId(String userId, String recipeId) {
+        return userFavoritesJpaRepository.findByUserIdAndRecipeId(userId, recipeId)
+                .map(userFavoritesMapper::toDomain);
+    }
+
+    @Override
+    public void deleteByUserIdAndRecipeId(String userId, String recipeId) {
+        userFavoritesJpaRepository.deleteByUserIdAndRecipeId(userId, recipeId);
+    }
+}

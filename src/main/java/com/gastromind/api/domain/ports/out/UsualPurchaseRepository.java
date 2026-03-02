@@ -15,4 +15,12 @@ public interface UsualPurchaseRepository {
 
     List<UsualPurchase> findAll();
 
+    /**
+     * Devuelve las compras habituales de un usuario ordenadas por frecuencia
+     * descendente
+     */
+    List<UsualPurchase> findByUserIdOrderByFrequencyDesc(String userId);
+
+    /** Busca una compra habitual concreta por userId y productId (para upsert) */
+    Optional<UsualPurchase> findByUserIdAndProductId(String userId, String productId);
 }

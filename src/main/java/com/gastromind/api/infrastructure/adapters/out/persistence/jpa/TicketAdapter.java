@@ -9,8 +9,9 @@ import org.springframework.stereotype.Component;
 import com.gastromind.api.domain.models.Ticket;
 import com.gastromind.api.domain.ports.out.TicketRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.TicketEntity;
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.TicketJpaRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers.TicketMapper;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.TicketJpaRepository;
+
 @Component
 public class TicketAdapter implements TicketRepository {
 
@@ -33,7 +34,7 @@ public class TicketAdapter implements TicketRepository {
 
     @Override
     public void deleteById(String id) {
-       ticketJpaRepository.deleteById(id);
+        ticketJpaRepository.deleteById(id);
     }
 
     @Override
@@ -41,5 +42,9 @@ public class TicketAdapter implements TicketRepository {
         List<TicketEntity> ticketEntities = ticketJpaRepository.findAll();
         return ticketMapper.toDomainList(ticketEntities);
     }
-    
+
+    @Override
+    public List<String> findTicketIdsByUserId(String userId) {
+        return ticketJpaRepository.findTicketIdsByUserId(userId);
+    }
 }

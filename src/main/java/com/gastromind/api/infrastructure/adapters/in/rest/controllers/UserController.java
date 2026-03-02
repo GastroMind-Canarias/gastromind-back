@@ -8,9 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import com.gastromind.api.application.services.UserServiceImpl;
+import com.gastromind.api.domain.models.Allergen;
 import com.gastromind.api.domain.models.User;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.allergen.AllergenResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.user.UserRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.user.UserResponse;
+import com.gastromind.api.infrastructure.adapters.in.rest.mappers.AllergenRestMapper;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.UserRestMapper;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
@@ -30,6 +33,9 @@ public class UserController {
 
     @Autowired
     private UserRestMapper userMapper;
+
+    @Autowired
+    private AllergenRestMapper allergenMapper;
 
     @Operation(summary = "Obtener todos los usuarios", description = "Devuelve una lista completa de todos los usuarios registrados.")
     @ApiStandardDoc
@@ -83,5 +89,47 @@ public class UserController {
     public ResponseEntity<Void> delete(@PathVariable String id) {
         userServiceImpl.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // ──────────────────────────────────────────────────────────────
+    // Use Cases: Gestión de Alérgenos de Usuario
+    // ──────────────────────────────────────────────────────────────
+
+    /**
+     * RegistrarNuevoAlergenoDeUsuario: añade un alérgeno a user_allergens.
+     */
+    @Operation(summary = "Registrar alérgeno de usuario", description = "Añade un alérgeno a la lista personal del usuario (tabla user_allergens). Este dato se usará para filtrar recetas generadas por la IA.")
+    @ApiPostDoc
+    @PostMapping("/{userId}/allergens/{allergenId}")
+    public ResponseEntity<Void> addAllergen(
+            @Parameter(description = "ID del usuario", example = "usr-123") @PathVariable String userId,
+            @Parameter(description = "ID del alérgeno a registrar", example = "alg-456") @PathVariable String allergenId) {
+        userServiceImpl.addAllergen(userId, allergenId);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+
+    /**
+     * EliminarAlergenoDeUsuario: elimina un alérgeno de user_allergens.
+     */
+    @Operation(summary = "Eliminar alérgeno de usuario", description = "Elimina un alérgeno de la lista personal del usuario (tabla user_allergens).")
+    @ApiStandardDoc
+    @DeleteMapping("/{userId}/allergens/{allergenId}")
+    public ResponseEntity<Void> removeAllergen(
+            @Parameter(description = "ID del usuario", example = "usr-123") @PathVariable String userId,
+            @Parameter(description = "ID del alérgeno a eliminar", example = "alg-456") @PathVariable String allergenId) {
+        userServiceImpl.removeAllergen(userId, allergenId);
+        return ResponseEntity.noContent().build();
+    }
+
+    /**
+     * ListarAlergenosDeUsuario: lista los alérgenos del usuario.
+     */
+    @Operation(summary = "Listar alérgenos del usuario", description = "Recupera todos los alérgenos registrados para un usuario específico.")
+    @ApiStandardDoc
+    @GetMapping("/{userId}/allergens")
+    public ResponseEntity<List<AllergenResponse>> listAllergens(
+            @Parameter(description = "ID del usuario", example = "usr-123") @PathVariable String userId) {
+        List<Allergen> allergens = userServiceImpl.listAllergens(userId);
+        return ResponseEntity.ok(allergenMapper.toResponseList(allergens));
     }
 }

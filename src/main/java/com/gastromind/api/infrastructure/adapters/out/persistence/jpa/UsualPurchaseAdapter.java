@@ -9,8 +9,8 @@ import org.springframework.stereotype.Component;
 import com.gastromind.api.domain.models.UsualPurchase;
 import com.gastromind.api.domain.ports.out.UsualPurchaseRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.UsualPurchaseEntity;
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.UsualPurchaseJpaRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers.UsualPurchaseMapper;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.UsualPurchaseJpaRepository;
 
 @Component
 public class UsualPurchaseAdapter implements UsualPurchaseRepository {
@@ -39,8 +39,19 @@ public class UsualPurchaseAdapter implements UsualPurchaseRepository {
 
     @Override
     public List<UsualPurchase> findAll() {
-         List<UsualPurchaseEntity> usualPurchaseEntities = usualPurchaseJpaRepository.findAll();
+        List<UsualPurchaseEntity> usualPurchaseEntities = usualPurchaseJpaRepository.findAll();
         return usualPurchaseMapper.toDomainList(usualPurchaseEntities);
     }
 
+    @Override
+    public List<UsualPurchase> findByUserIdOrderByFrequencyDesc(String userId) {
+        return usualPurchaseMapper.toDomainList(
+                usualPurchaseJpaRepository.findByUserIdOrderByFrequencyDesc(userId));
+    }
+
+    @Override
+    public Optional<UsualPurchase> findByUserIdAndProductId(String userId, String productId) {
+        return usualPurchaseJpaRepository.findByUserIdAndProductId(userId, productId)
+                .map(usualPurchaseMapper::toDomain);
+    }
 }

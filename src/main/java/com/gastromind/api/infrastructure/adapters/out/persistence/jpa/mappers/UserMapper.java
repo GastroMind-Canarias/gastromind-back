@@ -8,7 +8,7 @@ import org.mapstruct.Mapping;
 import com.gastromind.api.domain.models.User;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.UserEntity;
 
-@Mapper(componentModel = "spring", uses = {HouseholdMapper.class})
+@Mapper(componentModel = "spring", uses = { HouseholdMapper.class, AllergenMapper.class })
 public interface UserMapper {
 
     @Mapping(source = "houseHold_id", target = "household")
@@ -18,5 +18,6 @@ public interface UserMapper {
     User toDomain(UserEntity entity);
 
     List<UserEntity> toEntityList(List<User> domainList);
+
     List<User> toDomainList(List<UserEntity> entityList);
 }

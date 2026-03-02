@@ -12,6 +12,9 @@ public class Recipe {
     int prep_time;
     Appliance appliance_needed;
     String difficulty;
+    String description;
+    int calories;
+    String image_url;
     LocalDate created_at;
 
     /**
@@ -114,6 +117,30 @@ public class Recipe {
 
     public void setCreated_at(LocalDate created_at) {
         this.created_at = created_at;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public int getCalories() {
+        return calories;
+    }
+
+    public void setCalories(int calories) {
+        this.calories = calories;
+    }
+
+    public String getImage_url() {
+        return image_url;
+    }
+
+    public void setImage_url(String image_url) {
+        this.image_url = image_url;
     }
 
     @Override

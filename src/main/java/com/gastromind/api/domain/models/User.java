@@ -12,6 +12,7 @@ public class User {
     String password;
     HouseHold houseHold_id;
     Role role;
+    java.util.List<Allergen> allergens;
 
     public User() {
     }
@@ -20,13 +21,23 @@ public class User {
         this.id = id;
     }
 
-    public User(String id, String name, String email, String password, HouseHold houseHold_id, Role role) {
+    public User(String id, String name, String email, String password, HouseHold houseHold_id, Role role,
+            java.util.List<Allergen> allergens) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.houseHold_id = houseHold_id;
         this.role = role;
+        this.allergens = allergens;
+    }
+
+    public java.util.List<Allergen> getAllergens() {
+        return allergens;
+    }
+
+    public void setAllergens(java.util.List<Allergen> allergens) {
+        this.allergens = allergens;
     }
 
     public String getId() {
@@ -79,7 +90,8 @@ public class User {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass())
+            return false;
         User user = (User) o;
         return Objects.equals(getId(), user.getId());
     }

@@ -51,10 +51,6 @@ public class UserEntity {
     @JoinTable(name = "user_allergens", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "allergen_id"))
     private Set<AllergenEntity> allergens;
 
-    @ManyToMany
-    @JoinTable(name = "user_favorites", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "recipe_id"))
-    private Set<RecipeEntity> favoriteRecipes;
-
     public UserEntity() {
     }
 
@@ -62,7 +58,8 @@ public class UserEntity {
         this.id = id;
     }
 
-    public UserEntity(String id, String name, String email, String password, RoleType role, HouseholdEntity household, List<TicketEntity> tickets, List<UsualPurchaseEntity> usualPurchases, Set<AllergenEntity> allergens, Set<RecipeEntity> favoriteRecipes) {
+    public UserEntity(String id, String name, String email, String password, RoleType role, HouseholdEntity household,
+            List<TicketEntity> tickets, List<UsualPurchaseEntity> usualPurchases, Set<AllergenEntity> allergens) {
         this.id = id;
         this.name = name;
         this.email = email;
@@ -72,7 +69,6 @@ public class UserEntity {
         this.tickets = tickets;
         this.usualPurchases = usualPurchases;
         this.allergens = allergens;
-        this.favoriteRecipes = favoriteRecipes;
     }
 
     public String getId() {
@@ -139,14 +135,6 @@ public class UserEntity {
         this.allergens = allergens;
     }
 
-    public Set<RecipeEntity> getFavoriteRecipes() {
-        return favoriteRecipes;
-    }
-
-    public void setFavoriteRecipes(Set<RecipeEntity> favoriteRecipes) {
-        this.favoriteRecipes = favoriteRecipes;
-    }
-
     public RoleType getRole() {
         return role;
     }
@@ -157,7 +145,8 @@ public class UserEntity {
 
     @Override
     public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
+        if (o == null || getClass() != o.getClass())
+            return false;
         UserEntity that = (UserEntity) o;
         return Objects.equals(getId(), that.getId());
     }

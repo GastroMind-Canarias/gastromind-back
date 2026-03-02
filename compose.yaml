@@ -53,6 +53,7 @@ services:
       - SPRING_DATASOURCE_PASSWORD=secret
       - SPRING_DATA_MONGODB_URI=mongodb://root:secret@mongodb:27017/mydatabase?authSource=admin
       - SPRING_DOCKER_COMPOSE_ENABLED=false
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
     networks:
       - gastromind-network
     depends_on:

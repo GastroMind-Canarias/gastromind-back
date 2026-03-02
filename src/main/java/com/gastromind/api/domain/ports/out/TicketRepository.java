@@ -13,4 +13,9 @@ public interface TicketRepository {
     void deleteById(String id);
 
     List<Ticket> findAll();
+
+    /**
+     * Devuelve los IDs de los tickets de un usuario para el análisis del histórico
+     */
+    List<String> findTicketIdsByUserId(String userId);
 }

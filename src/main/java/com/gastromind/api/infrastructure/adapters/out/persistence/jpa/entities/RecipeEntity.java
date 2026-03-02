@@ -48,8 +48,8 @@ public class RecipeEntity {
     @OneToMany(mappedBy = "recipe")
     private List<RecipeIngredientEntity> ingredients;
 
-    @ManyToMany(mappedBy = "favoriteRecipes")
-    private List<UserEntity> favoritedBy;
+    @OneToMany(mappedBy = "recipe")
+    private List<UserFavoritesEntity> favoritedBy;
 
     public RecipeEntity() {
     }
@@ -60,7 +60,7 @@ public class RecipeEntity {
 
     public RecipeEntity(String id, String title, String instructions, Integer servings, Integer prepTimeMinutes,
             LocalDateTime createdAt, ApplianceType applianceNeeded, DifficultyLevel difficulty,
-            List<RecipeIngredientEntity> ingredients, List<UserEntity> favoritedBy) {
+            List<RecipeIngredientEntity> ingredients) {
         this.id = id;
         this.title = title;
         this.instructions = instructions;
@@ -70,7 +70,6 @@ public class RecipeEntity {
         this.applianceNeeded = applianceNeeded;
         this.difficulty = difficulty;
         this.ingredients = ingredients;
-        this.favoritedBy = favoritedBy;
     }
 
     public String getId() {
@@ -145,11 +144,11 @@ public class RecipeEntity {
         this.ingredients = ingredients;
     }
 
-    public List<UserEntity> getFavoritedBy() {
+    public List<UserFavoritesEntity> getFavoritedBy() {
         return favoritedBy;
     }
 
-    public void setFavoritedBy(List<UserEntity> favoritedBy) {
+    public void setFavoritedBy(List<UserFavoritesEntity> favoritedBy) {
         this.favoritedBy = favoritedBy;
     }
 

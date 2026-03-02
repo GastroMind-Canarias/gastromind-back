@@ -6,34 +6,20 @@ import java.util.Optional;
 import com.gastromind.api.domain.models.UserFavorites;
 
 public interface UserFavoritesRepository {
-    /**
-     * Guarda un usuario
-     * 
-     * @param userFavorites usuario a guardar
-     * @return El usuario guardado
-     */
     UserFavorites save(UserFavorites userFavorites);
 
-    /**
-     * Busca un UserFavorites por id
-     * 
-     * @param id id del usuairo
-     * @return El usuario o null
-     */
     Optional<UserFavorites> findById(String id);
 
-    /**
-     * Borra el usuario
-     * 
-     * @param id Id del usuario
-     */
     void deleteById(String id);
 
-    /**
-     * Lista todos los UserFavorites
-     * 
-     * @return Lista con todos los usuarios
-     */
     List<UserFavorites> findAll();
 
+    /** Busca todos los favoritos de un usuario por su userId */
+    List<UserFavorites> findByUserId(String userId);
+
+    /** Busca una entrada concreta de favorito por userId y recipeId */
+    Optional<UserFavorites> findByUserIdAndRecipeId(String userId, String recipeId);
+
+    /** Elimina por userId y recipeId */
+    void deleteByUserIdAndRecipeId(String userId, String recipeId);
 }
