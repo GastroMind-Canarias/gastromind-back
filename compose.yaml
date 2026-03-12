@@ -7,8 +7,6 @@ services:
       - 'MONGO_INITDB_ROOT_USERNAME=root'
     ports:
       - '27017:27017'
-    networks:
-      - gastromind-network
     healthcheck:
       test: [ "CMD", "mongosh", "--eval", "db.adminCommand('ping')" ]
       interval: 10s
@@ -23,8 +21,6 @@ services:
       - 'POSTGRES_USER=myuser'
     ports:
       - '5432:5432'
-    networks:
-      - gastromind-network
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U myuser -d mydatabase" ]
       interval: 10s
@@ -43,8 +39,6 @@ services:
       PGADMIN_DEFAULT_PASSWORD: admin123
     ports:
       - '5050:80'
-    networks:
-      - gastromind-network
     depends_on:
       - postgres
       - redis
