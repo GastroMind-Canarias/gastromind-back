@@ -31,6 +31,11 @@ services:
       timeout: 5s
       retries: 5
 
+  redis:
+    image: 'redis:alpine'
+    ports:
+      - '6379:6379'
+
   pgadmin:
     image: dpage/pgadmin4
     environment:
@@ -42,25 +47,4 @@ services:
       - gastromind-network
     depends_on:
       - postgres
-
-  api:
-    build: .
-    ports:
-      - '8080:8080'
-    environment:
-      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/mydatabase
-      - SPRING_DATASOURCE_USERNAME=myuser
-      - SPRING_DATASOURCE_PASSWORD=secret
-      - SPRING_DATA_MONGODB_URI=mongodb://root:secret@mongodb:27017/mydatabase?authSource=admin
-      - SPRING_DOCKER_COMPOSE_ENABLED=false
-    networks:
-      - gastromind-network
-    depends_on:
-      postgres:
-        condition: service_healthy
-      mongodb:
-        condition: service_healthy
-
-networks:
-  gastromind-network:
-    driver: bridge
+      - redis
