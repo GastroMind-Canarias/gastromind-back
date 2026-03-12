@@ -25,19 +25,5 @@ public class AuthService implements IAuthService {
                 .orElse(false);
     }
 
-    @Override
-    public void register(RegisterRequest request) {
-        if (userRepository.findByName(request.username()).isPresent()) {
-            throw new RuntimeException("Ya existe un usuario con esas credenciales");
-        }
-
-        UserEntity user = new UserEntity();
-        user.setName(request.username());
-        user.setPassword(passwordEncoder.encode(request.password()));
-        user.setEmail(request.email());
-        user.setRole(request.role());
-
-        userRepository.save(user);
-    }
 }
 

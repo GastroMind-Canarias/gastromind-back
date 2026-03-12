@@ -5,6 +5,7 @@ import com.gastromind.api.infrastructure.security.auth.dtos.RegisterRequest;
 import com.gastromind.api.infrastructure.security.auth.dtos.TokenResponse;
 import com.gastromind.api.infrastructure.security.auth.services.IAuthService;
 import com.gastromind.api.infrastructure.security.auth.services.IJwtService;
+import com.gastromind.api.application.usecases.RegisterUserUseCase;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,10 +23,12 @@ import org.springframework.web.server.ResponseStatusException;
 public class AuthController {
 
     private final IAuthService authService;
+    private final RegisterUserUseCase registerUserUseCase;
     private final IJwtService jwtService;
 
-    public AuthController(IAuthService authService, IJwtService jwtService) {
+    public AuthController(IAuthService authService, RegisterUserUseCase registerUserUseCase, IJwtService jwtService) {
         this.authService = authService;
+        this.registerUserUseCase = registerUserUseCase;
         this.jwtService = jwtService;
     }
 
@@ -48,7 +51,7 @@ public class AuthController {
     @ApiPostDoc
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
-        authService.register(request);
+        registerUserUseCase.registrarUsuarioCompleto(request);
         return ResponseEntity.status(HttpStatus.CREATED).body("Usuario registrado con exito");
     }
 }

@@ -3,6 +3,7 @@ package com.gastromind.api.domain.ports.out;
 import java.util.List;
 import java.util.Optional;
 
+import com.gastromind.api.domain.models.Allergen;
 import com.gastromind.api.domain.models.User;
 
 public interface UserRepository {
@@ -52,5 +53,11 @@ public interface UserRepository {
      * @return Lista con todos los usuarios
      */
     List<User> findAll();
+
+    void addAllergen(String userId, String allergenId);
+
+    void removeAllergen(String userId, String allergenId);
+
+    List<Allergen> findAllergens(String userId);
 
 }
