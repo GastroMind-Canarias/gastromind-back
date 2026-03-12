@@ -29,7 +29,7 @@ public class FridgeItemAdapter implements FridgeItemRepository {
 
     @Override
     public Optional<FridgeItem> findById(String id) {
-         return fridgeItemJpaRepository.findById(id).map(fridgeItemMapper::toDomain);
+        return fridgeItemJpaRepository.findById(id).map(fridgeItemMapper::toDomain);
     }
 
     @Override
@@ -41,6 +41,20 @@ public class FridgeItemAdapter implements FridgeItemRepository {
     @Override
     public void deleteById(String id) {
         fridgeItemJpaRepository.deleteById(id);
+    }
+
+    @Override
+    public List<FridgeItem> findExpiringItems(String fridgeId, java.time.LocalDate thresholdDate) {
+        List<FridgeItemEntity> entities = fridgeItemJpaRepository.findByFridgeIdAndExpirationDateBefore(fridgeId,
+                thresholdDate);
+        return fridgeItemMapper.toDomainList(entities);
+    }
+
+    @Override
+    public List<FridgeItem> findByFridgeIdAndCategoryId(String fridgeId, String categoryId) {
+        List<FridgeItemEntity> entities = fridgeItemJpaRepository.findByFridgeIdAndProductCategoryId(fridgeId,
+                categoryId);
+        return fridgeItemMapper.toDomainList(entities);
     }
 
     @Override

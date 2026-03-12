@@ -57,6 +57,17 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.toResponse(savedUser));
     }
 
+    @Operation(summary = "Actualizar perfil de usuario", description = "Modifica los campos name o email de un usuario existente.")
+    @ApiStandardDoc
+    @PatchMapping("/{id}/profile")
+    public ResponseEntity<UserResponse> updateProfile(
+            @PathVariable String id,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String email) {
+        User updatedUser = userServiceImpl.updateProfile(id, name, email);
+        return ResponseEntity.ok(userMapper.toResponse(updatedUser));
+    }
+
     @Operation(summary = "Actualizar usuario", description = "Modifica los datos de un usuario existente.")
     @ApiStandardDoc
     @PutMapping("/{id}")

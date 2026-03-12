@@ -6,8 +6,14 @@ import com.gastromind.api.domain.models.User;
 
 public interface IUserService {
     List<User> findAll();
+
     User findById(String id);
+
     User create(User user);
+
     User update(String id, User user);
+
+    User updateProfile(String id, String name, String email);
+
     void delete(String id);
 }
