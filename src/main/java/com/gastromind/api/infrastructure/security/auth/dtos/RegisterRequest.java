@@ -35,10 +35,6 @@ public record RegisterRequest(
 
         @Schema(example = "Mi Hogar", description = "Datos del hogar que se asignara al usuario")
         @NotNull(message = "La información del hogar es obligatoria")
-        String householdName,
-
-        @Schema(example = "[{ \"id\": 1, \"name\": \"Gluten\" }]", description = "Datos de los alergenos del usuario")
-        @NotNull(message = "La información de los alergenos es obligatoria")
-        List<Allergen> allergens
+        String householdName
 
 ) {}

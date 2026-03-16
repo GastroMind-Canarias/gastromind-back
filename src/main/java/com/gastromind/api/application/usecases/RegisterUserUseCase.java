@@ -43,9 +43,9 @@ public class RegisterUserUseCase {
     public void registrarUsuarioCompleto(RegisterRequest request) {
         HouseHold houseHold = new HouseHold();
         houseHold.setName(request.householdName());
+        houseHold.setMembers(1);
         var nuevoHogar = householdService.create(houseHold);
-
-
+            
         String passwordHash = passwordEncoder.encode(request.password());
 
         User user = new User();
@@ -56,10 +56,6 @@ public class RegisterUserUseCase {
         user.setRole(request.role());
         User nuevoUsuario = userService.create(user);
 
-        if (request.allergens() != null && !request.allergens().isEmpty()) {
-            for (Allergen allergen : request.allergens()) {
-                userService.addAllergen(nuevoUsuario.getId(), allergen.getId());
-            }
-        }
+        
     }
 }
