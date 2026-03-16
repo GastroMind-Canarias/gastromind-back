@@ -5,9 +5,12 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.gastromind.api.domain.exceptions.NotFoundException;
+import com.gastromind.api.domain.models.Allergen;
 import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.ports.in.IUserService;
 import com.gastromind.api.domain.ports.out.UserRepository;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -54,5 +57,25 @@ public class UserServiceImpl implements IUserService {
     public void delete(String id) {
         findById(id);
         repository.deleteById(id);
+    }
+
+    @Override
+    @Transactional
+    public void addAllergen(String userId, String allergenId) {
+        findById(userId);
+        repository.addAllergen(userId, allergenId);
+    }
+
+    @Override
+    @Transactional
+    public void removeAllergen(String userId, String allergenId) {
+        findById(userId);
+        repository.removeAllergen(userId, allergenId);
+    }
+
+    @Override
+    public List<Allergen> listAllergens(String userId) {
+        findById(userId);
+        return repository.findAllergens(userId);
     }
 }

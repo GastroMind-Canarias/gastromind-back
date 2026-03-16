@@ -1,5 +1,9 @@
 package com.gastromind.api.infrastructure.security.auth.dtos;
 
+import java.util.List;
+
+import com.gastromind.api.domain.models.Allergen;
+import com.gastromind.api.domain.models.enums.Role;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.RoleType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
@@ -27,5 +31,10 @@ public record RegisterRequest(
 
         @Schema(example = "ROLE_MEMBER", description = "Rol asignado al usuario (ADMIN, OWNER, etc.)")
         @NotNull(message = "El rol es obligatorio")
-        RoleType role
+        Role role,
+
+        @Schema(example = "Mi Hogar", description = "Datos del hogar que se asignara al usuario")
+        @NotNull(message = "La información del hogar es obligatoria")
+        String householdName
+
 ) {}
