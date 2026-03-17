@@ -31,36 +31,42 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
+
+        // DEBUG 1: ¿Llega el header?
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String token = authHeader.substring("Bearer ".length()).trim();
-        if (token.isEmpty() || SecurityContextHolder.getContext().getAuthentication() != null) {
-            filterChain.doFilter(request, response);
-            return;
-        }
+        String token = authHeader.substring(7).trim();
 
         try {
             String username = jwtService.extractUsername(token);
-            if (username == null || username.isBlank()) {
-                filterChain.doFilter(request, response);
-                return;
-            }
+            System.out.println("DEBUG: Username en Token -> " + username);
 
-            UserDetails user = userDetailsService.loadUserByUsername(username);
-            if (jwtService.isTokenValid(token, user)) {
-                UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
-                        user,
-                        null,
-                        user.getAuthorities()
-                );
-                auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(auth);
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                // Aquí suele fallar: si el nombre no coincide exacto con la DB
+                UserDetails user = userDetailsService.loadUserByUsername(username);
+                System.out.println("DEBUG: Usuario encontrado en DB -> " + user.getUsername());
+                System.out.println("DEBUG: Autoridades -> " + user.getAuthorities());
+
+                if (jwtService.isTokenValid(token, user)) {
+                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
+                            user,
+                            null,
+                            user.getAuthorities()
+                    );
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(auth);
+                    System.out.println("DEBUG: ¡Autenticación establecida con éxito!");
+                } else {
+                    System.out.println("DEBUG: El token no es válido para este usuario");
+                }
             }
-        } catch (Exception ignored) {
-            // Token invalido -> proceder sin autenticacion (sera bloqueado por reglas de seguridad)
+        } catch (Exception e) {
+            System.out.println("DEBUG: ERROR EN FILTRO -> " + e.getMessage());
+            e.printStackTrace();
         }
 
         filterChain.doFilter(request, response);

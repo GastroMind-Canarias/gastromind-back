@@ -5,17 +5,7 @@ import java.util.Objects;
 import java.util.Set;
 
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.RoleType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")
@@ -47,8 +37,12 @@ public class UserEntity {
     @OneToMany(mappedBy = "user")
     private List<UsualPurchaseEntity> usualPurchases;
 
-    @ManyToMany
-    @JoinTable(name = "user_allergens", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "allergen_id"))
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "user_allergens",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "allergen_id")
+    )
     private Set<AllergenEntity> allergens;
 
     @ManyToMany

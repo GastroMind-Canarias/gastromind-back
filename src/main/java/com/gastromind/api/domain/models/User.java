@@ -2,7 +2,9 @@ package com.gastromind.api.domain.models;
 
 import com.gastromind.api.domain.models.enums.Role;
 
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 public class User {
 
@@ -12,6 +14,7 @@ public class User {
     String password;
     HouseHold houseHold_id;
     Role role;
+    Set<Allergen> allergens = new HashSet<>();
 
     public User() {
     }
@@ -20,13 +23,14 @@ public class User {
         this.id = id;
     }
 
-    public User(String id, String name, String email, String password, HouseHold houseHold_id, Role role) {
+    public User(String id, String name, String email, String password, HouseHold houseHold_id, Role role, Set<Allergen> allergens) {
         this.id = id;
         this.name = name;
         this.email = email;
         this.password = password;
         this.houseHold_id = houseHold_id;
         this.role = role;
+        this.allergens = allergens;
     }
 
     public String getId() {
@@ -75,6 +79,24 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public void addAllergen(Allergen allergen) {
+        if (allergen != null) {
+            this.allergens.add(allergen);
+        }
+    }
+
+    public void removeAllergen(String allergenId) {
+        this.allergens.removeIf(a -> a.getId().equals(allergenId));
+    }
+
+    public void setAllergens(Set<Allergen> allergens) {
+        this.allergens = allergens;
+    }
+
+    public Set<Allergen> getAllergens() {
+        return this.allergens;
     }
 
     @Override

@@ -1,7 +1,10 @@
 package com.gastromind.api.infrastructure.adapters.in.rest.dtos.user;
 
 import com.gastromind.api.domain.models.enums.Role;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.allergen.AllergenResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.List;
 
 @Schema(description = "Información pública del usuario")
 public record UserResponse(
@@ -19,5 +22,8 @@ public record UserResponse(
         String houseHold_id,
 
         @Schema(example = "ROLE_MEMBER")
-        Role role
+        Role role,
+
+        @Schema(description = "Lista de alérgenos asociados al usuario")
+        List<AllergenResponse> allergens
 ) {}

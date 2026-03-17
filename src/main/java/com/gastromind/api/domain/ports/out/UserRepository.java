@@ -54,10 +54,4 @@ public interface UserRepository {
      */
     List<User> findAll();
 
-    void addAllergen(String userId, String allergenId);
-
-    void removeAllergen(String userId, String allergenId);
-
-    List<Allergen> findAllergens(String userId);
-
 }
