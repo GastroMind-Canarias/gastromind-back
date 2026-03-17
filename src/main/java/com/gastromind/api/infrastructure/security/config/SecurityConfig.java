@@ -2,9 +2,7 @@ package com.gastromind.api.infrastructure.security.config;
 
 import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.models.User;
-import com.gastromind.api.domain.repositories.UserRepository;
-import com.gastromind.api.infrastructure.adapters.out.persistence.postgreSQL.UserPersistenceAdapter;
-import com.gastromind.api.infrastructure.adapters.out.persistence.postgreSQL.entities.UserEntity;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.UserAdapter;
 import com.gastromind.api.infrastructure.security.filter.JwtAuthenticationFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -44,14 +42,17 @@ public class SecurityConfig {
     }
 
     @Bean
-    public UserDetailsService userDetailsService(UserPersistenceAdapter userRepository) {
+    public UserDetailsService userDetailsService(UserAdapter userRepository) {
         return username -> {
-            User user = userRepository.findByName(username).orElseThrow(()-> new NotFoundException("Usuario no encontrado")); // TODO: pedir user por name
+            User user = userRepository.findByName(username)
+                    .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+            String roleName = user.getRole().name();
 
             return org.springframework.security.core.userdetails.User
                     .withUsername(user.getName())
                     .password(user.getPassword())
-                    .authorities(user.getRole().toString())
+                    .authorities(roleName)
                     .build();
         };
     }

@@ -1,0 +1,36 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/mydatabase
+    username: myuser
+    password: secret
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+
+gastromind:
+  security:
+    public-urls:
+      - "/v3/api-docs/**"
+      - "/swagger-ui/**"
+      - "/swagger-ui.html"
+      - "/api/v1/auth/**"
+
+app:
+  jwt:
+    secret: "9a4f2c3d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7a8b9c0d1e4d"
+    expiration-minutes: 60
+  cors:
+    allowed-origins:
+      - "http://localhost:3000"
+      - "http://localhost:4200"
+      - "http://localhost:8081"
+
+server:
+  port: 8080
+  address: 0.0.0.0

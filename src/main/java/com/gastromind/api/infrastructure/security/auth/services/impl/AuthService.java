@@ -1,8 +1,7 @@
 package com.gastromind.api.infrastructure.security.auth.services.impl;
 
-import com.gastromind.api.domain.models.enums.Role;
-import com.gastromind.api.infrastructure.adapters.out.persistence.postgreSQL.entities.UserEntity;
-import com.gastromind.api.infrastructure.adapters.out.persistence.postgreSQL.jpa.repository.UserJpaRepository;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.UserEntity;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.UserJpaRepository;
 import com.gastromind.api.infrastructure.security.auth.dtos.RegisterRequest;
 import com.gastromind.api.infrastructure.security.auth.services.IAuthService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,19 +25,5 @@ public class AuthService implements IAuthService {
                 .orElse(false);
     }
 
-    @Override
-    public void register(RegisterRequest request) {
-        if (userRepository.findByName(request.username()).isPresent()) {
-            throw new RuntimeException("Ya existe un usuario con esas credenciales");
-        }
-
-        UserEntity user = new UserEntity();
-        user.setName(request.username());
-        user.setPassword(passwordEncoder.encode(request.password()));
-        user.setEmail(request.email());
-        user.setRole(request.role());
-
-        userRepository.save(user);
-    }
 }
 

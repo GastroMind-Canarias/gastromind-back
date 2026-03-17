@@ -4,7 +4,11 @@ spring:
     username: myuser
     password: secret
     driver-class-name: org.postgresql.Driver
+  sql:
+    init:
+      mode: always
   jpa:
+    defer-datasource-initialization: true
     hibernate:
       ddl-auto: update
     show-sql: true
@@ -31,3 +35,7 @@ app:
       - "http://localhost:3000"
       - "http://localhost:4200"
       - "http://localhost:8081"
+
+server:
+  port: 8080
+  address: 0.0.0.0

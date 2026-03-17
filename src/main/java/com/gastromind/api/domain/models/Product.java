@@ -4,20 +4,7 @@ public class Product {
     String id;
     String name;
     boolean is_essential;
-    Allergen allerge;
-
-    /**
-     * Constructor con todos los parametros
-     * 
-     * @param id           id del producto
-     * @param name         nombre del producto
-     * @param is_essential si el producto es esencial
-     */
-    public Product(String id, String name, boolean is_essential) {
-        this.id = id;
-        this.name = name;
-        this.is_essential = is_essential;
-    }
+    Allergen allergen;
 
     /**
      * Constructor con id
@@ -26,6 +13,21 @@ public class Product {
      */
     public Product(String id) {
         this.id = id;
+    }
+
+    /**
+     * Constructor con todos los parametros
+     * 
+     * @param id           id del producto
+     * @param name         nombre del producto
+     * @param is_essential si el producto es esencial
+     * @param allergen     Alergenos del producto
+     */
+    public Product(String id, String name, boolean is_essential, Allergen allergen) {
+        this.id = id;
+        this.name = name;
+        this.is_essential = is_essential;
+        this.allergen = allergen;
     }
 
     /**
@@ -81,6 +83,14 @@ public class Product {
         } else if (!id.equals(other.id))
             return false;
         return true;
+    }
+
+    public Allergen getAllergen() {
+        return allergen;
+    }
+
+    public void setAllergen(Allergen allerge) {
+        this.allergen = allerge;
     }
 
 }
