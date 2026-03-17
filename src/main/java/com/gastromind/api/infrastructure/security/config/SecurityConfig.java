@@ -44,12 +44,15 @@ public class SecurityConfig {
     @Bean
     public UserDetailsService userDetailsService(UserAdapter userRepository) {
         return username -> {
-            User user = userRepository.findByName(username).orElseThrow(()-> new NotFoundException("Usuario no encontrado")); // TODO: pedir user por name
+            User user = userRepository.findByName(username)
+                    .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+            String roleName = user.getRole().name();
 
             return org.springframework.security.core.userdetails.User
                     .withUsername(user.getName())
                     .password(user.getPassword())
-                    .authorities(user.getRole().toString())
+                    .authorities(roleName)
                     .build();
         };
     }

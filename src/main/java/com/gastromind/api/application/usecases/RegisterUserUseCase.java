@@ -13,8 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.UUID;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
@@ -45,7 +44,7 @@ public class RegisterUserUseCase {
         houseHold.setName(request.householdName());
         houseHold.setMembers(1);
         var nuevoHogar = householdService.create(houseHold);
-            
+
         String passwordHash = passwordEncoder.encode(request.password());
 
         User user = new User();
@@ -54,8 +53,18 @@ public class RegisterUserUseCase {
         user.setPassword(passwordHash);
         user.setHouseHold_id(nuevoHogar);
         user.setRole(request.role());
-        User nuevoUsuario = userService.create(user);
 
-        
+        if (request.allergenIds() != null && !request.allergenIds().isEmpty()) {
+            Set<Allergen> allergens = request.allergenIds().stream()
+                    .map(allergenService::findById)
+                    .collect(Collectors.toSet());
+
+            allergens.forEach(user::addAllergen);
+        }
+        userService.create(user);
+
+        Fridge fridge = new Fridge();
+        fridge.setHouseHold_id(nuevoHogar);
+        fridgeService.create(fridge);
     }
 }

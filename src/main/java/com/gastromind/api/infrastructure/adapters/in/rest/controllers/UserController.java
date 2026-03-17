@@ -2,9 +2,12 @@ package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
 import java.util.List;
 
+import com.gastromind.api.domain.models.enums.Role;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import com.gastromind.api.application.services.UserServiceImpl;
@@ -31,57 +34,70 @@ public class UserController {
     @Autowired
     private UserRestMapper userMapper;
 
-    @Operation(summary = "Obtener todos los usuarios", description = "Devuelve una lista completa de todos los usuarios registrados.")
+    @Operation(summary = "Obtener mi perfil", description = "Devuelve la información del usuario autenticado basándose en el token JWT.")
+    @ApiStandardDoc
+    @GetMapping("/me")
+    public ResponseEntity<UserResponse> getMyProfile(Authentication authentication) {
+        if (authentication == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String username = authentication.getName();
+        User user = userServiceImpl.findByUsername(username);
+        return ResponseEntity.ok(userMapper.toResponse(user));
+    }
+
+    @Operation(summary = "Buscar usuario por ID (Solo ADMIN)", description = "Permite a un administrador consultar cualquier perfil por su ID.")
+    @ApiStandardDoc
+    @GetMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserResponse> getById(@Parameter(description = "ID del usuario a buscar") @PathVariable String id) {
+        User user = userServiceImpl.findById(id);
+        return ResponseEntity.ok(userMapper.toResponse(user));
+    }
+
+    @Operation(summary = "Actualizar mi perfil", description = "Permite al usuario modificar su nombre, email y alérgenos.")
+    @ApiStandardDoc
+    @PatchMapping("/me/profile")
+    public ResponseEntity<UserResponse> updateMyProfile(Authentication authentication, @Valid @RequestBody UserRequest request) {
+        String authName = authentication.getName();
+        System.out.println("DEBUG: Buscando por username del token -> " + authName);
+
+        User existingUser = userServiceImpl.findByUsername(authName);
+        System.out.println("DEBUG: Usuario encontrado: " + existingUser.getName());
+        System.out.println("DEBUG: ID del usuario recuperado -> " + existingUser.getId()); // <-- SI ESTO ES NULL, AQUÍ ESTÁ EL ERROR
+
+        User userChanges = userMapper.toDomain(request);
+        User updatedUser = userServiceImpl.updateProfile(existingUser.getId(), userChanges);
+
+        return ResponseEntity.ok(userMapper.toResponse(updatedUser));
+    }
+
+    @Operation(summary = "Obtener todos los usuarios (Solo ADMIN)")
     @ApiStandardDoc
     @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> getAll() {
         List<User> users = userServiceImpl.findAll();
         return ResponseEntity.ok(userMapper.toResponseList(users));
     }
 
-    @Operation(summary = "Buscar usuario por ID", description = "Devuelve un único usuario basándose en su identificador único.")
-    @ApiStandardDoc
-    @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getById(
-            @Parameter(description = "ID del usuario a buscar", example = "1") @PathVariable String id) {
-        User user = userServiceImpl.findById(id);
-        return ResponseEntity.ok(userMapper.toResponse(user));
-    }
-
-    @Operation(summary = "Crear nuevo usuario", description = "Registra un nuevo usuario en el sistema.")
-    @ApiPostDoc
-    @PostMapping
-    public ResponseEntity<UserResponse> create(@Valid @RequestBody UserRequest request) {
-        User userDomain = userMapper.toDomain(request);
-        User savedUser = userServiceImpl.create(userDomain);
-        return ResponseEntity.status(HttpStatus.CREATED).body(userMapper.toResponse(savedUser));
-    }
-
-    @Operation(summary = "Actualizar perfil de usuario", description = "Modifica los campos name o email de un usuario existente.")
-    @ApiStandardDoc
-    @PatchMapping("/{id}/profile")
-    public ResponseEntity<UserResponse> updateProfile(
-            @PathVariable String id,
-            @RequestParam(required = false) String name,
-            @RequestParam(required = false) String email) {
-        User updatedUser = userServiceImpl.updateProfile(id, name, email);
-        return ResponseEntity.ok(userMapper.toResponse(updatedUser));
-    }
-
-    @Operation(summary = "Actualizar usuario", description = "Modifica los datos de un usuario existente.")
-    @ApiStandardDoc
-    @PutMapping("/{id}")
-    public ResponseEntity<UserResponse> update(@PathVariable String id, @Valid @RequestBody UserRequest request) {
-        User userDomain = userMapper.toDomain(request);
-        User updatedUser = userServiceImpl.update(id, userDomain);
-        return ResponseEntity.ok(userMapper.toResponse(updatedUser));
-    }
-
-    @Operation(summary = "Eliminar usuario", description = "Borra físicamente un usuario de la base de datos.")
+    @Operation(summary = "Eliminar usuario (Solo ADMIN)")
     @ApiStandardDoc
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable String id) {
         userServiceImpl.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Cambiar rol de usuario (Solo ADMIN)")
+    @PatchMapping("/{id}/role")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserResponse> changeUserRole(
+            @PathVariable String id,
+            @RequestParam Role newRole) {
+
+        User user = userServiceImpl.updateUserRole(id, newRole);
+        return ResponseEntity.ok(userMapper.toResponse(user));
     }
 }
