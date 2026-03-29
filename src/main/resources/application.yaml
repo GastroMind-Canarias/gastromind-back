@@ -1,6 +1,6 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/mydatabase
+    url: jdbc:postgresql://localhost:5433/gastromind_local
     username: myuser
     password: secret
     driver-class-name: org.postgresql.Driver
@@ -10,7 +10,7 @@ spring:
   jpa:
     defer-datasource-initialization: true
     hibernate:
-      ddl-auto: update
+      ddl-auto: create-drop
     show-sql: true
     properties:
       hibernate:
@@ -37,5 +37,5 @@ app:
       - "http://localhost:8081"
 
 server:
-  port: 8080
+  port: 8081
   address: 0.0.0.0

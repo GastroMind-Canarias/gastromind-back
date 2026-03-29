@@ -24,7 +24,7 @@ services:
     ports:
       - '${POSTGRES_PORT}:5432'
     volumes:
-      - pgdata-${ENV_NAME}:/var/lib/postgresql/data
+      - pgdata-${ENV_NAME}:/var/lib/postgresql
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${DB_NAME}" ]
       interval: 10s
@@ -46,9 +46,10 @@ services:
     ports:
       - '${PGADMIN_PORT}:80'
     depends_on:
-      - postgres
-      - redis
+      postgres:
+        condition: service_healthy
 
 volumes:
   pgdata-dev:
   pgdata-prod:
+  pgdata-local:
