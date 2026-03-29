@@ -55,11 +55,10 @@ public class RegisterUserUseCase {
         user.setRole(request.role());
 
         if (request.allergenIds() != null && !request.allergenIds().isEmpty()) {
-            Set<Allergen> allergens = request.allergenIds().stream()
-                    .map(allergenService::findById)
-                    .collect(Collectors.toSet());
-
-            allergens.forEach(user::addAllergen);
+            request.allergenIds().forEach(id -> {
+                Allergen allergen = allergenService.findById(id);
+                user.addAllergen(allergen);
+            });
         }
         userService.create(user);
 
