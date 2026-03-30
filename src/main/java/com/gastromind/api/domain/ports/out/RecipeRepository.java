@@ -1,9 +1,9 @@
 package com.gastromind.api.domain.ports.out;
 
+import com.gastromind.api.domain.models.Recipe;
+
 import java.util.List;
 import java.util.Optional;
-
-import com.gastromind.api.domain.models.Recipe;
 
 public interface RecipeRepository {
     Recipe save(Recipe recipe);

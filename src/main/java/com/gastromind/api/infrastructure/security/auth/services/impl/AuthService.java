@@ -1,8 +1,6 @@
 package com.gastromind.api.infrastructure.security.auth.services.impl;
 
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.UserEntity;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.UserJpaRepository;
-import com.gastromind.api.infrastructure.security.auth.dtos.RegisterRequest;
 import com.gastromind.api.infrastructure.security.auth.services.IAuthService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;

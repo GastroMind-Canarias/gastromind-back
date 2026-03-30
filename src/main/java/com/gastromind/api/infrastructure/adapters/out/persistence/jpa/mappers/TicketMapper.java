@@ -1,12 +1,11 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers;
 
-import java.util.List;
-
+import com.gastromind.api.domain.models.Ticket;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.TicketEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.gastromind.api.domain.models.Ticket;
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.TicketEntity;
+import java.util.List;
 
 // Usamos los mappers de User y Store para resolver las relaciones internas
 @Mapper(componentModel = "spring", uses = {UserMapper.class, StoreMapper.class})

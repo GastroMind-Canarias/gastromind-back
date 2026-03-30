@@ -1,21 +1,30 @@
 package com.gastromind.api.domain.models;
 
+import com.gastromind.api.domain.models.enums.Appliance;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+
 public class HouseHold {
     String id;
     String name;
     int members;
+    private List<Appliance> appliances = new ArrayList<>();
 
     /**
      * Constructor con todos los parametros
      * 
-     * @param id      id de la casa
-     * @param name    nombere de la casa
-     * @param members miembros de la casa
+     * @param id         id de la casa
+     * @param name       nombere de la casa
+     * @param members    miembros de la casa
+     * @param appliances utensilios de la casa
      */
-    public HouseHold(String id, String name, int members) {
+    public HouseHold(String id, String name, int members, List<Appliance> appliances) {
         this.id = id;
         this.name = name;
         this.members = members;
+        this.appliances = appliances;
     }
 
     /**
@@ -57,29 +66,28 @@ public class HouseHold {
         this.members = members;
     }
 
+    public List<Appliance> getAppliances() {
+        return appliances;
+    }
+
+    public void setAppliances(List<Appliance> appliances) {
+        this.appliances = appliances;
+    }
+
+    public void addAppliance(Appliance appliance) {
+        if (this.appliances == null) this.appliances = new ArrayList<>();
+        this.appliances.add(appliance);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        HouseHold houseHold = (HouseHold) o;
+        return Objects.equals(getId(), houseHold.getId());
+    }
+
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        return result;
+        return Objects.hashCode(getId());
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        HouseHold other = (HouseHold) obj;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        return true;
-    }
-
 }

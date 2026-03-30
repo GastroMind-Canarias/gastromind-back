@@ -1,15 +1,14 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa;
 
-import java.util.List;
-import java.util.Optional;
-
+import com.gastromind.api.domain.ports.out.StoreRepository;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.StoreEntity;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers.StoreMapper;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.StoreJpaRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import com.gastromind.api.domain.ports.out.StoreRepository;
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.StoreEntity;
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.StoreJpaRepository;
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers.StoreMapper;
+import java.util.List;
+import java.util.Optional;
 @Component
 public class StoreAdapter implements StoreRepository {
 

@@ -1,15 +1,14 @@
 package com.gastromind.api.infrastructure.security.auth.dtos;
 
-import java.util.List;
-
-import com.gastromind.api.domain.models.Allergen;
+import com.gastromind.api.domain.models.enums.Appliance;
 import com.gastromind.api.domain.models.enums.Role;
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.RoleType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+
+import java.util.List;
 
 @Schema(description = "Datos necesarios para registrar un nuevo usuario en el sistema")
 public record RegisterRequest(
@@ -38,5 +37,8 @@ public record RegisterRequest(
         String householdName,
 
         @Schema(example = "[\"uuid-alergeno-1\", \"uuid-alergeno-2\"]", description = "Lista de IDs de alérgenos del usuario")
-        List<String> allergenIds
+        List<String> allergenIds,
+
+        @Schema(example = "[\"HORNO\", \"AIR_FRYER\"]", description = "Lista de utensilios del hogar")
+        List<Appliance> applianceTypes
 ) {}

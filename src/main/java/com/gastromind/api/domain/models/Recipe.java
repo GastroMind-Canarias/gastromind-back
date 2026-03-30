@@ -1,8 +1,8 @@
 package com.gastromind.api.domain.models;
 
-import java.time.LocalDate;
-
 import com.gastromind.api.domain.models.enums.Appliance;
+
+import java.time.LocalDate;
 
 public class Recipe {
     String id;

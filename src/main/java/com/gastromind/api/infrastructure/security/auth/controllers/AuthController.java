@@ -1,13 +1,12 @@
 package com.gastromind.api.infrastructure.security.auth.controllers;
 
+import com.gastromind.api.application.usecases.RegisterUserUseCase;
+import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
 import com.gastromind.api.infrastructure.security.auth.dtos.LoginRequest;
 import com.gastromind.api.infrastructure.security.auth.dtos.RegisterRequest;
 import com.gastromind.api.infrastructure.security.auth.dtos.TokenResponse;
 import com.gastromind.api.infrastructure.security.auth.services.IAuthService;
 import com.gastromind.api.infrastructure.security.auth.services.IJwtService;
-import com.gastromind.api.application.usecases.RegisterUserUseCase;
-import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
-import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -51,7 +50,7 @@ public class AuthController {
     @ApiPostDoc
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
-        registerUserUseCase.registrarUsuarioCompleto(request);
+        registerUserUseCase.exec(request);
         return ResponseEntity.status(HttpStatus.CREATED).body("Usuario registrado con exito");
     }
 }

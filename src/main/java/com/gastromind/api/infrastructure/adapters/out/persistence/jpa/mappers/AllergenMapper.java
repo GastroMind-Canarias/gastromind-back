@@ -1,10 +1,11 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.ReportingPolicy;
-import java.util.List; // Importante añadir la importación
 import com.gastromind.api.domain.models.Allergen;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.AllergenEntity;
+import org.mapstruct.Mapper;
+import org.mapstruct.ReportingPolicy;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface AllergenMapper {

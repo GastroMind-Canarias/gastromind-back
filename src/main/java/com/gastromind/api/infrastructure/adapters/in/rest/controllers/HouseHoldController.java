@@ -1,31 +1,29 @@
 package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import com.gastromind.api.application.services.HouseHoldServiceImpl;
 import com.gastromind.api.domain.models.HouseHold;
 import com.gastromind.api.domain.models.HouseholdAppliance;
 import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.enums.Appliance;
+import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
+import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.household.ApplianceResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.household.HouseHoldRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.household.HouseHoldResponse;
-import com.gastromind.api.infrastructure.adapters.in.rest.dtos.household.ApplianceResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.user.UserResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.HouseHoldRestMapper;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.HouseholdApplianceRestMapper;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.UserRestMapper;
-import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
-import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/households")

@@ -1,10 +1,10 @@
 package com.gastromind.api.domain.ports.in;
 
-import java.util.List;
-
 import com.gastromind.api.domain.models.Allergen;
 import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.enums.Role;
+
+import java.util.List;
 
 public interface IUserService {
     List<User> findAll();
