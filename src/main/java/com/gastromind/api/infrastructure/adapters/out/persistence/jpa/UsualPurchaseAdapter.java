@@ -1,16 +1,15 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.gastromind.api.domain.models.UsualPurchase;
 import com.gastromind.api.domain.ports.out.UsualPurchaseRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.UsualPurchaseEntity;
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.UsualPurchaseJpaRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers.UsualPurchaseMapper;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.UsualPurchaseJpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Optional;
 
 @Component
 public class UsualPurchaseAdapter implements UsualPurchaseRepository {

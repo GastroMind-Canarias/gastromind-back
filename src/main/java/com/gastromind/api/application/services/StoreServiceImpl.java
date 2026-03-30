@@ -1,13 +1,12 @@
 package com.gastromind.api.application.services;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.models.Store;
 import com.gastromind.api.domain.ports.in.IStoreService;
 import com.gastromind.api.domain.ports.out.StoreRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class StoreServiceImpl implements IStoreService {

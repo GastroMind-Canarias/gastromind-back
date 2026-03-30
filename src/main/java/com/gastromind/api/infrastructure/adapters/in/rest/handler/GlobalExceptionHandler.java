@@ -4,7 +4,6 @@ import com.gastromind.api.domain.exceptions.ForbiddenException;
 import com.gastromind.api.domain.exceptions.ImageProcessingException;
 import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.exceptions.UnsupportedUnitException;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;

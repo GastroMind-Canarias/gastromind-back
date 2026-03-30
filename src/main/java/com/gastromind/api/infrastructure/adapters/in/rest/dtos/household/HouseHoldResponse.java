@@ -1,6 +1,9 @@
 package com.gastromind.api.infrastructure.adapters.in.rest.dtos.household;
 
+import com.gastromind.api.domain.models.enums.Appliance;
 import io.swagger.v3.oas.annotations.media.Schema;
+
+import java.util.List;
 
 @Schema(description = "Respuesta detallada del hogar")
 public record HouseHoldResponse(
@@ -9,6 +12,8 @@ public record HouseHoldResponse(
         @Schema(example = "Hogar de Cesar")
         String name,
         @Schema(example = "2")
-        int members
+        int members,
+        @Schema(example = "[\"HORNO\", \"AIR_FRYER\"]", description = "Lista de utensilios del hogar")
+        List<Appliance> appliances
 ) {
 }

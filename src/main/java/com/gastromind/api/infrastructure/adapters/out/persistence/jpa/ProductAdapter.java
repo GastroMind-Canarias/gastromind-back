@@ -1,16 +1,15 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-
 import com.gastromind.api.domain.models.Product;
 import com.gastromind.api.domain.ports.out.ProductRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.ProductEntity;
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.ProductJpaRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers.ProductMapper;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.ProductJpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Optional;
 @Component
 public class ProductAdapter implements ProductRepository {
 

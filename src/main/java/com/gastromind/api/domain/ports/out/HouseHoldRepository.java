@@ -1,9 +1,9 @@
 package com.gastromind.api.domain.ports.out;
 
+import com.gastromind.api.domain.models.HouseHold;
+
 import java.util.List;
 import java.util.Optional;
-
-import com.gastromind.api.domain.models.HouseHold;
 
 public interface HouseHoldRepository {
     HouseHold save(HouseHold houseHold);

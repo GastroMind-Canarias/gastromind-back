@@ -1,12 +1,5 @@
 package com.gastromind.api.application.services;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.models.FridgeItem;
 import com.gastromind.api.domain.models.Product;
@@ -15,6 +8,12 @@ import com.gastromind.api.domain.ports.out.FridgeItemRepository;
 import com.gastromind.api.domain.ports.out.FridgeRepository;
 import com.gastromind.api.domain.ports.out.ProductRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.List;
 
 @Service
 public class FridgeItemServiceImpl implements IFridgeItemService {

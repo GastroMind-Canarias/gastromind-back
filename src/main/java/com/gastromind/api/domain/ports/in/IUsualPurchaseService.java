@@ -1,8 +1,8 @@
 package com.gastromind.api.domain.ports.in;
 
-import java.util.List;
-
 import com.gastromind.api.domain.models.UsualPurchase;
+
+import java.util.List;
 
 public interface IUsualPurchaseService {
     List<UsualPurchase> findAll();

@@ -1,6 +1,7 @@
 package com.gastromind.api.infrastructure.adapters.in.rest.dtos.usualpurchase;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+
 import java.math.BigDecimal;
 
 @Schema(description = "Respuesta de la configuración de compra habitual")

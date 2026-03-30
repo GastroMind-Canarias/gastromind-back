@@ -1,12 +1,11 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers;
 
-import java.util.List;
-
+import com.gastromind.api.domain.models.User;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.gastromind.api.domain.models.User;
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.UserEntity;
+import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {HouseholdMapper.class})
 public interface UserMapper {

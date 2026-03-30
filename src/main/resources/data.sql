@@ -45,9 +45,9 @@ ON CONFLICT DO NOTHING;
 INSERT INTO users (id, name, email, password, role, household_id)
 VALUES (
     gen_random_uuid(),
-    'Guillermo',
-    'guillermo@mail.com',
-    '$2a$10$8.UnVuG9HHgffUDAlk8qfOuVGkqRzgVymGe07xd00DMxs.7uqqvS2', -- Hash de 'password'
+    'admin',
+    'gastromind@gmail.com',
+    '$2a$10$fS4mC6.L7SInuT9Nn6/m6.yD6j7kHhXkZq7QGzR4L6y5N6/m6.yD6', -- Hash de '12345678'
     0,
     (SELECT id FROM household WHERE name = 'Familia GastroMind' LIMIT 1)
 ) ON CONFLICT DO NOTHING;

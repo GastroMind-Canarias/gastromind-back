@@ -1,12 +1,11 @@
 package com.gastromind.api.domain.ports.in;
 
-import java.util.List;
-
 import com.gastromind.api.domain.models.HouseHold;
-import com.gastromind.api.domain.models.User;
-
 import com.gastromind.api.domain.models.HouseholdAppliance;
+import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.enums.Appliance;
+
+import java.util.List;
 
 public interface IHouseHoldService {
     List<HouseHold> findAll();

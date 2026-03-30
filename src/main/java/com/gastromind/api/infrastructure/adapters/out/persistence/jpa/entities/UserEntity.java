@@ -1,11 +1,11 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities;
 
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.RoleType;
+import jakarta.persistence.*;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.RoleType;
-import jakarta.persistence.*;
 
 @Entity
 @Table(name = "users")

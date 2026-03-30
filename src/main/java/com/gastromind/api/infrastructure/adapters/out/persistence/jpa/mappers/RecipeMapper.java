@@ -1,12 +1,11 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers;
 
-import java.util.List;
-
+import com.gastromind.api.domain.models.Recipe;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.RecipeEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
-import com.gastromind.api.domain.models.Recipe;
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.RecipeEntity;
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface RecipeMapper {

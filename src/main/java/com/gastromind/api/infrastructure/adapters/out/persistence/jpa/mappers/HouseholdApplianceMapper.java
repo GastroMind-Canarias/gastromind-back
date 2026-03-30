@@ -18,6 +18,5 @@ public interface HouseholdApplianceMapper {
     HouseholdAppliance toDomain(HouseholdApplianceEntity entity);
 
     List<HouseholdApplianceEntity> toEntityList(List<HouseholdAppliance> domainList);
-
     List<HouseholdAppliance> toDomainList(List<HouseholdApplianceEntity> entityList);
 }

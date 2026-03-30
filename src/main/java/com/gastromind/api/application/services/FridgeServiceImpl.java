@@ -1,14 +1,12 @@
 package com.gastromind.api.application.services;
 
-import java.util.List;
-
-import org.springframework.stereotype.Service;
-
 import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.models.Fridge;
-
 import com.gastromind.api.domain.ports.in.IFridgeService;
 import com.gastromind.api.domain.ports.out.FridgeRepository;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class FridgeServiceImpl implements IFridgeService {

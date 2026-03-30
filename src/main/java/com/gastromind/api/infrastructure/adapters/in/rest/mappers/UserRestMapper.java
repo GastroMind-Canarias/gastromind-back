@@ -1,7 +1,7 @@
 package com.gastromind.api.infrastructure.adapters.in.rest.mappers;
 
-import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.Allergen;
+import com.gastromind.api.domain.models.User;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.allergen.AllergenResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.user.UserRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.user.UserResponse;

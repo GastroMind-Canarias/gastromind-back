@@ -1,7 +1,8 @@
 package com.gastromind.api.domain.ports.in;
-import java.util.List;
 
 import com.gastromind.api.domain.models.Fridge;
+
+import java.util.List;
 
 public interface IFridgeService {
     List<Fridge> findAll();

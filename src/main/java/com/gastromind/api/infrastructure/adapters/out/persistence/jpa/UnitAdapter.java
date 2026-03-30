@@ -1,16 +1,15 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.gastromind.api.domain.models.Unit;
 import com.gastromind.api.domain.ports.out.UnitRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.UnitEntity;
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.UnitJpaRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers.UnitMapper;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.UnitJpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Optional;
 @Component
 public class UnitAdapter implements UnitRepository {
 

@@ -1,11 +1,10 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers;
 
-import java.util.List;
-
-import org.mapstruct.Mapper;
-
 import com.gastromind.api.domain.models.UserFavorites;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.UserFavoritesEntity;
+import org.mapstruct.Mapper;
+
+import java.util.List;
 
 @Mapper(componentModel = "spring")
 public interface UserFavoritesMapper {

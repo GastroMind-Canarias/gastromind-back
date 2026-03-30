@@ -1,9 +1,9 @@
 package com.gastromind.api.domain.ports.out;
 
+import com.gastromind.api.domain.models.UserFavorites;
+
 import java.util.List;
 import java.util.Optional;
-
-import com.gastromind.api.domain.models.UserFavorites;
 
 public interface UserFavoritesRepository {
     /**

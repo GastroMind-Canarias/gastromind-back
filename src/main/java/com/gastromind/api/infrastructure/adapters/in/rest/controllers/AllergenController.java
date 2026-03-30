@@ -1,24 +1,22 @@
 package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
-import java.util.List;
-
+import com.gastromind.api.application.services.AllergenServiceImpl;
+import com.gastromind.api.domain.models.Allergen;
+import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
+import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.allergen.AllergenRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.allergen.AllergenResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.AllergenRestMapper;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.gastromind.api.application.services.AllergenServiceImpl;
-import com.gastromind.api.domain.models.Allergen;
-import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
-import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
-
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/allergens")

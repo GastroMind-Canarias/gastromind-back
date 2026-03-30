@@ -1,8 +1,9 @@
 package com.gastromind.api.domain.models;
 
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
 
 public class FridgeItem {
     private String id;

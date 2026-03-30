@@ -1,15 +1,10 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities;
 
+import jakarta.persistence.*;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
+import java.util.Objects;
 
 @Entity
 @Table(name = "household")
@@ -28,7 +23,7 @@ public class HouseholdEntity {
     private List<FridgeEntity> fridges = new ArrayList<>();
 
     @OneToMany(mappedBy = "household", cascade = CascadeType.ALL)
-    private List<HouseholdApplianceEntity> aplliances = new ArrayList<>();
+    private List<HouseholdApplianceEntity> appliances = new ArrayList<>();
 
     public HouseholdEntity() {
     }
@@ -39,13 +34,13 @@ public class HouseholdEntity {
 
     public HouseholdEntity(String id, String name, int members_count, List<UserEntity> users,
             List<FridgeEntity> fridges,
-            List<HouseholdApplianceEntity> aplliances) {
+            List<HouseholdApplianceEntity> appliances) {
         this.id = id;
         this.name = name;
         this.members_count = members_count;
         this.users = users;
         this.fridges = fridges;
-        this.aplliances = aplliances;
+        this.appliances = appliances;
     }
 
     public String getId() {
@@ -88,37 +83,23 @@ public class HouseholdEntity {
         this.fridges = fridges;
     }
 
-    public List<HouseholdApplianceEntity> getAplliances() {
-        return aplliances;
+    public List<HouseholdApplianceEntity> getAppliances() {
+        return appliances;
     }
 
-    public void setAplliances(List<HouseholdApplianceEntity> aplliances) {
-        this.aplliances = aplliances;
+    public void setAppliances(List<HouseholdApplianceEntity> appliances) {
+        this.appliances = appliances;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        HouseholdEntity that = (HouseholdEntity) o;
+        return Objects.equals(getId(), that.getId());
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((id == null) ? 0 : id.hashCode());
-        return result;
+        return Objects.hashCode(getId());
     }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
-        HouseholdEntity other = (HouseholdEntity) obj;
-        if (id == null) {
-            if (other.id != null)
-                return false;
-        } else if (!id.equals(other.id))
-            return false;
-        return true;
-    }
-
 }

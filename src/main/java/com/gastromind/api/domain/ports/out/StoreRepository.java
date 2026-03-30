@@ -1,9 +1,9 @@
 package com.gastromind.api.domain.ports.out;
 
+import com.gastromind.api.domain.models.Store;
+
 import java.util.List;
 import java.util.Optional;
-
-import com.gastromind.api.domain.models.Store;
 
 public interface StoreRepository {
     Store save(Store store);
