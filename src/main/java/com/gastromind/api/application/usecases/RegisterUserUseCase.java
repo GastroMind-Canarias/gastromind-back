@@ -3,6 +3,7 @@ package com.gastromind.api.application.usecases;
 import com.gastromind.api.domain.models.Allergen;
 import com.gastromind.api.domain.models.HouseHold;
 import com.gastromind.api.domain.models.User;
+import com.gastromind.api.domain.models.enums.Role;
 import com.gastromind.api.domain.ports.in.IAllergenService;
 import com.gastromind.api.domain.ports.in.IHouseHoldService;
 import com.gastromind.api.domain.ports.in.IUserService;
@@ -34,7 +35,6 @@ public class RegisterUserUseCase {
     public void exec(RegisterRequest request) {
         HouseHold houseHold = new HouseHold();
         houseHold.setName(request.householdName());
-        houseHold.setMembers(1);
         var nuevoHogar = householdService.create(houseHold);
 
         if (request.applianceTypes() != null && !request.applianceTypes().isEmpty()) {
@@ -50,7 +50,7 @@ public class RegisterUserUseCase {
         user.setEmail(request.email());
         user.setPassword(passwordHash);
         user.setHouseHold_id(nuevoHogar);
-        user.setRole(request.role());
+        user.setRole(Role.ROLE_OWNER);
 
         if (request.allergenIds() != null && !request.allergenIds().isEmpty()) {
             request.allergenIds().forEach(id -> {

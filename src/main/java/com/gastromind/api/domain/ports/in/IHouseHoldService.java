@@ -14,12 +14,13 @@ public interface IHouseHoldService {
 
     HouseHold create(HouseHold houseHold);
 
-    HouseHold update(String id, HouseHold houseHold);
-
     void delete(String id);
 
-    // New methods
-    HouseHold createWithCreator(HouseHold houseHold, String creatorUserId);
+    void removeMember(String ownerId, String memberUserId);
+
+    User promoteToOwner(String householdId, String userId);
+
+    User addMemberByToken(String token, String userId);
 
     HouseholdAppliance addAppliance(String householdId, Appliance appliance);
 
@@ -31,7 +32,7 @@ public interface IHouseHoldService {
 
     String generateInviteToken(String householdId);
 
-    void removeMember(String ownerId, String householdId, String memberUserId);
-
     User addMember(String householdId, String userId);
+
+    void leaveHousehold(String userId);
 }

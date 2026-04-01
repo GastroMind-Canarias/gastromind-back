@@ -1,6 +1,7 @@
 package com.gastromind.api.infrastructure.adapters.in.rest.dtos.household;
 
 import com.gastromind.api.domain.models.enums.Appliance;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.user.UserResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
@@ -11,8 +12,10 @@ public record HouseHoldResponse(
         String id,
         @Schema(example = "Hogar de Cesar")
         String name,
-        @Schema(example = "2")
-        int members,
+        @Schema(description = "Numero de miembros del hogar", example = "2")
+        int membersCount,
+        @Schema(description = "Lista de miembros del hogar")
+        List<UserResponse> members,
         @Schema(example = "[\"HORNO\", \"AIR_FRYER\"]", description = "Lista de utensilios del hogar")
         List<Appliance> appliances
 ) {

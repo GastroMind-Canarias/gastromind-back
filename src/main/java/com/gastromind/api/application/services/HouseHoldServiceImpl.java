@@ -14,12 +14,15 @@ import com.gastromind.api.domain.ports.out.HouseHoldRepository;
 import com.gastromind.api.domain.ports.out.HouseholdApplianceRepository;
 import com.gastromind.api.domain.ports.out.UserRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
 
 @Service
 public class HouseHoldServiceImpl implements IHouseHoldService {
+    private static final String INVITE_TOKEN_PREFIX = "invite_";
+    private static final String INVITE_TOKEN_SEPARATOR = "_";
 
     private final HouseHoldRepository repository;
     private final UserRepository userRepository;
@@ -58,28 +61,64 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
     }
 
     @Override
-    public HouseHold update(String id, HouseHold houseHold) {
-        findById(id);
-        houseHold.setId(id);
-        return repository.save(houseHold);
-    }
-
-    @Override
     public void delete(String id) {
-        findById(id);
+        HouseHold houseHold = findById(id);
+        List<User> members = userRepository.findByHouseholdId(id);
+        members.forEach(m -> {
+            m.setHouseHold_id(null);
+            m.setRole(Role.ROLE_MEMBER);
+            userRepository.save(m);
+        });
         repository.deleteById(id);
     }
 
     @Override
-    public HouseHold createWithCreator(HouseHold houseHold, String creatorUserId) {
-        HouseHold savedHouseHold = repository.save(houseHold);
-        createFridge(savedHouseHold);
-        User creator = userRepository.findById(creatorUserId)
-                .orElseThrow(() -> new NotFoundException("Usuario creador no encontrado"));
-        creator.setHouseHold_id(savedHouseHold);
-        creator.setRole(Role.ROLE_OWNER);
-        userRepository.save(creator);
-        return savedHouseHold;
+    public void removeMember(String householdId, String memberUserId) {
+        User member = userRepository.findById(memberUserId)
+                .orElseThrow(() -> new NotFoundException("Miembro no encontrado"));
+
+        if (member.getHouseHold_id() == null || !member.getHouseHold_id().getId().equals(householdId)) {
+            throw new NotFoundException("El usuario no pertenece a este hogar");
+        }
+
+        member.setHouseHold_id(null);
+        member.setRole(Role.ROLE_MEMBER);
+        userRepository.save(member);
+    }
+
+    @Override
+    public User promoteToOwner(String householdId, String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        if (user.getHouseHold_id() == null || !user.getHouseHold_id().getId().equals(householdId)) {
+            throw new ForbiddenException("El usuario debe pertenecer al hogar para ser promovido");
+        }
+
+        user.setRole(Role.ROLE_OWNER);
+        return userRepository.save(user);
+    }
+
+    @Override
+    public User addMemberByToken(String token, String userId) {
+        if (token == null || token.isBlank()) {
+            throw new IllegalArgumentException("El token de invitación es obligatorio");
+        }
+        if (!token.startsWith(INVITE_TOKEN_PREFIX)) {
+            throw new IllegalArgumentException("El token de invitación no tiene un formato válido");
+        }
+
+        int separatorIndex = token.lastIndexOf(INVITE_TOKEN_SEPARATOR);
+        if (separatorIndex < 0 || separatorIndex == token.length() - 1) {
+            throw new IllegalArgumentException("El token de invitación no contiene un hogar válido");
+        }
+
+        String householdId = token.substring(separatorIndex + 1);
+        if (householdId.isBlank()) {
+            throw new IllegalArgumentException("El token de invitación no contiene un hogar válido");
+        }
+
+        return addMember(householdId, userId);
     }
 
     @Override
@@ -108,30 +147,8 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
 
     @Override
     public String generateInviteToken(String householdId) {
-
         findById(householdId);
-        // Generamos un token simple vinculado al householdId
-        return UUID.randomUUID().toString() + "-" + householdId;
-    }
-
-    @Override
-    public void removeMember(String ownerId, String householdId, String memberUserId) {
-        User owner = userRepository.findById(ownerId)
-                .orElseThrow(() -> new NotFoundException("Propietario no encontrado"));
-        if (!Role.ROLE_OWNER.equals(owner.getRole()) || owner.getHouseHold_id() == null
-                || !owner.getHouseHold_id().getId().equals(householdId)) {
-            throw new ForbiddenException("Solo el propietario del hogar puede eliminar miembros");
-        }
-
-        User member = userRepository.findById(memberUserId)
-                .orElseThrow(() -> new NotFoundException("Miembro no encontrado"));
-        if (member.getHouseHold_id() == null || !member.getHouseHold_id().getId().equals(householdId)) {
-            throw new NotFoundException("El usuario no pertenece a este hogar");
-        }
-
-        member.setHouseHold_id(null);
-        member.setRole(Role.ROLE_MEMBER); // Volvemos a un rol por defecto
-        userRepository.save(member);
+        return INVITE_TOKEN_PREFIX + UUID.randomUUID() + INVITE_TOKEN_SEPARATOR + householdId;
     }
 
     @Override
@@ -143,5 +160,20 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
         user.setHouseHold_id(houseHold);
         user.setRole(Role.ROLE_MEMBER);
         return userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void leaveHousehold(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+
+        if (user.getHouseHold_id() == null) {
+            throw new ForbiddenException("El usuario no pertenece a ningún hogar");
+        }
+
+        user.setHouseHold_id(null);
+        user.setRole(Role.ROLE_MEMBER);
+        userRepository.save(user);
     }
 }

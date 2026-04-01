@@ -14,10 +14,9 @@ public class HouseholdEntity {
     private String id;
 
     private String name;
-    private int members_count;
 
     @OneToMany(mappedBy = "household", cascade = CascadeType.ALL)
-    private List<UserEntity> users = new ArrayList<>();
+    private List<UserEntity> members = new ArrayList<>();
 
     @OneToMany(mappedBy = "household", cascade = CascadeType.ALL)
     private List<FridgeEntity> fridges = new ArrayList<>();
@@ -32,13 +31,12 @@ public class HouseholdEntity {
         this.id = id;
     }
 
-    public HouseholdEntity(String id, String name, int members_count, List<UserEntity> users,
+    public HouseholdEntity(String id, String name, List<UserEntity> members,
             List<FridgeEntity> fridges,
             List<HouseholdApplianceEntity> appliances) {
         this.id = id;
         this.name = name;
-        this.members_count = members_count;
-        this.users = users;
+        this.members = members;
         this.fridges = fridges;
         this.appliances = appliances;
     }
@@ -59,20 +57,15 @@ public class HouseholdEntity {
         this.name = name;
     }
 
-    public int getMembers_count() {
-        return members_count;
+    public List<UserEntity> getMembers() {
+        return members;
     }
 
-    public void setMembers_count(int members_count) {
-        this.members_count = members_count;
-    }
-
-    public List<UserEntity> getUsers() {
-        return users;
-    }
-
-    public void setUsers(List<UserEntity> users) {
-        this.users = users;
+    public void setMembers(List<UserEntity> members) {
+        this.members = members;
+        if (members != null) {
+            members.forEach(m -> m.setHousehold(this));
+        }
     }
 
     public List<FridgeEntity> getFridges() {
