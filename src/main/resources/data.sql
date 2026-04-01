@@ -2,8 +2,8 @@
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- 1. HOUSEHOLD
-INSERT INTO household (id, name, members_count)
-VALUES (gen_random_uuid(), 'Familia GastroMind', 3)
+INSERT INTO household (id, name)
+VALUES (gen_random_uuid(), 'Familia GastroMind')
 ON CONFLICT DO NOTHING;
 
 -- 2. CATEGORIES (Insertamos todas las principales)

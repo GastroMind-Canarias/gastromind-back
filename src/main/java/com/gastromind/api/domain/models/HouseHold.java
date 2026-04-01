@@ -9,7 +9,7 @@ import java.util.Objects;
 public class HouseHold {
     String id;
     String name;
-    int members;
+    List<User> members = new ArrayList<>();
     private List<Appliance> appliances = new ArrayList<>();
 
     /**
@@ -20,7 +20,7 @@ public class HouseHold {
      * @param members    miembros de la casa
      * @param appliances utensilios de la casa
      */
-    public HouseHold(String id, String name, int members, List<Appliance> appliances) {
+    public HouseHold(String id, String name, List<User> members, List<Appliance> appliances) {
         this.id = id;
         this.name = name;
         this.members = members;
@@ -58,11 +58,15 @@ public class HouseHold {
         this.name = name;
     }
 
-    public int getMembers() {
+    public int getMembersCount() {
+        return members != null ? members.size() : 0;
+    }
+
+    public List<User> getMembers() {
         return members;
     }
 
-    public void setMembers(int members) {
+    public void setMembers(List<User> members) {
         this.members = members;
     }
 

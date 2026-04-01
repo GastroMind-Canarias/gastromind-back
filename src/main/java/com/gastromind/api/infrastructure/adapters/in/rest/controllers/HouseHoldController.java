@@ -1,10 +1,13 @@
 package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
 import com.gastromind.api.application.services.HouseHoldServiceImpl;
+import com.gastromind.api.application.services.UserServiceImpl;
+import com.gastromind.api.domain.exceptions.ForbiddenException;
 import com.gastromind.api.domain.models.HouseHold;
 import com.gastromind.api.domain.models.HouseholdAppliance;
 import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.enums.Appliance;
+import com.gastromind.api.domain.models.enums.Role;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.household.ApplianceResponse;
@@ -21,135 +24,222 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/households")
-@Tag(name = "Unidad Familiar", description = "Gestión de las unidades familiares y la agrupación de usuarios.")
+@Tag(name = "Unidad Familiar")
 public class HouseHoldController {
 
     @Autowired
     private HouseHoldServiceImpl holdServiceImpl;
-
     @Autowired
     private HouseHoldRestMapper houseHoldMapper;
-
     @Autowired
     private HouseholdApplianceRestMapper applianceRestMapper;
-
     @Autowired
     private UserRestMapper userRestMapper;
+    @Autowired
+    private UserServiceImpl userServiceImpl;
 
-    @Operation(summary = "Obtener todas las unidades familiares", description = "Devuelve una lista completa de todas las unidades familiares registradas.")
-    @ApiStandardDoc
-    @GetMapping
-    public ResponseEntity<List<HouseHoldResponse>> getAll() {
-        List<HouseHold> households = holdServiceImpl.findAll();
-        return ResponseEntity.ok(houseHoldMapper.toResponseList(households));
+    private User getCurrentUser(Authentication authentication) {
+        if (authentication == null) {
+            authentication = SecurityContextHolder.getContext().getAuthentication();
+        }
+        if (authentication == null) {
+            throw new ForbiddenException("Usuario no autenticado");
+        }
+        return userServiceImpl.findByUsername(authentication.getName());
     }
 
-    @Operation(summary = "Buscar unidad familiar por ID", description = "Devuelve una única unidad familiar basándose en su identificador único.")
+    private String getCurrentHouseholdId(Authentication authentication) {
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser.getHouseHold_id() == null || currentUser.getHouseHold_id().getId() == null) {
+            throw new ForbiddenException("El usuario no pertenece a ningún hogar");
+        }
+        return currentUser.getHouseHold_id().getId();
+    }
+
+    @Operation(summary = "Listar todos los hogares (Solo ADMIN)")
+    @ApiStandardDoc
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<HouseHoldResponse>> getAll() {
+        return ResponseEntity.ok(houseHoldMapper.toResponseList(holdServiceImpl.findAll()));
+    }
+
+    @Operation(summary = "Eliminar unidad familiar (ADMIN/OWNER)")
+    @ApiStandardDoc
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> delete(@PathVariable String id) {
+        holdServiceImpl.delete(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Añadir dispositivo (ADMIN/OWNER)")
+    @ApiPostDoc
+    @PostMapping("/{id}/appliances")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApplianceResponse> addAppliance(@PathVariable String id, @RequestParam Appliance appliance) {
+        HouseholdAppliance saved = holdServiceImpl.addAppliance(id, appliance);
+        return ResponseEntity.status(HttpStatus.CREATED).body(applianceRestMapper.toResponse(saved));
+    }
+
+    @Operation(summary = "Expulsar miembro (ADMIN/OWNER)")
+    @ApiStandardDoc
+    @DeleteMapping("/{id}/members/{memberUserId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> removeMember(@PathVariable String id, @PathVariable String memberUserId) {
+        holdServiceImpl.removeMember(id, memberUserId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Generar token de invitación")
+    @ApiStandardDoc
+    @PostMapping("/{id}/invite")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<String> invite(@PathVariable String id) {
+        return ResponseEntity.ok(holdServiceImpl.generateInviteToken(id));
+    }
+
+    @Operation(summary = "Ascender a OWNER (ADMIN/OWNER)")
+    @ApiStandardDoc
+    @PatchMapping("/{id}/promote/{userId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<UserResponse> promoteToOwner(@PathVariable String id, @PathVariable String userId) {
+        User promoted = holdServiceImpl.promoteToOwner(id, userId);
+        return ResponseEntity.ok(userRestMapper.toResponse(promoted));
+    }
+
+    @Operation(summary = "Ver detalle del hogar (ADMIN/OWNER)")
     @ApiStandardDoc
     @GetMapping("/{id}")
-    public ResponseEntity<HouseHoldResponse> getById(
-            @Parameter(description = "ID de la unidad familiar a buscar", example = "1") @PathVariable String id) {
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<HouseHoldResponse> getById(@PathVariable String id) {
         HouseHold houseHold = holdServiceImpl.findById(id);
         return ResponseEntity.ok(houseHoldMapper.toResponse(houseHold));
     }
 
-    @Operation(summary = "Crear nueva unidad familiar", description = "Registra una nueva unidad familiar en el sistema.")
-    @ApiPostDoc
-    @PostMapping
-    public ResponseEntity<HouseHoldResponse> create(@Valid @RequestBody HouseHoldRequest request) {
-        HouseHold houseHoldDomain = houseHoldMapper.toDomain(request);
-        HouseHold savedHouseHold = holdServiceImpl.create(houseHoldDomain);
-        return ResponseEntity.status(HttpStatus.CREATED).body(houseHoldMapper.toResponse(savedHouseHold));
-    }
-
-    @Operation(summary = "Crear nueva unidad familiar con propietario", description = "Registra una nueva unidad familiar y vincula al creador como OWNER.")
-    @ApiPostDoc
-    @PostMapping("/create-with-owner")
-    public ResponseEntity<HouseHoldResponse> createWithOwner(@Valid @RequestBody HouseHoldRequest request,
-            @RequestParam String userId) {
-        HouseHold houseHoldDomain = houseHoldMapper.toDomain(request);
-        HouseHold savedHouseHold = holdServiceImpl.createWithCreator(houseHoldDomain, userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(houseHoldMapper.toResponse(savedHouseHold));
-    }
-
-    @Operation(summary = "Listar miembros del hogar", description = "Recupera todos los usuarios que pertenecen a una unidad familiar específica.")
+    @Operation(summary = "Listar miembros del hogar")
     @ApiStandardDoc
     @GetMapping("/{id}/members")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> listMembers(@PathVariable String id) {
         List<User> members = holdServiceImpl.listMembers(id);
         return ResponseEntity.ok(userRestMapper.toResponseList(members));
     }
 
-    @Operation(summary = "Añadir miembro al hogar", description = "Víncula un usuario a una unidad familiar específica.")
+    @Operation(summary = "Crear nuevo hogar")
     @ApiPostDoc
-    @PostMapping("/{id}/members/{userId}")
-    public ResponseEntity<UserResponse> addMember(@PathVariable String id, @PathVariable String userId) {
-        User savedUser = holdServiceImpl.addMember(id, userId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(userRestMapper.toResponse(savedUser));
+    @PostMapping
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<HouseHoldResponse> create(@Valid @RequestBody HouseHoldRequest request) {
+        HouseHold saved = holdServiceImpl.create(houseHoldMapper.toDomain(request));
+        return ResponseEntity.status(HttpStatus.CREATED).body(houseHoldMapper.toResponse(saved));
     }
 
-    @Operation(summary = "Añadir dispositivo al hogar", description = "Añade un electrodoméstico a una unidad familiar específica.")
+    @Operation(summary = "Abandonar el hogar actual")
     @ApiPostDoc
-    @PostMapping("/{id}/appliances")
-    public ResponseEntity<ApplianceResponse> addAppliance(@PathVariable String id, @RequestParam Appliance appliance) {
-        HouseholdAppliance savedAppliance = holdServiceImpl.addAppliance(id, appliance);
-        return ResponseEntity.status(HttpStatus.CREATED).body(applianceRestMapper.toResponse(savedAppliance));
-    }
-
-    @Operation(summary = "Listar dispositivos del hogar", description = "Recupera todos los electrodomésticos de una unidad familiar específica.")
-    @ApiStandardDoc
-    @GetMapping("/{id}/appliances")
-    public ResponseEntity<List<ApplianceResponse>> listAppliances(@PathVariable String id) {
-        List<HouseholdAppliance> appliances = holdServiceImpl.listAppliances(id);
-        return ResponseEntity.ok(applianceRestMapper.toResponseList(appliances));
-    }
-
-    @Operation(summary = "Eliminar dispositivo del hogar", description = "Elimina un electrodoméstico de la unidad familiar.")
-    @ApiStandardDoc
-    @DeleteMapping("/appliances/{applianceId}")
-    public ResponseEntity<Void> removeAppliance(@PathVariable String applianceId) {
-        holdServiceImpl.removeAppliance(applianceId);
+    @PostMapping("/leave")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> leave(Authentication authentication) {
+        User currentUser = getCurrentUser(authentication);
+        holdServiceImpl.leaveHousehold(currentUser.getId());
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Generar token de invitación", description = "Genera un token de invitación vinculado a la unidad familiar.")
+    @Operation(summary = "Ver detalle de mi hogar")
+    @ApiStandardDoc
+    @GetMapping("/me")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<HouseHoldResponse> getMyHousehold(Authentication authentication) {
+        String householdId = getCurrentHouseholdId(authentication);
+        HouseHold houseHold = holdServiceImpl.findById(householdId);
+        return ResponseEntity.ok(houseHoldMapper.toResponse(houseHold));
+    }
+
+    @Operation(summary = "Listar miembros de mi hogar")
+    @ApiStandardDoc
+    @GetMapping("/me/members")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<UserResponse>> listMyMembers(Authentication authentication) {
+        String householdId = getCurrentHouseholdId(authentication);
+        List<User> members = holdServiceImpl.listMembers(householdId);
+        return ResponseEntity.ok(userRestMapper.toResponseList(members));
+    }
+
+    @Operation(summary = "Generar token de invitación de mi hogar")
+    @ApiStandardDoc
+    @PostMapping("/me/invite")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<String> inviteMyHousehold(Authentication authentication) {
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser.getRole() != Role.ROLE_OWNER && currentUser.getRole() != Role.ROLE_ADMIN) {
+            throw new ForbiddenException("Solo el owner puede generar invitaciones");
+        }
+        String householdId = getCurrentHouseholdId(authentication);
+        return ResponseEntity.ok(holdServiceImpl.generateInviteToken(householdId));
+    }
+
+    @Operation(summary = "Añadir dispositivo a mi hogar")
     @ApiPostDoc
-    @PostMapping("/{id}/invite")
-    public ResponseEntity<String> inviteMember(@PathVariable String id) {
-        String token = holdServiceImpl.generateInviteToken(id);
-        return ResponseEntity.ok(token);
+    @PostMapping("/me/appliances")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApplianceResponse> addMyAppliance(
+            Authentication authentication,
+            @RequestParam Appliance appliance) {
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser.getRole() != Role.ROLE_OWNER && currentUser.getRole() != Role.ROLE_ADMIN) {
+            throw new ForbiddenException("Solo el owner puede añadir dispositivos");
+        }
+        String householdId = getCurrentHouseholdId(authentication);
+        HouseholdAppliance saved = holdServiceImpl.addAppliance(householdId, appliance);
+        return ResponseEntity.status(HttpStatus.CREATED).body(applianceRestMapper.toResponse(saved));
     }
 
-    @Operation(summary = "Eliminar miembro del hogar", description = "Permite al propietario eliminar a otro usuario del hogar.")
+    @Operation(summary = "Expulsar miembro de mi hogar")
     @ApiStandardDoc
-    @DeleteMapping("/{id}/members/{memberUserId}")
-    public ResponseEntity<Void> removeMember(@PathVariable String id, @PathVariable String memberUserId,
-            @RequestParam String ownerId) {
-        holdServiceImpl.removeMember(ownerId, id, memberUserId);
+    @DeleteMapping("/me/members/{memberUserId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> removeMyMember(Authentication authentication, @PathVariable String memberUserId) {
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser.getRole() != Role.ROLE_OWNER && currentUser.getRole() != Role.ROLE_ADMIN) {
+            throw new ForbiddenException("Solo el owner puede expulsar miembros");
+        }
+        String householdId = getCurrentHouseholdId(authentication);
+        holdServiceImpl.removeMember(householdId, memberUserId);
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Actualizar unidad familiar", description = "Modifica los datos de una unidad familiar existente.")
+    @Operation(summary = "Ascender miembro de mi hogar a OWNER")
     @ApiStandardDoc
-    @PutMapping("/{id}")
-    public ResponseEntity<HouseHoldResponse> update(@PathVariable String id,
-            @Valid @RequestBody HouseHoldRequest request) {
-        HouseHold houseHoldDomain = houseHoldMapper.toDomain(request);
-        HouseHold updatedHouseHold = holdServiceImpl.update(id, houseHoldDomain);
-        return ResponseEntity.ok(houseHoldMapper.toResponse(updatedHouseHold));
+    @PatchMapping("/me/promote/{userId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserResponse> promoteMyMemberToOwner(Authentication authentication, @PathVariable String userId) {
+        User currentUser = getCurrentUser(authentication);
+        if (currentUser.getRole() != Role.ROLE_OWNER && currentUser.getRole() != Role.ROLE_ADMIN) {
+            throw new ForbiddenException("Solo el owner puede ascender miembros");
+        }
+        String householdId = getCurrentHouseholdId(authentication);
+        User promoted = holdServiceImpl.promoteToOwner(householdId, userId);
+        return ResponseEntity.ok(userRestMapper.toResponse(promoted));
     }
 
-    @Operation(summary = "Eliminar unidad familiar", description = "Borra físicamente una unidad familiar de la base de datos.")
-    @ApiStandardDoc
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
-        holdServiceImpl.delete(id);
-        return ResponseEntity.noContent().build();
+    @Operation(summary = "Unirme a un hogar con código de invitación")
+    @ApiPostDoc
+    @PostMapping("/me/join")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<UserResponse> joinMyUserWithInvite(
+            Authentication authentication,
+            @RequestParam String token) {
+        User currentUser = getCurrentUser(authentication);
+        User updated = holdServiceImpl.addMemberByToken(token, currentUser.getId());
+        return ResponseEntity.ok(userRestMapper.toResponse(updated));
     }
 }

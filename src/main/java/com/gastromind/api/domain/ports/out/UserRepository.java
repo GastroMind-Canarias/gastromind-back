@@ -32,6 +32,14 @@ public interface UserRepository {
     Optional<User> findByName(String name);
 
     /**
+     * Busca un User por email
+     *
+     * @param email email del usuairo
+     * @return El usuario o null
+     */
+    Optional<User> findByEmail(String email);
+
+    /**
      * Borra el usuario
      * 
      * @param id Id del usuario

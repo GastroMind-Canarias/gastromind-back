@@ -37,6 +37,11 @@ public class UserAdapter implements UserRepository {
     }
 
     @Override
+    public Optional<User> findByEmail(String email) {
+        return userJpaRepository.findByEmail(email).map(userMapper::toDomain);
+    }
+
+    @Override
     public List<User> findByHouseholdId(String householdId) {
         return userMapper.toDomainList(userJpaRepository.findByHouseholdId(householdId));
     }
