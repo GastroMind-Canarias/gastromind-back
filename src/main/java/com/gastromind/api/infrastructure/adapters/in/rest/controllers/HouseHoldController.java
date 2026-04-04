@@ -126,7 +126,7 @@ public class HouseHoldController {
         return ResponseEntity.ok(houseHoldMapper.toResponse(houseHold));
     }
 
-    @Operation(summary = "Listar miembros del hogar")
+    @Operation(summary = "Listar miembros del hogar (Solo Admin)")
     @ApiStandardDoc
     @GetMapping("/{id}/members")
     @PreAuthorize("hasRole('ADMIN')")
