@@ -8,6 +8,8 @@ import java.util.Optional;
 public interface HouseHoldRepository {
     HouseHold save(HouseHold houseHold);
 
+    boolean existsById(String id);
+
     Optional<HouseHold> findById(String id);
 
     void deleteById(String id);

@@ -7,9 +7,13 @@ import com.gastromind.api.domain.models.HouseHold;
 import com.gastromind.api.domain.models.HouseholdAppliance;
 import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.enums.Appliance;
+import com.gastromind.api.domain.models.enums.Role;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.household.ApplianceIdListRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.household.ApplianceResponse;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.household.ApplianceSingleUpdateRequest;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.household.ApplianceTypeListRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.household.HouseHoldRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.household.HouseHoldResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.user.UserResponse;
@@ -20,6 +24,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -62,6 +67,13 @@ public class HouseHoldController {
             throw new ForbiddenException("El usuario no pertenece a ningún hogar");
         }
         return currentUser.getHouseHold_id().getId();
+    }
+
+    /** Solo el dueño del hogar (rol {@link Role#ROLE_OWNER}) puede mutar electrodomésticos en rutas {@code /me/appliances/**}. */
+    private void requireHouseholdOwner(User user) {
+        if (user.getRole() != Role.ROLE_OWNER) {
+            throw new ForbiddenException("Solo el OWNER del hogar puede gestionar los electrodomésticos");
+        }
     }
 
     @Operation(summary = "Listar todos los hogares (Solo ADMIN)")
@@ -182,16 +194,85 @@ public class HouseHoldController {
         return ResponseEntity.ok(holdServiceImpl.generateInviteToken(householdId));
     }
 
-    @Operation(summary = "Añadir dispositivo a mi hogar (ADMIN u OWNER del hogar)")
+    @Operation(summary = "Listar electrodomésticos de mi hogar")
+    @ApiStandardDoc
+    @GetMapping("/me/appliances")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<ApplianceResponse>> listMyAppliances(Authentication authentication) {
+        String householdId = getCurrentHouseholdId(authentication);
+        return ResponseEntity.ok(applianceRestMapper.toResponseList(holdServiceImpl.listAppliances(householdId)));
+    }
+
+    @Operation(summary = "Añadir un electrodoméstico a mi hogar (solo OWNER)")
     @ApiPostDoc
     @PostMapping("/me/appliances")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ApplianceResponse> addMyAppliance(
             Authentication authentication,
-            @RequestParam Appliance appliance) {
+            @RequestParam @NotNull Appliance appliance) {
+        User user = getCurrentUser(authentication);
+        requireHouseholdOwner(user);
         String householdId = getCurrentHouseholdId(authentication);
         HouseholdAppliance saved = holdServiceImpl.addAppliance(householdId, appliance);
         return ResponseEntity.status(HttpStatus.CREATED).body(applianceRestMapper.toResponse(saved));
+    }
+
+    @Operation(summary = "Añadir varios electrodomésticos a mi hogar (solo OWNER; ignora tipos ya existentes)")
+    @ApiPostDoc
+    @PostMapping("/me/appliances/batch")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<List<ApplianceResponse>> addMyAppliancesBatch(
+            Authentication authentication,
+            @Valid @RequestBody ApplianceTypeListRequest request) {
+        User user = getCurrentUser(authentication);
+        requireHouseholdOwner(user);
+        String householdId = getCurrentHouseholdId(authentication);
+        List<HouseholdAppliance> list = holdServiceImpl.addAppliancesBulk(householdId,
+                request.appliances() != null ? request.appliances() : List.of());
+        return ResponseEntity.status(HttpStatus.CREATED).body(applianceRestMapper.toResponseList(list));
+    }
+
+    @Operation(summary = "Cambiar el tipo de un electrodoméstico de mi hogar (solo OWNER)")
+    @ApiStandardDoc
+    @PatchMapping("/me/appliances/{applianceRecordId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApplianceResponse> updateMyAppliance(
+            Authentication authentication,
+            @PathVariable String applianceRecordId,
+            @Valid @RequestBody ApplianceSingleUpdateRequest request) {
+        User user = getCurrentUser(authentication);
+        requireHouseholdOwner(user);
+        String householdId = getCurrentHouseholdId(authentication);
+        HouseholdAppliance saved = holdServiceImpl.updateAppliance(householdId, applianceRecordId, request.appliance());
+        return ResponseEntity.ok(applianceRestMapper.toResponse(saved));
+    }
+
+    @Operation(summary = "Eliminar un electrodoméstico de mi hogar por id de fila (solo OWNER)")
+    @ApiStandardDoc
+    @DeleteMapping("/me/appliances/{applianceRecordId}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> deleteMyAppliance(
+            Authentication authentication,
+            @PathVariable String applianceRecordId) {
+        User user = getCurrentUser(authentication);
+        requireHouseholdOwner(user);
+        String householdId = getCurrentHouseholdId(authentication);
+        holdServiceImpl.removeApplianceFromHousehold(householdId, applianceRecordId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Operation(summary = "Eliminar varios electrodomésticos por ids de fila (solo OWNER)")
+    @ApiStandardDoc
+    @DeleteMapping("/me/appliances/batch")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<Void> deleteMyAppliancesBatch(
+            Authentication authentication,
+            @Valid @RequestBody ApplianceIdListRequest request) {
+        User user = getCurrentUser(authentication);
+        requireHouseholdOwner(user);
+        String householdId = getCurrentHouseholdId(authentication);
+        holdServiceImpl.removeAppliancesBulk(householdId, request.ids());
+        return ResponseEntity.noContent().build();
     }
 
     @Operation(summary = "Expulsar miembro de mi hogar (ADMIN u OWNER del hogar)")

@@ -32,12 +32,17 @@ public class HouseholdApplianceAdapter implements HouseholdApplianceRepository {
     }
 
     @Override
+    public void deleteAllByHouseholdId(String householdId) {
+        jpaRepository.deleteAllByHousehold_Id(householdId);
+    }
+
+    @Override
     public Optional<HouseholdAppliance> findById(String id) {
         return jpaRepository.findById(id).map(mapper::toDomain);
     }
 
     @Override
     public List<HouseholdAppliance> findByHouseholdId(String householdId) {
-        return mapper.toDomainList(jpaRepository.findByHouseholdId(householdId));
+        return mapper.toDomainList(jpaRepository.findByHousehold_Id(householdId));
     }
 }

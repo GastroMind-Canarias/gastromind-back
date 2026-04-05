@@ -16,10 +16,16 @@ import com.gastromind.api.domain.ports.out.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
+/**
+ * Electrodomésticos: catálogo = enum; {@code household_appliances} solo enlaza hogar ↔ tipo.
+ * Los borrados quitan esa relación, no una entidad de catálogo.
+ */
 @Service
 public class HouseHoldServiceImpl implements IHouseHoldService {
     private static final String INVITE_TOKEN_PREFIX = "invite_";
@@ -48,6 +54,12 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
         return repository.findById(id).orElseThrow(() -> new NotFoundException("Unidad Familiar no encontrada"));
     }
 
+    private void ensureHouseholdExists(String householdId) {
+        if (!repository.existsById(householdId)) {
+            throw new NotFoundException("Unidad Familiar no encontrada");
+        }
+    }
+
     @Override
     public HouseHold create(HouseHold houseHold) {
         HouseHold savedHouseHold = repository.save(houseHold);
@@ -63,7 +75,7 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
 
     @Override
     public void delete(String id) {
-        findById(id);
+        ensureHouseholdExists(id);
         List<User> members = userRepository.findByHouseholdId(id);
         members.forEach(m -> {
             m.setHouseHold_id(null);
@@ -124,7 +136,10 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
 
     @Override
     public HouseholdAppliance addAppliance(String householdId, Appliance appliance) {
-        findById(householdId);
+        ensureHouseholdExists(householdId);
+        if (applianceTypeExistsInHousehold(householdId, appliance, null)) {
+            throw new IllegalArgumentException("Ese tipo de electrodoméstico ya está en el hogar");
+        }
         HouseholdAppliance newAppliance = new HouseholdAppliance();
         newAppliance.setAppliance(appliance);
         newAppliance.setHouseholdId(householdId);
@@ -132,8 +147,93 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
     }
 
     @Override
-    public void removeAppliance(String applianceId) {
-        applianceRepository.deleteById(applianceId);
+    @Transactional
+    public List<HouseholdAppliance> addAppliancesBulk(String householdId, List<Appliance> appliances) {
+        ensureHouseholdExists(householdId);
+        if (appliances == null || appliances.isEmpty()) {
+            return listAppliances(householdId);
+        }
+        for (Appliance a : new LinkedHashSet<>(appliances)) {
+            if (!applianceTypeExistsInHousehold(householdId, a, null)) {
+                HouseholdAppliance row = new HouseholdAppliance();
+                row.setAppliance(a);
+                row.setHouseholdId(householdId);
+                applianceRepository.save(row);
+            }
+        }
+        return listAppliances(householdId);
+    }
+
+    @Override
+    @Transactional
+    public void removeAppliancesBulk(String householdId, List<String> applianceRecordIds) {
+        ensureHouseholdExists(householdId);
+        if (applianceRecordIds == null) {
+            return;
+        }
+        for (String rid : applianceRecordIds) {
+            if (rid == null || rid.isBlank()) {
+                continue;
+            }
+            HouseholdAppliance ha = applianceRepository.findById(rid)
+                    .orElseThrow(() -> new NotFoundException("Electrodoméstico no encontrado"));
+            if (!ha.getHouseholdId().equals(householdId)) {
+                throw new ForbiddenException("El electrodoméstico no pertenece a este hogar");
+            }
+            applianceRepository.deleteById(rid);
+        }
+    }
+
+    @Override
+    @Transactional
+    public List<HouseholdAppliance> replaceAppliances(String householdId, List<Appliance> appliances) {
+        ensureHouseholdExists(householdId);
+        applianceRepository.deleteAllByHouseholdId(householdId);
+        if (appliances == null || appliances.isEmpty()) {
+            return List.of();
+        }
+        List<HouseholdAppliance> saved = new ArrayList<>();
+        for (Appliance ap : new LinkedHashSet<>(appliances)) {
+            HouseholdAppliance row = new HouseholdAppliance();
+            row.setAppliance(ap);
+            row.setHouseholdId(householdId);
+            saved.add(applianceRepository.save(row));
+        }
+        return saved;
+    }
+
+    @Override
+    @Transactional
+    public HouseholdAppliance updateAppliance(String householdId, String applianceRecordId, Appliance appliance) {
+        ensureHouseholdExists(householdId);
+        HouseholdAppliance ha = applianceRepository.findById(applianceRecordId)
+                .orElseThrow(() -> new NotFoundException("Electrodoméstico no encontrado"));
+        if (!ha.getHouseholdId().equals(householdId)) {
+            throw new ForbiddenException("El electrodoméstico no pertenece a este hogar");
+        }
+        if (applianceTypeExistsInHousehold(householdId, appliance, applianceRecordId)) {
+            throw new IllegalArgumentException("Ese tipo de electrodoméstico ya está en el hogar");
+        }
+        ha.setAppliance(appliance);
+        return applianceRepository.save(ha);
+    }
+
+    private boolean applianceTypeExistsInHousehold(String householdId, Appliance type, String excludeRecordId) {
+        return listAppliances(householdId).stream()
+                .anyMatch(a -> a.getAppliance() == type
+                        && (excludeRecordId == null || !excludeRecordId.equals(a.getId())));
+    }
+
+    @Override
+    @Transactional
+    public void removeApplianceFromHousehold(String householdId, String applianceRecordId) {
+        ensureHouseholdExists(householdId);
+        HouseholdAppliance ha = applianceRepository.findById(applianceRecordId)
+                .orElseThrow(() -> new NotFoundException("Electrodoméstico no encontrado"));
+        if (!ha.getHouseholdId().equals(householdId)) {
+            throw new ForbiddenException("El electrodoméstico no pertenece a este hogar");
+        }
+        applianceRepository.deleteById(applianceRecordId);
     }
 
     @Override
@@ -148,7 +248,7 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
 
     @Override
     public String generateInviteToken(String householdId) {
-        findById(householdId);
+        ensureHouseholdExists(householdId);
         return INVITE_TOKEN_PREFIX + UUID.randomUUID() + INVITE_TOKEN_SEPARATOR + householdId;
     }
 
@@ -198,7 +298,7 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
      * No debe quedar ningún usuario referenciando este hogar.
      */
     private void deleteHouseholdAndRelatedData(String householdId) {
-        applianceRepository.findByHouseholdId(householdId).forEach(a -> applianceRepository.deleteById(a.getId()));
+        applianceRepository.deleteAllByHouseholdId(householdId);
         fridgeRepository.findByHouseholdId(householdId).forEach(f -> fridgeRepository.deleteById(f.getId()));
         repository.deleteById(householdId);
     }

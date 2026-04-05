@@ -27,6 +27,11 @@ public class HouseHoldAdapter implements HouseHoldRepository {
     }
 
     @Override
+    public boolean existsById(String id) {
+        return holdJpaRepository.existsById(id);
+    }
+
+    @Override
     public Optional<HouseHold> findById(String id) {
         return holdJpaRepository.findById(id).map(householdMapper::toDomain);
     }
