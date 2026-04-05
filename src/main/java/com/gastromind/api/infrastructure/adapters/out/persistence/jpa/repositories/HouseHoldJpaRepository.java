@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface HouseHoldJpaRepository extends JpaRepository<HouseholdEntity, String> {
-    @EntityGraph(attributePaths = {"members", "appliances", "fridges"})
+    @EntityGraph(attributePaths = {"members", "fridges"})
     Optional<HouseholdEntity> findById(String id);
 }

@@ -24,7 +24,19 @@ public interface IHouseHoldService {
 
     HouseholdAppliance addAppliance(String householdId, Appliance appliance);
 
-    void removeAppliance(String applianceId);
+    /** Añade varios tipos; ignora los que ya existen en el hogar. */
+    List<HouseholdAppliance> addAppliancesBulk(String householdId, List<Appliance> appliances);
+
+    void removeApplianceFromHousehold(String householdId, String applianceRecordId);
+
+    /** Elimina por ids de fila; cada uno debe pertenecer al hogar. */
+    void removeAppliancesBulk(String householdId, List<String> applianceRecordIds);
+
+    /** Sustituye el conjunto de tipos del hogar por el listado (puede quedar vacío). */
+    List<HouseholdAppliance> replaceAppliances(String householdId, List<Appliance> appliances);
+
+    /** Cambia el tipo de un registro concreto (sin duplicar tipo en el mismo hogar). */
+    HouseholdAppliance updateAppliance(String householdId, String applianceRecordId, Appliance appliance);
 
     List<HouseholdAppliance> listAppliances(String householdId);
 

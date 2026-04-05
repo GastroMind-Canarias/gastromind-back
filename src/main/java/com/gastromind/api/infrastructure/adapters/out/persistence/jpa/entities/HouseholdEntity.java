@@ -25,7 +25,8 @@ public class HouseholdEntity {
     @OneToMany(mappedBy = "household", cascade = CascadeType.ALL)
     private List<FridgeEntity> fridges = new ArrayList<>();
 
-    @OneToMany(mappedBy = "household", cascade = CascadeType.ALL)
+    /** Sin cascade (se gestionan vía su repositorio); cascade ALL desincronizaba deletes con el padre cargado. */
+    @OneToMany(mappedBy = "household")
     private List<HouseholdApplianceEntity> appliances = new ArrayList<>();
 
     public HouseholdEntity() {

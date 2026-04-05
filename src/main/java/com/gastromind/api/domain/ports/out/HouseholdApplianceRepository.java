@@ -10,6 +10,8 @@ public interface HouseholdApplianceRepository {
 
     void deleteById(String id);
 
+    void deleteAllByHouseholdId(String householdId);
+
     Optional<HouseholdAppliance> findById(String id);
 
     List<HouseholdAppliance> findByHouseholdId(String householdId);

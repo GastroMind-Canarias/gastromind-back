@@ -8,5 +8,7 @@ import java.util.List;
 
 @Repository
 public interface HouseholdApplianceJpaRepository extends JpaRepository<HouseholdApplianceEntity, String> {
-    List<HouseholdApplianceEntity> findByHouseholdId(String householdId);
+    List<HouseholdApplianceEntity> findByHousehold_Id(String householdId);
+
+    void deleteAllByHousehold_Id(String householdId);
 }
