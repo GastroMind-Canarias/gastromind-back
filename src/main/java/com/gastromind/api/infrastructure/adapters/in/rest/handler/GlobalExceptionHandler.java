@@ -1,5 +1,6 @@
 package com.gastromind.api.infrastructure.adapters.in.rest.handler;
 
+import com.gastromind.api.domain.exceptions.AiRecipeException;
 import com.gastromind.api.domain.exceptions.ForbiddenException;
 import com.gastromind.api.domain.exceptions.ImageProcessingException;
 import com.gastromind.api.domain.exceptions.NotFoundException;
@@ -40,6 +41,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex) {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(AiRecipeException.class)
+    public ResponseEntity<ErrorResponse> handleAiRecipeException(AiRecipeException ex) {
+        return buildResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
     }
 
     @ExceptionHandler({

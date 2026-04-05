@@ -41,8 +41,10 @@ public class UserEntity {
     @JoinTable(
             name = "user_allergens",
             joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "allergen_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "allergen_id"),
+            uniqueConstraints = @UniqueConstraint(
+                    name = "uk_user_allergens_user_allergen",
+                    columnNames = {"user_id", "allergen_id"}))
     private Set<AllergenEntity> allergens;
 
     @ManyToMany

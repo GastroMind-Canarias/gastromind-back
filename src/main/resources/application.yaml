@@ -16,6 +16,10 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
 gastromind:
   security:
@@ -30,6 +34,14 @@ app:
   jwt:
     secret: "9a4f2c3d5e6f7g8h9i0j1k2l3m4n5o6p7q8r9s0t1u2v3w4x5y6z7a8b9c0d1e4d"
     expiration-minutes: 60
+  ai:
+    gemini:
+      api-key: ${GEMINI_API_KEY:}
+      model: ${GEMINI_MODEL:gemini-2.5-flash}
+      base-url: https://generativelanguage.googleapis.com
+    suggestion-cache:
+      ttl-days: 10
+      key-prefix: "gastromind:recipe:suggestion:"
   cors:
     allowed-origins:
       - "http://localhost:3000"

@@ -13,7 +13,7 @@ public class ProductEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true, length = 200)
     private String name;
 
     @Column(name = "is_essential")
@@ -24,7 +24,13 @@ public class ProductEntity {
     private CategoryEntity category;
 
     @ManyToMany
-    @JoinTable(name = "product_allergens", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "allergen_id"))
+    @JoinTable(
+            name = "product_allergens",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "allergen_id"),
+            uniqueConstraints = @UniqueConstraint(
+                    name = "uk_product_allergens_product_allergen",
+                    columnNames = {"product_id", "allergen_id"}))
     private Set<AllergenEntity> allergens;
 
     @OneToMany(mappedBy = "product")

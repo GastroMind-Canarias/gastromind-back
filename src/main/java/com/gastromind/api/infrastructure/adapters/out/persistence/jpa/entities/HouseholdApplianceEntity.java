@@ -4,7 +4,11 @@ import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.e
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "household_appliances")
+@Table(
+        name = "household_appliances",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_household_appliance",
+                columnNames = {"household_id", "appliance"}))
 public class HouseholdApplianceEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
