@@ -5,12 +5,11 @@ import com.gastromind.api.domain.models.enums.Role;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
-@Schema(description = "Datos necesarios para registrar un nuevo usuario en el sistema")
+@Schema(description = "Registro: credenciales, hogar (crear o unirse) y preferencias. El rol efectivo lo asigna el servidor (OWNER al crear, MEMBER al unirse).")
 public record RegisterRequest(
 
         @Schema(example = "juan_gastro", description = "Nombre de usuario único")
@@ -23,22 +22,36 @@ public record RegisterRequest(
         @Size(min = 8, message = "La contraseña debe tener al menos 8 caracteres")
         String password,
 
-        @Schema(example = "juan@example.com", description = "Correo electronico de contacto")
+        @Schema(example = "juan@example.com", description = "Correo electrónico")
         @NotBlank(message = "El email es obligatorio")
         @Email(message = "El formato del email no es válido")
         String email,
 
-        @Schema(example = "ROLE_MEMBER", description = "Rol asignado al usuario (ADMIN, OWNER, etc.)")
-        @NotNull(message = "El rol es obligatorio")
+        @Schema(
+                description = "Opcional; ignorado en el registro (el servidor asigna OWNER o MEMBER según el modo de hogar).",
+                example = "ROLE_MEMBER",
+                deprecated = true
+        )
         Role role,
 
-        @Schema(example = "Mi Hogar", description = "Datos del hogar que se asignara al usuario")
-        @NotNull(message = "La información del hogar es obligatoria")
+        @Schema(
+                description = "Modo de hogar. Si no se envía, se infiere: JOIN_EXISTING si inviteToken tiene valor; si no, CREATE_NEW (requiere householdName).",
+                example = "CREATE_NEW"
+        )
+        HouseholdRegistrationMode householdMode,
+
+        @Schema(example = "Mi Hogar", description = "Nombre del hogar nuevo. Obligatorio si householdMode es CREATE_NEW (o sin token de invitación).")
         String householdName,
 
-        @Schema(example = "[\"uuid-alergeno-1\", \"uuid-alergeno-2\"]", description = "Lista de IDs de alérgenos del usuario")
+        @Schema(
+                example = "invite_550e8400-e29b-41d4-a716-446655440000_21c8ec97-1cf9-46c7-a81c-3c24df66c20c",
+                description = "Código de invitación del hogar existente. Si tiene valor, se une como MEMBER (se ignoran householdName y electrodomésticos del hogar)."
+        )
+        String inviteToken,
+
+        @Schema(example = "[\"uuid-alergeno-1\"]", description = "IDs de alérgenos del usuario")
         List<String> allergenIds,
 
-        @Schema(example = "[\"HORNO\", \"AIR_FRYER\"]", description = "Lista de utensilios del hogar")
+        @Schema(example = "[\"HORNO\", \"AIR_FRYER\"]", description = "Electrodomésticos del hogar; solo aplica al crear hogar nuevo")
         List<Appliance> applianceTypes
 ) {}
