@@ -41,4 +41,9 @@ public class FridgeAdapter implements FridgeRepository {
         return fridgeMapper.toDomainList(fridgeEntities);
     }
 
+    @Override
+    public List<Fridge> findByHouseholdId(String householdId) {
+        return fridgeMapper.toDomainList(fridgeJpaRepository.findByHousehold_Id(householdId));
+    }
+
 }

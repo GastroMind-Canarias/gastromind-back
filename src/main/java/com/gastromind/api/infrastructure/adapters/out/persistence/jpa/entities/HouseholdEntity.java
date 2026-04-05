@@ -15,7 +15,11 @@ public class HouseholdEntity {
 
     private String name;
 
-    @OneToMany(mappedBy = "household", cascade = CascadeType.ALL)
+    /**
+     * Sin cascade hacia User: borrar el hogar no debe eliminar cuentas de usuario.
+     * La relación se gestiona desde {@link UserEntity#household} (FK).
+     */
+    @OneToMany(mappedBy = "household")
     private List<UserEntity> members = new ArrayList<>();
 
     @OneToMany(mappedBy = "household", cascade = CascadeType.ALL)

@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Service
 public class HouseHoldServiceImpl implements IHouseHoldService {
@@ -62,14 +63,14 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
 
     @Override
     public void delete(String id) {
-        HouseHold houseHold = findById(id);
+        findById(id);
         List<User> members = userRepository.findByHouseholdId(id);
         members.forEach(m -> {
             m.setHouseHold_id(null);
             m.setRole(Role.ROLE_MEMBER);
             userRepository.save(m);
         });
-        repository.deleteById(id);
+        deleteHouseholdAndRelatedData(id);
     }
 
     @Override
@@ -168,12 +169,37 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
-        if (user.getHouseHold_id() == null) {
+        if (user.getHouseHold_id() == null || user.getHouseHold_id().getId() == null) {
             throw new ForbiddenException("El usuario no pertenece a ningún hogar");
         }
+
+        String householdId = user.getHouseHold_id().getId();
+        boolean wasOwner = user.getRole() == Role.ROLE_OWNER;
 
         user.setHouseHold_id(null);
         user.setRole(Role.ROLE_MEMBER);
         userRepository.save(user);
+
+        List<User> remaining = userRepository.findByHouseholdId(householdId);
+        if (remaining.isEmpty()) {
+            deleteHouseholdAndRelatedData(householdId);
+            return;
+        }
+        if (wasOwner) {
+            int idx = ThreadLocalRandom.current().nextInt(remaining.size());
+            User newOwner = remaining.get(idx);
+            newOwner.setRole(Role.ROLE_OWNER);
+            userRepository.save(newOwner);
+        }
+    }
+
+    /**
+     * Elimina neveras (e ítems en cascada), electrodomésticos del hogar y el registro del hogar.
+     * No debe quedar ningún usuario referenciando este hogar.
+     */
+    private void deleteHouseholdAndRelatedData(String householdId) {
+        applianceRepository.findByHouseholdId(householdId).forEach(a -> applianceRepository.deleteById(a.getId()));
+        fridgeRepository.findByHouseholdId(householdId).forEach(f -> fridgeRepository.deleteById(f.getId()));
+        repository.deleteById(householdId);
     }
 }

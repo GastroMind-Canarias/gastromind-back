@@ -18,15 +18,22 @@ public class SecurityService {
 
     public boolean isOwnerOfHousehold(String householdId) {
         User currentUser = getCurrentUser();
-        return currentUser.getRole() == Role.ROLE_OWNER &&
-                currentUser.getHouseHold_id() != null &&
-                currentUser.getHouseHold_id().getId().equals(householdId);
+        if (currentUser.getRole() == Role.ROLE_ADMIN) {
+            return true;
+        }
+        return currentUser.getRole() == Role.ROLE_OWNER
+                && currentUser.getHouseHold_id() != null
+                && currentUser.getHouseHold_id().getId().equals(householdId);
     }
 
+    /** Miembro del hogar (solo lectura) o administrador global. */
     public boolean isMemberOfHousehold(String householdId) {
         User currentUser = getCurrentUser();
-        return currentUser.getHouseHold_id() != null &&
-                currentUser.getHouseHold_id().getId().equals(householdId);
+        if (currentUser.getRole() == Role.ROLE_ADMIN) {
+            return true;
+        }
+        return currentUser.getHouseHold_id() != null
+                && currentUser.getHouseHold_id().getId().equals(householdId);
     }
 
     private User getCurrentUser() {
