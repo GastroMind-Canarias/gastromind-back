@@ -6,5 +6,9 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface UnitJpaRepository extends JpaRepository<UnitEntity,String> {
-    
+
+    java.util.Optional<UnitEntity> findByName(String name);
+
+    /** Reserva: si existiera datos legacy duplicados antes de aplicar UNIQUE(name). */
+    java.util.Optional<UnitEntity> findFirstByNameOrderByIdAsc(String name);
 }

@@ -19,5 +19,6 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, String> {
     @EntityGraph(attributePaths = {"household", "household.members"})
     Optional<UserEntity> findByEmail(String email);
 
+    @EntityGraph(attributePaths = {"allergens", "household"})
     List<UserEntity> findByHouseholdId(String householdId);
 }

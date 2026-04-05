@@ -3,6 +3,8 @@ package com.gastromind.api.domain.models;
 import com.gastromind.api.domain.models.enums.Appliance;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Recipe {
     String id;
@@ -13,6 +15,9 @@ public class Recipe {
     Appliance appliance_needed;
     String difficulty;
     LocalDate created_at;
+
+    /** Productos del hogar que la receta emplea y cantidades (sugerencia IA / favoritos). */
+    private List<RecipeIngredientUsage> ingredientsUsed = new ArrayList<>();
 
     /**
      * 
@@ -114,6 +119,14 @@ public class Recipe {
 
     public void setCreated_at(LocalDate created_at) {
         this.created_at = created_at;
+    }
+
+    public List<RecipeIngredientUsage> getIngredientsUsed() {
+        return ingredientsUsed;
+    }
+
+    public void setIngredientsUsed(List<RecipeIngredientUsage> ingredientsUsed) {
+        this.ingredientsUsed = ingredientsUsed != null ? ingredientsUsed : new ArrayList<>();
     }
 
     @Override
