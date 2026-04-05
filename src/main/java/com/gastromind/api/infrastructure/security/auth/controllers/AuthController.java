@@ -46,7 +46,14 @@ public class AuthController {
         }
     }
 
-    @Operation(summary = "Registrar nuevo usuario", description = "Crea una cuenta de usuario en el sistema con las credenciales proporcionadas.")
+    @Operation(
+            summary = "Registrar nuevo usuario",
+            description = """
+                    Crea la cuenta y vincula el hogar de una de dos formas:
+                    - **Crear hogar**: `householdMode=CREATE_NEW` (o sin token) + `householdName`; el usuario queda como OWNER. Opcional: `applianceTypes`.
+                    - **Unirse a un hogar**: `householdMode=JOIN_EXISTING` (o solo `inviteToken`) + código de invitación; el usuario queda como MEMBER. `householdName` y `applianceTypes` no aplican.
+                    El campo `role` del cuerpo, si se envía, no determina el rol final (lo fija el servidor)."""
+    )
     @ApiPostDoc
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
