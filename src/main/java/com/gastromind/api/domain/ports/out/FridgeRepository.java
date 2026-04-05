@@ -13,4 +13,6 @@ public interface FridgeRepository {
     void deleteById(String id);
 
     List<Fridge> findAll();
+
+    List<Fridge> findByHouseholdId(String householdId);
 }

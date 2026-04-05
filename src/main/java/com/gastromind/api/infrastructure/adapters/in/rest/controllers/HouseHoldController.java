@@ -7,7 +7,6 @@ import com.gastromind.api.domain.models.HouseHold;
 import com.gastromind.api.domain.models.HouseholdAppliance;
 import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.enums.Appliance;
-import com.gastromind.api.domain.models.enums.Role;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.household.ApplianceResponse;
@@ -73,7 +72,7 @@ public class HouseHoldController {
         return ResponseEntity.ok(houseHoldMapper.toResponseList(holdServiceImpl.findAll()));
     }
 
-    @Operation(summary = "Eliminar unidad familiar (ADMIN/OWNER)")
+    @Operation(summary = "Eliminar unidad familiar (Solo Admin)")
     @ApiStandardDoc
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -82,7 +81,7 @@ public class HouseHoldController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Añadir dispositivo (ADMIN/OWNER)")
+    @Operation(summary = "Añadir dispositivo (Solo Admin)")
     @ApiPostDoc
     @PostMapping("/{id}/appliances")
     @PreAuthorize("hasRole('ADMIN')")
@@ -91,7 +90,7 @@ public class HouseHoldController {
         return ResponseEntity.status(HttpStatus.CREATED).body(applianceRestMapper.toResponse(saved));
     }
 
-    @Operation(summary = "Expulsar miembro (ADMIN/OWNER)")
+    @Operation(summary = "Expulsar miembro (Solo Admin)")
     @ApiStandardDoc
     @DeleteMapping("/{id}/members/{memberUserId}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -100,7 +99,7 @@ public class HouseHoldController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Generar token de invitación")
+    @Operation(summary = "Generar token de invitación (Solo Admin)")
     @ApiStandardDoc
     @PostMapping("/{id}/invite")
     @PreAuthorize("hasRole('ADMIN')")
@@ -108,7 +107,7 @@ public class HouseHoldController {
         return ResponseEntity.ok(holdServiceImpl.generateInviteToken(id));
     }
 
-    @Operation(summary = "Ascender a OWNER (ADMIN/OWNER)")
+    @Operation(summary = "Ascender a OWNER (Solo Admin)")
     @ApiStandardDoc
     @PatchMapping("/{id}/promote/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -117,7 +116,7 @@ public class HouseHoldController {
         return ResponseEntity.ok(userRestMapper.toResponse(promoted));
     }
 
-    @Operation(summary = "Ver detalle del hogar (ADMIN/OWNER)")
+    @Operation(summary = "Ver detalle del hogar (Solo Admin)")
     @ApiStandardDoc
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -174,58 +173,42 @@ public class HouseHoldController {
         return ResponseEntity.ok(userRestMapper.toResponseList(members));
     }
 
-    @Operation(summary = "Generar token de invitación de mi hogar")
+    @Operation(summary = "Generar token de invitación de mi hogar (ADMIN u OWNER del hogar)")
     @ApiStandardDoc
     @PostMapping("/me/invite")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
     public ResponseEntity<String> inviteMyHousehold(Authentication authentication) {
-        User currentUser = getCurrentUser(authentication);
-        if (currentUser.getRole() != Role.ROLE_OWNER && currentUser.getRole() != Role.ROLE_ADMIN) {
-            throw new ForbiddenException("Solo el owner puede generar invitaciones");
-        }
         String householdId = getCurrentHouseholdId(authentication);
         return ResponseEntity.ok(holdServiceImpl.generateInviteToken(householdId));
     }
 
-    @Operation(summary = "Añadir dispositivo a mi hogar")
+    @Operation(summary = "Añadir dispositivo a mi hogar (ADMIN u OWNER del hogar)")
     @ApiPostDoc
     @PostMapping("/me/appliances")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
     public ResponseEntity<ApplianceResponse> addMyAppliance(
             Authentication authentication,
             @RequestParam Appliance appliance) {
-        User currentUser = getCurrentUser(authentication);
-        if (currentUser.getRole() != Role.ROLE_OWNER && currentUser.getRole() != Role.ROLE_ADMIN) {
-            throw new ForbiddenException("Solo el owner puede añadir dispositivos");
-        }
         String householdId = getCurrentHouseholdId(authentication);
         HouseholdAppliance saved = holdServiceImpl.addAppliance(householdId, appliance);
         return ResponseEntity.status(HttpStatus.CREATED).body(applianceRestMapper.toResponse(saved));
     }
 
-    @Operation(summary = "Expulsar miembro de mi hogar")
+    @Operation(summary = "Expulsar miembro de mi hogar (ADMIN u OWNER del hogar)")
     @ApiStandardDoc
     @DeleteMapping("/me/members/{memberUserId}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
     public ResponseEntity<Void> removeMyMember(Authentication authentication, @PathVariable String memberUserId) {
-        User currentUser = getCurrentUser(authentication);
-        if (currentUser.getRole() != Role.ROLE_OWNER && currentUser.getRole() != Role.ROLE_ADMIN) {
-            throw new ForbiddenException("Solo el owner puede expulsar miembros");
-        }
         String householdId = getCurrentHouseholdId(authentication);
         holdServiceImpl.removeMember(householdId, memberUserId);
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Ascender miembro de mi hogar a OWNER")
+    @Operation(summary = "Ascender miembro de mi hogar a OWNER (ADMIN u OWNER del hogar)")
     @ApiStandardDoc
     @PatchMapping("/me/promote/{userId}")
-    @PreAuthorize("isAuthenticated()")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
     public ResponseEntity<UserResponse> promoteMyMemberToOwner(Authentication authentication, @PathVariable String userId) {
-        User currentUser = getCurrentUser(authentication);
-        if (currentUser.getRole() != Role.ROLE_OWNER && currentUser.getRole() != Role.ROLE_ADMIN) {
-            throw new ForbiddenException("Solo el owner puede ascender miembros");
-        }
         String householdId = getCurrentHouseholdId(authentication);
         User promoted = holdServiceImpl.promoteToOwner(householdId, userId);
         return ResponseEntity.ok(userRestMapper.toResponse(promoted));
