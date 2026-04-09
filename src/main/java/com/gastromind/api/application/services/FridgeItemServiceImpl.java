@@ -54,7 +54,7 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
     @Override
     @Transactional
     public FridgeItem addProductToFridge(String fridgeId, String productId, BigDecimal quantity,
-            LocalDate expirationDate) {
+            LocalDate expirationDate, ItemStatus initialStatus) {
         fridgeRepository.findById(fridgeId).orElseThrow(() -> new NotFoundException("Nevera no encontrada"));
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Producto no encontrado"));
@@ -64,7 +64,7 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
         newItem.setProduct(product);
         newItem.setQuantity(quantity);
         newItem.setExpirationDate(expirationDate);
-        newItem.setStatus(ItemStatus.IN_FRIDGE);
+        newItem.setStatus(initialStatus != null ? initialStatus : ItemStatus.GOOD);
 
         return repository.save(newItem);
     }
@@ -79,6 +79,8 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
         item.setQuantity(item.getQuantity().subtract(quantityToConsume));
         if (item.getQuantity().compareTo(BigDecimal.ZERO) == 0) {
             item.setStatus(ItemStatus.CONSUMED);
+            repository.deleteById(itemId);
+            return item;
         }
         return repository.save(item);
     }
@@ -86,10 +88,7 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
     @Override
     @Transactional
     public void markAsConsumed(String itemId) {
-        FridgeItem item = findById(itemId);
-        item.setStatus(ItemStatus.CONSUMED);
-        item.setQuantity(BigDecimal.ZERO);
-        repository.save(item);
+        delete(itemId);
     }
 
     @Override

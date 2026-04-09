@@ -1,6 +1,7 @@
 package com.gastromind.api.domain.ports.in;
 
 import com.gastromind.api.domain.models.FridgeItem;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
 
 import java.util.List;
 
@@ -29,15 +30,15 @@ public interface IFridgeItemService {
      * Añade un producto a la nevera con validaciones.
      */
     FridgeItem addProductToFridge(String fridgeId, String productId, java.math.BigDecimal quantity,
-            java.time.LocalDate expirationDate);
+            java.time.LocalDate expirationDate, ItemStatus initialStatus);
 
     /**
-     * Consume parte de la cantidad de un item.
+     * Consume parte de la cantidad de un item. Si tras el descuento la cantidad es cero, el ítem se elimina del inventario.
      */
     FridgeItem consumePartially(String itemId, java.math.BigDecimal quantityToConsume);
 
     /**
-     * Marca un item como consumido.
+     * Da por consumido todo el ítem: lo elimina del inventario (no persiste cantidad 0).
      */
     void markAsConsumed(String itemId);
 

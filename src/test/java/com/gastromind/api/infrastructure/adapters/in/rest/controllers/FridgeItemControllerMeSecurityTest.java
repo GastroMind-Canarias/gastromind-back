@@ -12,6 +12,8 @@ import com.gastromind.api.application.usecases.MarkMyFridgeItemConsumedUseCase;
 import com.gastromind.api.application.usecases.UpdateMyFridgeItemUseCase;
 import com.gastromind.api.domain.models.FridgeItem;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.FridgeItemResponse;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.MyFridgeItemRequest;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
 import com.gastromind.api.infrastructure.adapters.in.rest.handler.GlobalExceptionHandler;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.FridgeItemRestMapper;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.UserJpaRepository;
@@ -93,30 +95,35 @@ class FridgeItemControllerMeSecurityTest {
     }
 
     @Test
-    void meRoutes_shouldAllowMemberOwnerAndAdmin() throws Exception {
+    void meRoutes_shouldAllowOwnerAndAdmin() throws Exception {
         FridgeItem domain = buildItem("item-1", "fridge-1");
-        FridgeItemResponse response = new FridgeItemResponse("item-1", new BigDecimal("2.0"), LocalDate.of(2026, 5, 1), "IN_FRIDGE", "Leche", "fridge-1");
+        FridgeItemResponse response = new FridgeItemResponse("item-1", new BigDecimal("2.0"), LocalDate.of(2026, 5, 1), "IN_FRIDGE", "Leche");
         String body = objectMapper.writeValueAsString(Map.of(
                 "productId", "product-1",
-                "fridgeId", "ignored-fridge-id",
                 "quantity", "2.0",
                 "expirationDate", "2026-05-01",
                 "status", "IN_FRIDGE"
         ));
         String consumeBody = objectMapper.writeValueAsString(new BigDecimal("1.0"));
 
-        when(fridgeItemRestMapper.toDomain(any())).thenReturn(domain);
+        when(fridgeItemRestMapper.toDomain(any(MyFridgeItemRequest.class))).thenReturn(domain);
         when(fridgeItemRestMapper.toResponse(any())).thenReturn(response);
         when(fridgeItemRestMapper.toResponseList(any())).thenReturn(List.of(response));
 
         when(listMyFridgeItemsUseCase.execute(any())).thenReturn(List.of(domain));
-        when(createMyFridgeItemUseCase.execute(any(), eq("product-1"), eq(new BigDecimal("2.0")), eq(LocalDate.of(2026, 5, 1)))).thenReturn(domain);
+        when(createMyFridgeItemUseCase.execute(
+                any(),
+                eq("product-1"),
+                eq(new BigDecimal("2.0")),
+                eq(LocalDate.of(2026, 5, 1)),
+                eq(ItemStatus.IN_FRIDGE)))
+                .thenReturn(domain);
         when(updateMyFridgeItemUseCase.execute(any(), eq("item-1"), any())).thenReturn(domain);
         when(consumeMyFridgeItemUseCase.execute(any(), eq("item-1"), eq(new BigDecimal("1.0")))).thenReturn(domain);
         when(listMyExpiringFridgeItemsUseCase.execute(any(), eq(5))).thenReturn(List.of(domain));
         when(listMyFridgeItemsByCategoryUseCase.execute(any(), eq("cat-1"))).thenReturn(List.of(domain));
 
-        String[] roles = new String[]{"ROLE_MEMBER", "ROLE_OWNER", "ROLE_ADMIN"};
+        String[] roles = new String[]{"ROLE_OWNER", "ROLE_ADMIN"};
         for (String role : roles) {
             mockMvc.perform(get("/api/v1/fridge-items/me")
                             .with(user("user1").authorities(new SimpleGrantedAuthority(role))))
@@ -157,6 +164,30 @@ class FridgeItemControllerMeSecurityTest {
                             .with(user("user1").authorities(new SimpleGrantedAuthority(role))))
                     .andExpect(status().isOk());
         }
+    }
+
+    @Test
+    void meRoutes_shouldRejectMember() throws Exception {
+        String body = objectMapper.writeValueAsString(Map.of(
+                "productId", "product-1",
+                "quantity", "2.0",
+                "expirationDate", "2026-05-01",
+                "status", "IN_FRIDGE"
+        ));
+        String consumeBody = objectMapper.writeValueAsString(new BigDecimal("1.0"));
+        var member = user("user1").authorities(new SimpleGrantedAuthority("ROLE_MEMBER"));
+
+        mockMvc.perform(get("/api/v1/fridge-items/me").with(member)).andExpect(status().isForbidden());
+        mockMvc.perform(post("/api/v1/fridge-items/me").contentType(MediaType.APPLICATION_JSON).content(body).with(member))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(put("/api/v1/fridge-items/me/item-1").contentType(MediaType.APPLICATION_JSON).content(body).with(member))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(put("/api/v1/fridge-items/me/item-1/consume").contentType(MediaType.APPLICATION_JSON).content(consumeBody).with(member))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(put("/api/v1/fridge-items/me/item-1/mark-consumed").with(member)).andExpect(status().isForbidden());
+        mockMvc.perform(delete("/api/v1/fridge-items/me/item-1").with(member)).andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/v1/fridge-items/me/expiring").param("days", "5").with(member)).andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/v1/fridge-items/me/category/cat-1").with(member)).andExpect(status().isForbidden());
     }
 
     private FridgeItem buildItem(String itemId, String fridgeId) {

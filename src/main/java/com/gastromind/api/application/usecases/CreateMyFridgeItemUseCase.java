@@ -2,6 +2,7 @@ package com.gastromind.api.application.usecases;
 
 import com.gastromind.api.application.services.FridgeItemServiceImpl;
 import com.gastromind.api.domain.models.FridgeItem;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,8 +24,14 @@ public class CreateMyFridgeItemUseCase {
     }
 
     @Transactional
-    public FridgeItem execute(String principal, String productId, BigDecimal quantity, LocalDate expirationDate) {
+    public FridgeItem execute(
+            String principal,
+            String productId,
+            BigDecimal quantity,
+            LocalDate expirationDate,
+            ItemStatus status
+    ) {
         String fridgeId = resolveAuthenticatedHouseholdContextUseCase.execute(principal).fridge().getId();
-        return fridgeItemService.addProductToFridge(fridgeId, productId, quantity, expirationDate);
+        return fridgeItemService.addProductToFridge(fridgeId, productId, quantity, expirationDate, status);
     }
 }

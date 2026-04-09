@@ -43,7 +43,7 @@ public class FridgeController {
     @Autowired
     private DeleteMyFridgeUseCase deleteMyFridgeUseCase;
 
-    @Operation(summary = "Obtener todas las neveras", description = "Devuelve una lista completa de todas las neveras registradas.")
+    @Operation(summary = "Obtener todas las neveras (Solo Admin)", description = "Devuelve una lista completa de todas las neveras registradas.")
     @ApiStandardDoc
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -52,7 +52,7 @@ public class FridgeController {
         return ResponseEntity.ok(fridgeRestMapper.toResponseList(fridges));
     }
 
-    @Operation(summary = "Buscar nevera por ID", description = "Devuelve una única nevera basándose en su identificador único.")
+    @Operation(summary = "Buscar nevera por ID (Solo Admin)", description = "Devuelve una única nevera basándose en su identificador único.")
     @ApiStandardDoc
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -71,7 +71,7 @@ public class FridgeController {
         return ResponseEntity.ok(fridgeRestMapper.toResponse(fridge));
     }
 
-    @Operation(summary = "Crear nueva nevera", description = "Registra una nueva nevera en el sistema.")
+    @Operation(summary = "Crear nueva nevera (Solo Admin)", description = "Registra una nueva nevera en el sistema.")
     @ApiPostDoc
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -81,7 +81,7 @@ public class FridgeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(fridgeRestMapper.toResponse(savedFridge));
     }
 
-    @Operation(summary = "Crear mi nevera", description = "Crea la nevera del hogar asociado al usuario OWNER autenticado.")
+    @Operation(summary = "Crear mi nevera (solo OWNER)", description = "Crea la nevera del hogar asociado al usuario OWNER autenticado.")
     @ApiPostDoc
     @PostMapping("/me")
     @PreAuthorize("hasRole('OWNER')")
@@ -91,7 +91,7 @@ public class FridgeController {
         return ResponseEntity.status(HttpStatus.CREATED).body(fridgeRestMapper.toResponse(savedFridge));
     }
 
-    @Operation(summary = "Actualizar nevera", description = "Modifica los datos de una nevera existente.")
+    @Operation(summary = "Actualizar nevera (Solo Admin)", description = "Modifica los datos de una nevera existente.")
     @ApiStandardDoc
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -101,7 +101,7 @@ public class FridgeController {
         return ResponseEntity.ok(fridgeRestMapper.toResponse(updatedFridge));
     }
 
-    @Operation(summary = "Actualizar mi nevera", description = "Actualiza la nevera del hogar asociado al usuario OWNER autenticado.")
+    @Operation(summary = "Actualizar mi nevera (solo OWNER)", description = "Actualiza la nevera del hogar asociado al usuario OWNER autenticado.")
     @ApiStandardDoc
     @PutMapping("/me")
     @PreAuthorize("hasRole('OWNER')")
@@ -111,7 +111,7 @@ public class FridgeController {
         return ResponseEntity.ok(fridgeRestMapper.toResponse(updatedFridge));
     }
 
-    @Operation(summary = "Eliminar nevera", description = "Borra físicamente una nevera de la base de datos.")
+    @Operation(summary = "Eliminar nevera (Solo Admin)", description = "Borra físicamente una nevera de la base de datos.")
     @ApiStandardDoc
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -120,7 +120,7 @@ public class FridgeController {
         return ResponseEntity.noContent().build();
     }
 
-    @Operation(summary = "Eliminar mi nevera", description = "Elimina la nevera del hogar asociado al usuario OWNER autenticado.")
+    @Operation(summary = "Eliminar mi nevera (solo OWNER)", description = "Elimina la nevera del hogar asociado al usuario OWNER autenticado.")
     @ApiStandardDoc
     @DeleteMapping("/me")
     @PreAuthorize("hasRole('OWNER')")

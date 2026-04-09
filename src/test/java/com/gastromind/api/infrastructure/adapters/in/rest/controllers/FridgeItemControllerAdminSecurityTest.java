@@ -11,7 +11,9 @@ import com.gastromind.api.application.usecases.ListMyFridgeItemsUseCase;
 import com.gastromind.api.application.usecases.MarkMyFridgeItemConsumedUseCase;
 import com.gastromind.api.application.usecases.UpdateMyFridgeItemUseCase;
 import com.gastromind.api.domain.models.FridgeItem;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.FridgeItemRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.FridgeItemResponse;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
 import com.gastromind.api.infrastructure.adapters.in.rest.handler.GlobalExceptionHandler;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.FridgeItemRestMapper;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.UserJpaRepository;
@@ -101,8 +103,7 @@ class FridgeItemControllerAdminSecurityTest {
                 new BigDecimal("2.0"),
                 LocalDate.of(2026, 5, 1),
                 "IN_FRIDGE",
-                "Leche",
-                "fridge-1");
+                "Leche");
         String body = objectMapper.writeValueAsString(Map.of(
                 "productId", "product-1",
                 "fridgeId", "fridge-1",
@@ -115,13 +116,18 @@ class FridgeItemControllerAdminSecurityTest {
         when(fridgeItemService.findAll()).thenReturn(List.of(domain));
         when(fridgeItemService.findById("item-1")).thenReturn(domain);
         when(fridgeItemService.findByFridgeId("fridge-1")).thenReturn(List.of(domain));
-        when(fridgeItemService.addProductToFridge(eq("fridge-1"), eq("product-1"), eq(new BigDecimal("2.0")), eq(LocalDate.of(2026, 5, 1))))
+        when(fridgeItemService.addProductToFridge(
+                eq("fridge-1"),
+                eq("product-1"),
+                eq(new BigDecimal("2.0")),
+                eq(LocalDate.of(2026, 5, 1)),
+                eq(ItemStatus.IN_FRIDGE)))
                 .thenReturn(domain);
         when(fridgeItemService.update(eq("item-1"), any())).thenReturn(domain);
         when(fridgeItemService.consumePartially(eq("item-1"), eq(new BigDecimal("1.0")))).thenReturn(domain);
         when(fridgeItemService.getExpiringItems(eq("fridge-1"), eq(5))).thenReturn(List.of(domain));
         when(fridgeItemService.getInventoryByCategory(eq("fridge-1"), eq("cat-1"))).thenReturn(List.of(domain));
-        when(fridgeItemRestMapper.toDomain(any())).thenReturn(domain);
+        when(fridgeItemRestMapper.toDomain(any(FridgeItemRequest.class))).thenReturn(domain);
         when(fridgeItemRestMapper.toResponse(any())).thenReturn(response);
         when(fridgeItemRestMapper.toResponseList(any())).thenReturn(List.of(response));
 
@@ -175,7 +181,12 @@ class FridgeItemControllerAdminSecurityTest {
         verify(fridgeItemService).findAll();
         verify(fridgeItemService).findById("item-1");
         verify(fridgeItemService).findByFridgeId("fridge-1");
-        verify(fridgeItemService).addProductToFridge(eq("fridge-1"), eq("product-1"), eq(new BigDecimal("2.0")), eq(LocalDate.of(2026, 5, 1)));
+        verify(fridgeItemService).addProductToFridge(
+                eq("fridge-1"),
+                eq("product-1"),
+                eq(new BigDecimal("2.0")),
+                eq(LocalDate.of(2026, 5, 1)),
+                eq(ItemStatus.IN_FRIDGE));
         verify(fridgeItemService).update(eq("item-1"), any());
         verify(fridgeItemService).consumePartially(eq("item-1"), eq(new BigDecimal("1.0")));
         verify(fridgeItemService).markAsConsumed("item-1");

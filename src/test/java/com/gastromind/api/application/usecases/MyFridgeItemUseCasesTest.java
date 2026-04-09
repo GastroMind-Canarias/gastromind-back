@@ -8,6 +8,7 @@ import com.gastromind.api.domain.models.Product;
 import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.enums.Role;
 import com.gastromind.api.domain.ports.out.FridgeItemRepository;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -50,13 +51,28 @@ class MyFridgeItemUseCasesTest {
 
         FridgeItem created = buildItem("item-1", "fridge-1");
         when(resolveUseCase.execute("member1")).thenReturn(buildContext(Role.ROLE_MEMBER, "house-1", "fridge-1"));
-        when(fridgeItemService.addProductToFridge(eq("fridge-1"), eq("product-1"), eq(new BigDecimal("2.50")), eq(LocalDate.of(2026, 4, 20))))
+        when(fridgeItemService.addProductToFridge(
+                eq("fridge-1"),
+                eq("product-1"),
+                eq(new BigDecimal("2.50")),
+                eq(LocalDate.of(2026, 4, 20)),
+                eq(ItemStatus.GOOD)))
                 .thenReturn(created);
 
-        FridgeItem result = useCase.execute("member1", "product-1", new BigDecimal("2.50"), LocalDate.of(2026, 4, 20));
+        FridgeItem result = useCase.execute(
+                "member1",
+                "product-1",
+                new BigDecimal("2.50"),
+                LocalDate.of(2026, 4, 20),
+                ItemStatus.GOOD);
 
         assertEquals("item-1", result.getId());
-        verify(fridgeItemService).addProductToFridge("fridge-1", "product-1", new BigDecimal("2.50"), LocalDate.of(2026, 4, 20));
+        verify(fridgeItemService).addProductToFridge(
+                "fridge-1",
+                "product-1",
+                new BigDecimal("2.50"),
+                LocalDate.of(2026, 4, 20),
+                ItemStatus.GOOD);
     }
 
     @Test
