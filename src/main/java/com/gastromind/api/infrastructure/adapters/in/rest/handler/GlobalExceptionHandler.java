@@ -3,6 +3,7 @@ package com.gastromind.api.infrastructure.adapters.in.rest.handler;
 import com.gastromind.api.domain.exceptions.AiRecipeException;
 import com.gastromind.api.domain.exceptions.AiTicketException;
 import com.gastromind.api.domain.exceptions.ForbiddenException;
+import com.gastromind.api.domain.exceptions.FridgeAlreadyExistsException;
 import com.gastromind.api.domain.exceptions.ImageProcessingException;
 import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.exceptions.UnsupportedUnitException;
@@ -42,6 +43,11 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex) {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+
+    @ExceptionHandler(FridgeAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleFridgeAlreadyExistsException(FridgeAlreadyExistsException ex) {
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
 
     @ExceptionHandler(AiRecipeException.class)
