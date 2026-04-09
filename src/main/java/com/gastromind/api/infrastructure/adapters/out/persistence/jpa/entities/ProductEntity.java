@@ -19,6 +19,13 @@ public class ProductEntity {
     @Column(name = "is_essential")
     private Boolean isEssential;
 
+    /** Alta desde ticket u otro origen que requiera revisar el producto en catálogo. */
+    @Column(name = "needs_review")
+    private Boolean needsReview;
+
+    @Column(name = "review_note", length = 500)
+    private String reviewNote;
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     private CategoryEntity category;
@@ -84,6 +91,22 @@ public class ProductEntity {
 
     public void setIsEssential(Boolean isEssential) {
         this.isEssential = isEssential;
+    }
+
+    public Boolean getNeedsReview() {
+        return needsReview;
+    }
+
+    public void setNeedsReview(Boolean needsReview) {
+        this.needsReview = needsReview;
+    }
+
+    public String getReviewNote() {
+        return reviewNote;
+    }
+
+    public void setReviewNote(String reviewNote) {
+        this.reviewNote = reviewNote;
     }
 
     public CategoryEntity getCategory() {

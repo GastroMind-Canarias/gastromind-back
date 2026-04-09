@@ -13,4 +13,6 @@ public interface UnitRepository {
     void deleteById(String id);
 
     List<Unit> findAll();
+
+    Optional<Unit> findFirstByNameIgnoreCase(String name);
 }

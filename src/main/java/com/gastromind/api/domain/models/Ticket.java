@@ -1,5 +1,8 @@
 package com.gastromind.api.domain.models;
+
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 public class Ticket {
@@ -8,6 +11,7 @@ public class Ticket {
     Store store_id;
     float total_amount;
     LocalDate purchaseDate;
+    List<TicketItem> items = new ArrayList<>();
 
     public Ticket() {
     }
@@ -16,13 +20,22 @@ public class Ticket {
         this.id = id;
     }
 
-
     public Ticket(String id, User user_id, Store store_id, float total_amount, LocalDate purchaseDate) {
         this.id = id;
         this.user_id = user_id;
         this.store_id = store_id;
         this.total_amount = total_amount;
         this.purchaseDate = purchaseDate;
+    }
+
+    public Ticket(String id, User user_id, Store store_id, float total_amount, LocalDate purchaseDate,
+            List<TicketItem> items) {
+        this.id = id;
+        this.user_id = user_id;
+        this.store_id = store_id;
+        this.total_amount = total_amount;
+        this.purchaseDate = purchaseDate;
+        this.items = items != null ? items : new ArrayList<>();
     }
 
     public String getId() {
@@ -63,6 +76,14 @@ public class Ticket {
 
     public void setPurchaseDate(LocalDate purchaseDate) {
         this.purchaseDate = purchaseDate;
+    }
+
+    public List<TicketItem> getItems() {
+        return items;
+    }
+
+    public void setItems(List<TicketItem> items) {
+        this.items = items != null ? items : new ArrayList<>();
     }
 
     @Override

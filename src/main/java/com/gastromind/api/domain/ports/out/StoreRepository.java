@@ -13,4 +13,6 @@ public interface StoreRepository {
     void deleteById(String id);
 
     List<Store> findAll();
+
+    Optional<Store> findFirstByNameIgnoreCase(String name);
 }
