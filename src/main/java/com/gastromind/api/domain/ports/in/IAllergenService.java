@@ -1,8 +1,8 @@
 package com.gastromind.api.domain.ports.in;
 
-import java.util.List;
-
 import com.gastromind.api.domain.models.Allergen;
+
+import java.util.List;
 
 public interface IAllergenService {
     List<Allergen> findAll();

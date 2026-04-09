@@ -1,20 +1,21 @@
 package com.gastromind.api.application.services;
 
-import java.util.List;
-
-import com.gastromind.api.domain.models.enums.Role;
-import com.gastromind.api.domain.ports.out.AllergenRepository;
-import com.gastromind.api.infrastructure.adapters.in.rest.dtos.user.UserRequest;
-import org.springframework.stereotype.Service;
-
 import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.models.Allergen;
 import com.gastromind.api.domain.models.User;
+import com.gastromind.api.domain.models.enums.Role;
 import com.gastromind.api.domain.ports.in.IUserService;
+import com.gastromind.api.domain.ports.out.AllergenRepository;
 import com.gastromind.api.domain.ports.out.UserRepository;
-
 import jakarta.transaction.Transactional;
+import org.springframework.stereotype.Service;
 
+import java.util.LinkedHashSet;
+import java.util.List;
+
+/**
+ * Alérgenos de usuario: {@code user_allergens} es la relación Many-to-Many; quitar un alérgeno no borra filas de {@code allergen}.
+ */
 @Service
 public class UserServiceImpl implements IUserService {
 
@@ -90,10 +91,50 @@ public class UserServiceImpl implements IUserService {
 
     @Override
     @Transactional
+    public void addAllergensBulk(String userId, List<String> allergenIds) {
+        if (allergenIds == null || allergenIds.isEmpty()) {
+            return;
+        }
+        for (String id : new LinkedHashSet<>(allergenIds)) {
+            if (id == null || id.isBlank()) {
+                continue;
+            }
+            addAllergen(userId, id);
+        }
+    }
+
+    @Override
+    @Transactional
     public void removeAllergen(String userId, String allergenId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
         user.removeAllergen(allergenId);
         userRepository.save(user);
+    }
+
+    @Override
+    @Transactional
+    public void removeAllergensBulk(String userId, List<String> allergenIds) {
+        if (allergenIds == null) {
+            return;
+        }
+        for (String id : allergenIds) {
+            if (id == null || id.isBlank()) {
+                continue;
+            }
+            removeAllergen(userId, id);
+        }
+    }
+
+    @Override
+    @Transactional
+    public void replaceAllergens(String userId, List<String> allergenIds) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+        user.getAllergens().clear();
+        userRepository.save(user);
+        if (allergenIds == null || allergenIds.isEmpty()) {
+            return;
+        }
+        addAllergensBulk(userId, allergenIds);
     }
 
     @Override

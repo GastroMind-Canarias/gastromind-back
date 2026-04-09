@@ -4,6 +4,12 @@ public class Product {
     String id;
     String name;
     boolean is_essential;
+    /**
+     * Si el producto viene de un alta automática (ticket) y conviene revisar nombre/categoría en catálogo.
+     */
+    boolean needsReview;
+    /** Motivo o detalle para el usuario (ej. creado desde ticket). */
+    String reviewNote;
     Allergen allergen;
 
     /**
@@ -58,6 +64,22 @@ public class Product {
 
     public void setIs_essential(boolean is_essential) {
         this.is_essential = is_essential;
+    }
+
+    public boolean isNeedsReview() {
+        return needsReview;
+    }
+
+    public void setNeedsReview(boolean needsReview) {
+        this.needsReview = needsReview;
+    }
+
+    public String getReviewNote() {
+        return reviewNote;
+    }
+
+    public void setReviewNote(String reviewNote) {
+        this.reviewNote = reviewNote;
     }
 
     @Override

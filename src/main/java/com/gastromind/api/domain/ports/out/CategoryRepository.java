@@ -1,9 +1,9 @@
 package com.gastromind.api.domain.ports.out;
 
+import com.gastromind.api.domain.models.Category;
+
 import java.util.List;
 import java.util.Optional;
-
-import com.gastromind.api.domain.models.Category;
 
 public interface CategoryRepository {
     Category save(Category category);

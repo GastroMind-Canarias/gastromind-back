@@ -1,8 +1,9 @@
 package com.gastromind.api.domain.ports.out;
 
+import com.gastromind.api.domain.models.FridgeItem;
+
 import java.util.List;
 import java.util.Optional;
-import com.gastromind.api.domain.models.FridgeItem;
 
 public interface FridgeItemRepository {
     FridgeItem save(FridgeItem fridgeItem);

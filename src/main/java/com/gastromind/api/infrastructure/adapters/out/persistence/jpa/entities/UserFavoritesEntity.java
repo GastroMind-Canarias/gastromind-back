@@ -3,7 +3,11 @@ package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "user_favorites")
+@Table(
+        name = "user_favorites",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_user_favorites_user_recipe",
+                columnNames = {"user_id", "recipe_id"}))
 public class UserFavoritesEntity {
 
     @Id

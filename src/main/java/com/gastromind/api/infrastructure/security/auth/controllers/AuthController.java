@@ -1,13 +1,12 @@
 package com.gastromind.api.infrastructure.security.auth.controllers;
 
+import com.gastromind.api.application.usecases.RegisterUserUseCase;
+import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
 import com.gastromind.api.infrastructure.security.auth.dtos.LoginRequest;
 import com.gastromind.api.infrastructure.security.auth.dtos.RegisterRequest;
 import com.gastromind.api.infrastructure.security.auth.dtos.TokenResponse;
 import com.gastromind.api.infrastructure.security.auth.services.IAuthService;
 import com.gastromind.api.infrastructure.security.auth.services.IJwtService;
-import com.gastromind.api.application.usecases.RegisterUserUseCase;
-import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
-import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -47,11 +46,18 @@ public class AuthController {
         }
     }
 
-    @Operation(summary = "Registrar nuevo usuario", description = "Crea una cuenta de usuario en el sistema con las credenciales proporcionadas.")
+    @Operation(
+            summary = "Registrar nuevo usuario",
+            description = """
+                    Crea la cuenta y vincula el hogar de una de dos formas:
+                    - **Crear hogar**: `householdMode=CREATE_NEW` (o sin token) + `householdName`; el usuario queda como OWNER. Opcional: `applianceTypes`.
+                    - **Unirse a un hogar**: `householdMode=JOIN_EXISTING` (o solo `inviteToken`) + código de invitación; el usuario queda como MEMBER. `householdName` y `applianceTypes` no aplican.
+                    El campo `role` del cuerpo, si se envía, no determina el rol final (lo fija el servidor)."""
+    )
     @ApiPostDoc
     @PostMapping("/register")
     public ResponseEntity<String> register(@Valid @RequestBody RegisterRequest request) {
-        registerUserUseCase.registrarUsuarioCompleto(request);
+        registerUserUseCase.exec(request);
         return ResponseEntity.status(HttpStatus.CREATED).body("Usuario registrado con exito");
     }
 }

@@ -1,19 +1,9 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities;
 
+import jakarta.persistence.*;
+
 import java.util.List;
 import java.util.Set;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "product")
@@ -23,18 +13,31 @@ public class ProductEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true, length = 200)
     private String name;
 
     @Column(name = "is_essential")
     private Boolean isEssential;
+
+    /** Alta desde ticket u otro origen que requiera revisar el producto en catálogo. */
+    @Column(name = "needs_review")
+    private Boolean needsReview;
+
+    @Column(name = "review_note", length = 500)
+    private String reviewNote;
 
     @ManyToOne
     @JoinColumn(name = "category_id")
     private CategoryEntity category;
 
     @ManyToMany
-    @JoinTable(name = "product_allergens", joinColumns = @JoinColumn(name = "product_id"), inverseJoinColumns = @JoinColumn(name = "allergen_id"))
+    @JoinTable(
+            name = "product_allergens",
+            joinColumns = @JoinColumn(name = "product_id"),
+            inverseJoinColumns = @JoinColumn(name = "allergen_id"),
+            uniqueConstraints = @UniqueConstraint(
+                    name = "uk_product_allergens_product_allergen",
+                    columnNames = {"product_id", "allergen_id"}))
     private Set<AllergenEntity> allergens;
 
     @OneToMany(mappedBy = "product")
@@ -88,6 +91,22 @@ public class ProductEntity {
 
     public void setIsEssential(Boolean isEssential) {
         this.isEssential = isEssential;
+    }
+
+    public Boolean getNeedsReview() {
+        return needsReview;
+    }
+
+    public void setNeedsReview(Boolean needsReview) {
+        this.needsReview = needsReview;
+    }
+
+    public String getReviewNote() {
+        return reviewNote;
+    }
+
+    public void setReviewNote(String reviewNote) {
+        this.reviewNote = reviewNote;
     }
 
     public CategoryEntity getCategory() {

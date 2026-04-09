@@ -8,13 +8,15 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = { UserRestMapper.class })
 public interface HouseHoldRestMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "members", ignore = true)
+    @Mapping(target = "appliances", ignore = true)
     HouseHold toDomain(HouseHoldRequest request);
 
+    @Mapping(target = "membersCount", expression = "java(domain.getMembersCount())")
     HouseHoldResponse toResponse(HouseHold domain);
 
     List<HouseHoldResponse> toResponseList(List<HouseHold> houseHolds);

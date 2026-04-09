@@ -1,16 +1,15 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.gastromind.api.domain.models.Category;
 import com.gastromind.api.domain.ports.out.CategoryRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.CategoryEntity;
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.CategoryJpaRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers.CategoryMapper;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.CategoryJpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Optional;
 @Component
 public class CategoryAdapter implements CategoryRepository {
 

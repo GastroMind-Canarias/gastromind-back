@@ -3,6 +3,7 @@ package com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Schema(description = "Información del ticket devuelta por la API")
 public record TicketResponse(
@@ -19,5 +20,8 @@ public record TicketResponse(
         float total_amount,
 
         @Schema(example = "2024-03-15")
-        LocalDate purchaseDate
+        LocalDate purchaseDate,
+
+        @Schema(description = "Líneas del ticket con productos del catálogo")
+        List<TicketItemResponse> items
 ) {}

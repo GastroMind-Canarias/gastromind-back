@@ -1,19 +1,14 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities;
 
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ApplianceType;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 
 @Entity
-@Table(name = "household_appliances")
+@Table(
+        name = "household_appliances",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_household_appliance",
+                columnNames = {"household_id", "appliance"}))
 public class HouseholdApplianceEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

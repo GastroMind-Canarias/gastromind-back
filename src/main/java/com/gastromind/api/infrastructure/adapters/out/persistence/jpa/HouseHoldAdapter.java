@@ -1,16 +1,15 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.gastromind.api.domain.models.HouseHold;
 import com.gastromind.api.domain.ports.out.HouseHoldRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.HouseholdEntity;
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.HouseHoldJpaRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers.HouseholdMapper;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.HouseHoldJpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Optional;
 
 @Component
 public class HouseHoldAdapter implements HouseHoldRepository {
@@ -25,6 +24,11 @@ public class HouseHoldAdapter implements HouseHoldRepository {
     public HouseHold save(HouseHold houseHold) {
         HouseholdEntity entity = householdMapper.toEntity(houseHold);
         return householdMapper.toDomain(holdJpaRepository.save(entity));
+    }
+
+    @Override
+    public boolean existsById(String id) {
+        return holdJpaRepository.existsById(id);
     }
 
     @Override

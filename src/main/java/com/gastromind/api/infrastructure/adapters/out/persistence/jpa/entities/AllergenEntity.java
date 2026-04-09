@@ -1,13 +1,8 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities;
 
-import java.util.Set;
+import jakarta.persistence.*;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
+import java.util.Set;
 
 @Entity
 @Table(name = "allergen")
@@ -16,6 +11,7 @@ public class AllergenEntity {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @Column(nullable = false, unique = true, length = 120)
     private String name;
 
     @ManyToMany(mappedBy = "allergens")

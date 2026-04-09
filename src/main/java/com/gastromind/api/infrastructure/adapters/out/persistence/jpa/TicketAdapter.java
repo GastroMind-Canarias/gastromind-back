@@ -1,16 +1,15 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.gastromind.api.domain.models.Ticket;
 import com.gastromind.api.domain.ports.out.TicketRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.TicketEntity;
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.TicketJpaRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers.TicketMapper;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.TicketJpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Optional;
 @Component
 public class TicketAdapter implements TicketRepository {
 

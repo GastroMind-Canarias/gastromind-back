@@ -1,13 +1,14 @@
 package com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket;
 
 import io.swagger.v3.oas.annotations.media.Schema;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.Positive;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Schema(description = "Datos necesarios para registrar un ticket")
 public record TicketRequest(
@@ -28,5 +29,8 @@ public record TicketRequest(
         @Schema(example = "2024-03-15", description = "Fecha en la que se realizo la compra")
         @NotNull(message = "La fecha de compra es obligatoria")
         @PastOrPresent(message = "La fecha no puede ser futura")
-        LocalDate purchaseDate
+        LocalDate purchaseDate,
+
+        @Schema(description = "Líneas del ticket (opcional; vacío = solo cabecera)")
+        List<@Valid TicketItemRequest> items
 ) {}

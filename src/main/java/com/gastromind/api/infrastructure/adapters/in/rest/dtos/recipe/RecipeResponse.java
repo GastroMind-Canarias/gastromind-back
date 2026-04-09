@@ -2,12 +2,9 @@ package com.gastromind.api.infrastructure.adapters.in.rest.dtos.recipe;
 
 import com.gastromind.api.domain.models.enums.Appliance;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
-import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Schema(description = "Respuesta detallada de la receta")
 public record RecipeResponse(
@@ -26,6 +23,8 @@ public record RecipeResponse(
         @Schema(example = "Media")
         String difficulty,
         @Schema(example = "10-12-2025")
-        LocalDate created_at
+        LocalDate created_at,
+        @Schema(description = "Productos del inventario empleados y cantidades (p. ej. sugerencia IA)")
+        List<IngredientUsageResponse> ingredientsUsed
 ) {
 }

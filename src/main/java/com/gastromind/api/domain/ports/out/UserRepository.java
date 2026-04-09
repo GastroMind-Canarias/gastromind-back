@@ -1,10 +1,9 @@
 package com.gastromind.api.domain.ports.out;
 
+import com.gastromind.api.domain.models.User;
+
 import java.util.List;
 import java.util.Optional;
-
-import com.gastromind.api.domain.models.Allergen;
-import com.gastromind.api.domain.models.User;
 
 public interface UserRepository {
 
@@ -31,6 +30,14 @@ public interface UserRepository {
      * @return El usuario o null
      */
     Optional<User> findByName(String name);
+
+    /**
+     * Busca un User por email
+     *
+     * @param email email del usuairo
+     * @return El usuario o null
+     */
+    Optional<User> findByEmail(String email);
 
     /**
      * Borra el usuario

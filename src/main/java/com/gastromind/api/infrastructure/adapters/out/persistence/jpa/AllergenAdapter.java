@@ -1,16 +1,15 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
-
 import com.gastromind.api.domain.models.Allergen;
 import com.gastromind.api.domain.ports.out.AllergenRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.AllergenEntity;
-import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.AllergenJpaRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers.AllergenMapper;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.AllergenJpaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+import java.util.Optional;
 @Component
 public class AllergenAdapter implements AllergenRepository {
 

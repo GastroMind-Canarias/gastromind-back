@@ -1,9 +1,9 @@
 package com.gastromind.api.domain.ports.out;
 
+import com.gastromind.api.domain.models.Fridge;
+
 import java.util.List;
 import java.util.Optional;
-
-import com.gastromind.api.domain.models.Fridge;
 
 public interface FridgeRepository {
     Fridge save(Fridge fridge);
@@ -13,4 +13,6 @@ public interface FridgeRepository {
     void deleteById(String id);
 
     List<Fridge> findAll();
+
+    List<Fridge> findByHouseholdId(String householdId);
 }
