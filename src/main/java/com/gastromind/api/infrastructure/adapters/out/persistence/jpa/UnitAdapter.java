@@ -41,5 +41,8 @@ public class UnitAdapter implements UnitRepository {
         return unitMapper.toDomainList(unitEntities);
     }
 
-    
+    @Override
+    public Optional<Unit> findFirstByNameIgnoreCase(String name) {
+        return unitJpaRepository.findFirstByNameIgnoreCase(name).map(unitMapper::toDomain);
+    }
 }

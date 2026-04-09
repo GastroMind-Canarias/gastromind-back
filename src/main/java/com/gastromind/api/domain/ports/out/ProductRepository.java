@@ -13,4 +13,9 @@ public interface ProductRepository {
     void deleteById(String id);
 
     List<Product> findAll();
+
+    /**
+     * Empareja por nombre sin distinguir mayúsculas (nombre único en catálogo).
+     */
+    Optional<Product> findFirstByNameIgnoreCase(String name);
 }

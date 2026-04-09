@@ -49,7 +49,8 @@ FROM (VALUES
     ('Gramos'),
     ('Mililitros'),
     ('Unidades'),
-    ('Kilogramos')
+    ('Kilogramos'),
+    ('Litros')
 ) AS v(name)
 WHERE NOT EXISTS (SELECT 1 FROM unit u WHERE u.name = v.name);
 

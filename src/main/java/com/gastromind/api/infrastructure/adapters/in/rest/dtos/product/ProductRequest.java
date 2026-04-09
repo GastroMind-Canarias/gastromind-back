@@ -12,6 +12,10 @@ public record ProductRequest(
         @Schema(example = "true", allowableValues = {"true", "false"})
         @NotNull(message = "Debe tener alguno de los dos valores")
         boolean is_essential,
+        @Schema(description = "Si el producto debe revisarse en catálogo (p. ej. creado desde ticket). Omitir = false.")
+        Boolean needs_review,
+        @Schema(description = "Motivo o detalle para el usuario")
+        String review_note,
         @Schema(example = "550e8400-e29b-41d4-a716-446655440000")
         String allergen_id
 ) {

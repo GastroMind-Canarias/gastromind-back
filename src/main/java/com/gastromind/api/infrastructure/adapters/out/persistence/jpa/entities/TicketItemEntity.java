@@ -1,5 +1,6 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities;
 
+import com.gastromind.api.domain.models.enums.TicketLineVerificationStatus;
 import jakarta.persistence.*;
 
 import java.math.BigDecimal;
@@ -15,6 +16,10 @@ public class TicketItemEntity {
     @Column(precision = 10, scale = 2, nullable = false)
     private BigDecimal quantity;
 
+    @ManyToOne
+    @JoinColumn(name = "unit_id", nullable = false)
+    private UnitEntity unit;
+
     @Column(name = "price_unit", precision = 10, scale = 2, nullable = false)
     private BigDecimal priceUnit;
 
@@ -25,6 +30,13 @@ public class TicketItemEntity {
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
     private ProductEntity product;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "verification_status", nullable = false, length = 32)
+    private TicketLineVerificationStatus verificationStatus = TicketLineVerificationStatus.OK;
+
+    @Column(name = "line_note", length = 500)
+    private String lineNote;
 
     public TicketItemEntity() {
     }
@@ -58,6 +70,14 @@ public class TicketItemEntity {
         this.quantity = quantity;
     }
 
+    public UnitEntity getUnit() {
+        return unit;
+    }
+
+    public void setUnit(UnitEntity unit) {
+        this.unit = unit;
+    }
+
     public BigDecimal getPriceUnit() {
         return priceUnit;
     }
@@ -80,6 +100,22 @@ public class TicketItemEntity {
 
     public void setProduct(ProductEntity product) {
         this.product = product;
+    }
+
+    public TicketLineVerificationStatus getVerificationStatus() {
+        return verificationStatus;
+    }
+
+    public void setVerificationStatus(TicketLineVerificationStatus verificationStatus) {
+        this.verificationStatus = verificationStatus;
+    }
+
+    public String getLineNote() {
+        return lineNote;
+    }
+
+    public void setLineNote(String lineNote) {
+        this.lineNote = lineNote;
     }
 
     @Override

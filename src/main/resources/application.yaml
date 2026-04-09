@@ -1,4 +1,8 @@
 spring:
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 12MB
   datasource:
     url: jdbc:postgresql://localhost:5432/gastromind_local
     username: myuser
@@ -42,6 +46,8 @@ app:
     suggestion-cache:
       ttl-days: 10
       key-prefix: "gastromind:recipe:suggestion:"
+    ticket:
+      max-image-bytes: 10485760
   cors:
     allowed-origins:
       - "http://localhost:3000"

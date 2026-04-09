@@ -40,4 +40,9 @@ public class StoreAdapter implements StoreRepository {
         return storeMapper.toDomainList(storeEntities);
     }
 
+    @Override
+    public Optional<com.gastromind.api.domain.models.Store> findFirstByNameIgnoreCase(String name) {
+        return storeJpaRepository.findFirstByNameIgnoreCase(name).map(storeMapper::toDomain);
+    }
+
 }

@@ -41,4 +41,9 @@ public class ProductAdapter implements ProductRepository {
         return productMapper.toDomainList(productEntities);
     }
 
+    @Override
+    public Optional<Product> findFirstByNameIgnoreCase(String name) {
+        return productJpaRepository.findFirstByNameIgnoreCase(name).map(productMapper::toDomain);
+    }
+
 }
