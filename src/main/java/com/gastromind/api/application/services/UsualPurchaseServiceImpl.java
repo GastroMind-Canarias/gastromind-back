@@ -1,5 +1,6 @@
 package com.gastromind.api.application.services;
 
+import com.gastromind.api.domain.exceptions.ForbiddenException;
 import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.models.UsualPurchase;
 import com.gastromind.api.domain.ports.in.IUsualPurchaseService;
@@ -24,8 +25,27 @@ public class UsualPurchaseServiceImpl implements IUsualPurchaseService {
     }
 
     @Override
+    public List<UsualPurchase> findAllByUserId(String userId) {
+        return repository.findAllByUserId(userId);
+    }
+
+    @Override
     public UsualPurchase findById(String id) {
         return repository.findById(id).orElseThrow(()-> new NotFoundException("Producto más comprado no encontrado"));
+    }
+
+    @Override
+    public UsualPurchase findByIdForUser(String id, String userId) {
+        UsualPurchase up = findById(id);
+        requireUsualPurchaseOwner(up, userId);
+        return up;
+    }
+
+    private static void requireUsualPurchaseOwner(UsualPurchase usualPurchase, String userId) {
+        if (usualPurchase.getUser_id() == null || usualPurchase.getUser_id().getId() == null
+                || !usualPurchase.getUser_id().getId().equals(userId)) {
+            throw new ForbiddenException("No tiene acceso a este registro de compra habitual");
+        }
     }
 
     @Override
@@ -41,8 +61,22 @@ public class UsualPurchaseServiceImpl implements IUsualPurchaseService {
     }
 
     @Override
+    public UsualPurchase updateForUser(String id, UsualPurchase usualPurchase, String userId) {
+        UsualPurchase existing = findByIdForUser(id, userId);
+        usualPurchase.setId(id);
+        usualPurchase.setUser_id(existing.getUser_id());
+        return repository.save(usualPurchase);
+    }
+
+    @Override
     public void delete(String id) {
         findById(id);
+        repository.deleteById(id);
+    }
+
+    @Override
+    public void deleteForUser(String id, String userId) {
+        findByIdForUser(id, userId);
         repository.deleteById(id);
     }
 }

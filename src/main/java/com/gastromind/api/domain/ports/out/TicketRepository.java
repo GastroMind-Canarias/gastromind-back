@@ -13,4 +13,6 @@ public interface TicketRepository {
     void deleteById(String id);
 
     List<Ticket> findAll();
+
+    List<Ticket> findAllByUserId(String userId);
 }

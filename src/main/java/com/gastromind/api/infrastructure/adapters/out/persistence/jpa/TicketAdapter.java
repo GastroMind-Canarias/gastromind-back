@@ -40,5 +40,9 @@ public class TicketAdapter implements TicketRepository {
         List<TicketEntity> ticketEntities = ticketJpaRepository.findAll();
         return ticketMapper.toDomainList(ticketEntities);
     }
-    
+
+    @Override
+    public List<Ticket> findAllByUserId(String userId) {
+        return ticketMapper.toDomainList(ticketJpaRepository.findByUser_Id(userId));
+    }
 }

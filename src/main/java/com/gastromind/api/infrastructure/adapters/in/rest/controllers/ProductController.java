@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class ProductController {
     @Operation(summary = "Obtener todos los productos", description = "Devuelve una lista completa de todos los productos registrados.")
     @ApiStandardDoc
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<ProductResponse>> getAll() {
         List<Product> products = productServiceImpl.findAll();
         return ResponseEntity.ok(productMapper.toResponseList(products));
@@ -40,6 +42,7 @@ public class ProductController {
     @Operation(summary = "Buscar producto por ID", description = "Devuelve un único producto basándose en su identificador único.")
     @ApiStandardDoc
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<ProductResponse> getById(
             @Parameter(description = "ID del producto a buscar", example = "1") @PathVariable String id) {
         Product product = productServiceImpl.findById(id);
@@ -49,6 +52,7 @@ public class ProductController {
     @Operation(summary = "Crear nuevo producto", description = "Registra un nuevo producto en el sistema.")
     @ApiPostDoc
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> create(@Valid @RequestBody ProductRequest request) {
         Product productDomain = productMapper.toDomain(request);
         Product savedProduct = productServiceImpl.create(productDomain);
@@ -58,6 +62,7 @@ public class ProductController {
     @Operation(summary = "Actualizar producto", description = "Modifica los datos de un producto existente.")
     @ApiStandardDoc
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<ProductResponse> update(@PathVariable String id, @Valid @RequestBody ProductRequest request) {
         Product productDomain = productMapper.toDomain(request);
         Product updatedProduct = productServiceImpl.update(id, productDomain);
@@ -67,6 +72,7 @@ public class ProductController {
     @Operation(summary = "Eliminar producto", description = "Borra físicamente un producto de la base de datos.")
     @ApiStandardDoc
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable String id) {
         productServiceImpl.delete(id);
         return ResponseEntity.noContent().build();

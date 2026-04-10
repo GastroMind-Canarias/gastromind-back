@@ -1,8 +1,10 @@
 package com.gastromind.api.application.services;
 
+import com.gastromind.api.domain.exceptions.ForbiddenException;
 import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.models.Product;
 import com.gastromind.api.domain.models.Ticket;
+import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.TicketItem;
 import com.gastromind.api.domain.models.Unit;
 import com.gastromind.api.domain.models.enums.TicketLineVerificationStatus;
@@ -21,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -48,6 +51,7 @@ class TicketServiceImplTest {
     @BeforeEach
     void setUp() {
         existing = new Ticket("t-1");
+        existing.setUser_id(new User("owner-1"));
         defaultUd = new Unit("u-def", "Unidades");
         otherUnit = new Unit("u-kg", "Kg");
         fullProduct = new Product("p-1");
@@ -58,6 +62,24 @@ class TicketServiceImplTest {
     void findAll_delegates() {
         when(repository.findAll()).thenReturn(List.of(existing));
         assertEquals(List.of(existing), service.findAll());
+    }
+
+    @Test
+    void findAllByUserId_delegates() {
+        when(repository.findAllByUserId("owner-1")).thenReturn(List.of(existing));
+        assertEquals(List.of(existing), service.findAllByUserId("owner-1"));
+    }
+
+    @Test
+    void findByIdForUser_returnsWhenOwner() {
+        when(repository.findById("t-1")).thenReturn(Optional.of(existing));
+        assertSame(existing, service.findByIdForUser("t-1", "owner-1"));
+    }
+
+    @Test
+    void findByIdForUser_throwsWhenNotOwner() {
+        when(repository.findById("t-1")).thenReturn(Optional.of(existing));
+        assertThrows(ForbiddenException.class, () -> service.findByIdForUser("t-1", "other"));
     }
 
     @Test
@@ -175,5 +197,32 @@ class TicketServiceImplTest {
         when(repository.findById("t-1")).thenReturn(Optional.of(existing));
         service.delete("t-1");
         verify(repository).deleteById(eq("t-1"));
+    }
+
+    @Test
+    void deleteForUser_verifiesOwnerThenDeletes() {
+        when(repository.findById("t-1")).thenReturn(Optional.of(existing));
+        service.deleteForUser("t-1", "owner-1");
+        verify(repository).deleteById(eq("t-1"));
+    }
+
+    @Test
+    void updateForUser_keepsOwnerUser() {
+        when(repository.findById("t-1")).thenReturn(Optional.of(existing));
+        when(unitRepository.findFirstByNameIgnoreCase("Unidades")).thenReturn(Optional.of(defaultUd));
+        when(productRepository.findById("p-1")).thenReturn(Optional.of(fullProduct));
+
+        TicketItem line = new TicketItem();
+        line.setProduct(new Product("p-1"));
+        Ticket patch = new Ticket();
+        patch.setItems(List.of(line));
+
+        when(repository.save(any(Ticket.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Ticket out = service.updateForUser("t-1", patch, "owner-1");
+
+        assertEquals("t-1", out.getId());
+        assertEquals("owner-1", out.getUser_id().getId());
+        verify(repository).save(patch);
     }
 }

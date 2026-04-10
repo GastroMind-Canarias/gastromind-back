@@ -1,5 +1,6 @@
 package com.gastromind.api.application.services;
 
+import com.gastromind.api.domain.exceptions.ForbiddenException;
 import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.models.Product;
 import com.gastromind.api.domain.models.Ticket;
@@ -37,8 +38,27 @@ public class TicketServiceImpl implements ITicketService {
     }
 
     @Override
+    public List<Ticket> findAllByUserId(String userId) {
+        return repository.findAllByUserId(userId);
+    }
+
+    @Override
     public Ticket findById(String id) {
         return repository.findById(id).orElseThrow(() -> new NotFoundException("Ticket no encontrado"));
+    }
+
+    @Override
+    public Ticket findByIdForUser(String ticketId, String userId) {
+        Ticket ticket = findById(ticketId);
+        requireTicketOwner(ticket, userId);
+        return ticket;
+    }
+
+    private static void requireTicketOwner(Ticket ticket, String userId) {
+        if (ticket.getUser_id() == null || ticket.getUser_id().getId() == null
+                || !ticket.getUser_id().getId().equals(userId)) {
+            throw new ForbiddenException("No tiene acceso a este ticket");
+        }
     }
 
     @Override
@@ -86,8 +106,24 @@ public class TicketServiceImpl implements ITicketService {
     }
 
     @Override
+    @Transactional
+    public Ticket updateForUser(String id, Ticket ticket, String userId) {
+        Ticket existing = findByIdForUser(id, userId);
+        ticket.setId(id);
+        ticket.setUser_id(existing.getUser_id());
+        resolveItemReferences(ticket);
+        return repository.save(ticket);
+    }
+
+    @Override
     public void delete(String id) {
         findById(id);
+        repository.deleteById(id);
+    }
+
+    @Override
+    public void deleteForUser(String id, String userId) {
+        findByIdForUser(id, userId);
         repository.deleteById(id);
     }
 }

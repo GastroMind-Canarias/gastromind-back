@@ -1,6 +1,8 @@
 package com.gastromind.api.application.services;
 
+import com.gastromind.api.domain.exceptions.ForbiddenException;
 import com.gastromind.api.domain.exceptions.NotFoundException;
+import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.UserFavorites;
 import com.gastromind.api.domain.ports.out.UserFavoritesRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -14,6 +16,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -33,7 +36,7 @@ class UserFavoritesServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        existing = new UserFavorites("id-1", null, null);
+        existing = new UserFavorites("id-1", new User("user-1"), null);
     }
 
     @Test
@@ -59,4 +62,39 @@ class UserFavoritesServiceImplTest {
         service.delete("id-1");
         verify(repository).deleteById(eq("id-1"));
     }
+
+    @Test
+    void findAllByUserId_delegates() {
+        when(repository.findAllByUserId("user-1")).thenReturn(List.of(existing));
+        assertEquals(List.of(existing), service.findAllByUserId("user-1"));
+    }
+
+    @Test
+    void findByIdForUser_returnsWhenOwner() {
+        when(repository.findById("id-1")).thenReturn(Optional.of(existing));
+        assertSame(existing, service.findByIdForUser("id-1", "user-1"));
+    }
+
+    @Test
+    void findByIdForUser_throwsWhenNotOwner() {
+        when(repository.findById("id-1")).thenReturn(Optional.of(existing));
+        assertThrows(ForbiddenException.class, () -> service.findByIdForUser("id-1", "other"));
+    }
+
+    @Test
+    void updateForUser_keepsOwner() {
+        when(repository.findById("id-1")).thenReturn(Optional.of(existing));
+        UserFavorites patch = new UserFavorites();
+        when(repository.save(any(UserFavorites.class))).thenAnswer(inv -> inv.getArgument(0));
+        UserFavorites out = service.updateForUser("id-1", patch, "user-1");
+        assertEquals("user-1", out.getUser_id().getId());
+    }
+
+    @Test
+    void deleteForUser_verifiesOwner() {
+        when(repository.findById("id-1")).thenReturn(Optional.of(existing));
+        service.deleteForUser("id-1", "user-1");
+        verify(repository).deleteById(eq("id-1"));
+    }
 }
+

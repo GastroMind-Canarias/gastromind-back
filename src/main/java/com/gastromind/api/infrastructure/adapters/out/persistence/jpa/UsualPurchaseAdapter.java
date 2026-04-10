@@ -42,4 +42,8 @@ public class UsualPurchaseAdapter implements UsualPurchaseRepository {
         return usualPurchaseMapper.toDomainList(usualPurchaseEntities);
     }
 
+    @Override
+    public List<UsualPurchase> findAllByUserId(String userId) {
+        return usualPurchaseMapper.toDomainList(usualPurchaseJpaRepository.findByUser_Id(userId));
+    }
 }
