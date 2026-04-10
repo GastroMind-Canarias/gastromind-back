@@ -108,10 +108,11 @@ class FridgeItemServiceImplTest {
         FridgeItem one = new FridgeItem();
         one.setQuantity(BigDecimal.ONE);
         when(repository.findById("fi-2")).thenReturn(Optional.of(one));
-        when(repository.save(any(FridgeItem.class))).thenAnswer(inv -> inv.getArgument(0));
 
         FridgeItem consumed = service.consumePartially("fi-2", BigDecimal.ONE);
         assertEquals(ItemStatus.CONSUMED, consumed.getStatus());
+        assertEquals(0, BigDecimal.ZERO.compareTo(consumed.getQuantity()));
+        verify(repository).deleteById("fi-2");
     }
 
     @Test
@@ -121,15 +122,12 @@ class FridgeItemServiceImplTest {
     }
 
     @Test
-    void markAsConsumed_setsStatusAndZero() {
+    void markAsConsumed_deletesItemFromInventory() {
         when(repository.findById("fi-1")).thenReturn(Optional.of(existing));
-        when(repository.save(any(FridgeItem.class))).thenAnswer(inv -> inv.getArgument(0));
 
         service.markAsConsumed("fi-1");
 
-        assertEquals(ItemStatus.CONSUMED, existing.getStatus());
-        assertEquals(0, BigDecimal.ZERO.compareTo(existing.getQuantity()));
-        verify(repository).save(existing);
+        verify(repository).deleteById("fi-1");
     }
 
     @Test
