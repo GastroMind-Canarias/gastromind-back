@@ -9,25 +9,25 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Schema(description = "Registrar o actualizar un producto en una nevera concreta (uso administrador; incluye fridgeId)")
-public record FridgeItemRequest(
+/**
+ * Cuerpo para crear o actualizar un ítem en las rutas {@code /me}:
+ * la nevera se resuelve desde el hogar del usuario autenticado (no se envía {@code fridgeId}).
+ */
+@Schema(description = "Alta o edición de ítem en la nevera del usuario (sin fridgeId)")
+public record MyFridgeItemRequest(
         @Schema(description = "ID del producto maestro", example = "550e8400-e29b-41d4-a716-446655440001")
         @NotBlank(message = "El identificador del producto es obligatorio")
         String productId,
-
-        @Schema(description = "ID de la nevera donde se almacena", example = "550e8400-e29b-41d4-a716-446655440000")
-        @NotBlank(message = "El identificador de la nevera es obligatorio")
-        String fridgeId,
 
         @Schema(description = "Cantidad disponible (permite decimales)", example = "1.50")
         @NotNull(message = "La cantidad es obligatoria")
         @DecimalMin(value = "0.01", message = "La cantidad debe ser mayor a cero")
         BigDecimal quantity,
 
-        @Schema(description = "Fecha de caducidad estimada", example = "2026-12-31")
+        @Schema(description = "Fecha de caducidad estimada (opcional si el producto no caduca)", example = "2026-12-31")
         LocalDate expirationDate,
 
-        @Schema(description = "Estado del producto", example = "GOOD")
+        @Schema(description = "Estado del ítem en nevera", example = "GOOD")
         @NotNull(message = "El estado es obligatorio")
         ItemStatus status
 ) {
