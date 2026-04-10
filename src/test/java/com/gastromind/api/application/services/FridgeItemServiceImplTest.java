@@ -84,7 +84,8 @@ class FridgeItemServiceImplTest {
             return i;
         });
 
-        FridgeItem out = service.addProductToFridge("fr-1", "p-1", BigDecimal.ONE, LocalDate.now());
+        FridgeItem out = service.addProductToFridge("fr-1", "p-1", BigDecimal.ONE, LocalDate.now(),
+                ItemStatus.IN_FRIDGE);
 
         assertEquals("fr-1", out.getFridgeId());
         assertEquals(product, out.getProduct());
