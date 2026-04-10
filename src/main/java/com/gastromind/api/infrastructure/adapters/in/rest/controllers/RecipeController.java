@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class RecipeController {
     @Operation(summary = "Obtener todas las recetas", description = "Devuelve una lista completa de todas las recetas registradas.")
     @ApiStandardDoc
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<RecipeResponse>> getAll() {
         List<Recipe> recipes = recipeServiceImpl.findAll();
         return ResponseEntity.ok(recipeMapper.toResponseList(recipes));
@@ -40,6 +42,7 @@ public class RecipeController {
     @Operation(summary = "Buscar receta por ID", description = "Devuelve una única receta basándose en su identificador único.")
     @ApiStandardDoc
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<RecipeResponse> getById(
             @Parameter(description = "ID de la receta a buscar", example = "1") @PathVariable String id) {
         Recipe recipe = recipeServiceImpl.findById(id);
@@ -49,6 +52,7 @@ public class RecipeController {
     @Operation(summary = "Crear nueva receta", description = "Registra una nueva receta en el sistema.")
     @ApiPostDoc
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RecipeResponse> create(@Valid @RequestBody RecipeRequest request) {
         Recipe recipeDomain = recipeMapper.toDomain(request);
         Recipe savedRecipe = recipeServiceImpl.create(recipeDomain);
@@ -58,6 +62,7 @@ public class RecipeController {
     @Operation(summary = "Actualizar receta", description = "Modifica los datos de una receta existente.")
     @ApiStandardDoc
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<RecipeResponse> update(@PathVariable String id, @Valid @RequestBody RecipeRequest request) {
         Recipe recipeDomain = recipeMapper.toDomain(request);
         Recipe updatedRecipe = recipeServiceImpl.update(id, recipeDomain);
@@ -67,6 +72,7 @@ public class RecipeController {
     @Operation(summary = "Eliminar receta", description = "Borra físicamente una receta de la base de datos.")
     @ApiStandardDoc
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable String id) {
         recipeServiceImpl.delete(id);
         return ResponseEntity.noContent().build();

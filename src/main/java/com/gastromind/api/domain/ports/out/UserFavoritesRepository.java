@@ -36,4 +36,6 @@ public interface UserFavoritesRepository {
      */
     List<UserFavorites> findAll();
 
+    List<UserFavorites> findAllByUserId(String userId);
 }
+

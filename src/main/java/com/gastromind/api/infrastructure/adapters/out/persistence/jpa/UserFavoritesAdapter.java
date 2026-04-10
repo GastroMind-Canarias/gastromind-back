@@ -41,4 +41,8 @@ public class UserFavoritesAdapter implements UserFavoritesRepository {
         return userFavoritesMapper.toDomainList(userFavoritesEntities);
     }
 
-   }
+    @Override
+    public List<UserFavorites> findAllByUserId(String userId) {
+        return userFavoritesMapper.toDomainList(userFavoritesJpaRepository.findByUser_Id(userId));
+    }
+}

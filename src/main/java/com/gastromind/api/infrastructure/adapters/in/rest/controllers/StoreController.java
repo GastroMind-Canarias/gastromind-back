@@ -14,6 +14,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class StoreController {
     @Operation(summary = "Obtener todas las tiendas", description = "Devuelve una lista completa de todas las tiendas registradas.")
     @ApiStandardDoc
     @GetMapping
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<List<StoreResponse>> getAll() {
         List<Store> stores = storeServiceImpl.findAll();
         return ResponseEntity.ok(storeMapper.toResponseList(stores));
@@ -40,6 +42,7 @@ public class StoreController {
     @Operation(summary = "Buscar tienda por ID", description = "Devuelve una única tienda basándose en su identificador único.")
     @ApiStandardDoc
     @GetMapping("/{id}")
+    @PreAuthorize("isAuthenticated()")
     public ResponseEntity<StoreResponse> getById(
             @Parameter(description = "ID de la tienda a buscar", example = "1")
             @PathVariable String id) {
@@ -50,6 +53,7 @@ public class StoreController {
     @Operation(summary = "Crear nueva tienda", description = "Registra una nueva tienda en el sistema.")
     @ApiPostDoc
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<StoreResponse> create(@Valid @RequestBody StoreRequest request) {
         Store storeDomain = storeMapper.toDomain(request);
         Store savedStore = storeServiceImpl.create(storeDomain);
@@ -59,6 +63,7 @@ public class StoreController {
     @Operation(summary = "Actualizar tienda", description = "Modifica los datos de una tienda existente.")
     @ApiStandardDoc
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<StoreResponse> update(@PathVariable String id, @Valid @RequestBody StoreRequest request) {
         Store storeDomain = storeMapper.toDomain(request);
         Store updatedStore = storeServiceImpl.update(id, storeDomain);
@@ -68,6 +73,7 @@ public class StoreController {
     @Operation(summary = "Eliminar tienda", description = "Borra físicamente una tienda de la base de datos.")
     @ApiStandardDoc
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Void> delete(@PathVariable String id) {
         storeServiceImpl.delete(id);
         return ResponseEntity.noContent().build();
