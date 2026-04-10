@@ -7,11 +7,8 @@ import com.gastromind.api.domain.exceptions.AiTicketException;
 import com.gastromind.api.domain.models.ticket.ExtractedTicketLine;
 import com.gastromind.api.domain.models.ticket.ExtractedTicketReceipt;
 import com.gastromind.api.domain.ports.out.TicketExtractionPort;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -28,13 +25,16 @@ public class GeminiTicketExtractionAdapter implements TicketExtractionPort {
     private static final Set<String> ALLOWED_UNITS = Set.of("g", "kg", "ml", "l", "ud");
 
     private final GeminiProperties properties;
+    private final GeminiGenerateContentClient geminiClient;
     private final ObjectMapper objectMapper;
-    private final RestClient restClient;
 
-    public GeminiTicketExtractionAdapter(GeminiProperties properties, ObjectMapper objectMapper) {
+    public GeminiTicketExtractionAdapter(
+            GeminiProperties properties,
+            GeminiGenerateContentClient geminiClient,
+            ObjectMapper objectMapper) {
         this.properties = properties;
+        this.geminiClient = geminiClient;
         this.objectMapper = objectMapper;
-        this.restClient = RestClient.builder().build();
     }
 
     @Override
@@ -46,23 +46,11 @@ public class GeminiTicketExtractionAdapter implements TicketExtractionPort {
             throw new AiTicketException("La imagen del ticket está vacía");
         }
 
-        String base = properties.getBaseUrl().replaceAll("/$", "");
-        String url = UriComponentsBuilder
-                .fromUriString(base + "/v1beta/models/" + properties.getModel() + ":generateContent")
-                .queryParam("key", properties.getApiKey().trim())
-                .build()
-                .toUriString();
-
         String prompt = buildPrompt();
         String requestBody = buildMultimodalRequestBody(prompt, imageBytes, mimeType);
 
         try {
-            String raw = restClient.post()
-                    .uri(url)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(requestBody)
-                    .retrieve()
-                    .body(String.class);
+            String raw = geminiClient.postGenerateContent(requestBody);
             return parseReceiptResponse(raw);
         } catch (RestClientException e) {
             throw new AiTicketException("Error al llamar a Gemini: " + e.getMessage(), e);

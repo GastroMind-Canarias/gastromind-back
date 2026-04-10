@@ -42,6 +42,8 @@ app:
     gemini:
       api-key: ${GEMINI_API_KEY:}
       model: ${GEMINI_MODEL:gemini-2.5-flash}
+      # Opcional: lista de modelos alternativos si el principal falla por 429/503/5xx o error de red (en orden).
+      # Ej.: fallback-models: [ gemini-2.0-flash ]
       base-url: https://generativelanguage.googleapis.com
     suggestion-cache:
       ttl-days: 10
