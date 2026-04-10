@@ -5,7 +5,11 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 
 @Entity
-@Table(name = "usual_purchase")
+@Table(
+        name = "usual_purchase",
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_usual_purchase_user_product",
+                columnNames = {"user_id", "product_id"}))
 public class UsualPurchaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)

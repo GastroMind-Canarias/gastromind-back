@@ -9,9 +9,19 @@ public interface ITicketService {
 
     List<Ticket> findAllByUserId(String userId);
 
+    /**
+     * Tickets visibles para el hogar del usuario (incluye los subidos por otros miembros).
+     */
+    List<Ticket> findAllVisibleForUserHousehold(String userId);
+
     Ticket findById(String id);
 
     Ticket findByIdForUser(String ticketId, String userId);
+
+    /**
+     * Acceso de lectura si el ticket pertenece al mismo hogar que el usuario.
+     */
+    Ticket findByIdForHouseholdMember(String ticketId, String userId);
 
     Ticket create(Ticket ticket);
 

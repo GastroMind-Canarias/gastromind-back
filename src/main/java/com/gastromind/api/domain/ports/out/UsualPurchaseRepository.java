@@ -16,4 +16,6 @@ public interface UsualPurchaseRepository {
     List<UsualPurchase> findAll();
 
     List<UsualPurchase> findAllByUserId(String userId);
+
+    Optional<UsualPurchase> findByUserIdAndProductId(String userId, String productId);
 }

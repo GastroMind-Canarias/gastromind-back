@@ -8,6 +8,7 @@ import com.gastromind.api.domain.ports.out.UsualPurchaseRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class UsualPurchaseServiceImpl implements IUsualPurchaseService {
@@ -50,7 +51,27 @@ public class UsualPurchaseServiceImpl implements IUsualPurchaseService {
 
     @Override
     public UsualPurchase create(UsualPurchase usualPurchase) {
+        requireUserAndProductIds(usualPurchase);
+        String uid = usualPurchase.getUser_id().getId();
+        String pid = usualPurchase.getProduct_id().getId();
+        Optional<UsualPurchase> existing = repository.findByUserIdAndProductId(uid, pid);
+        if (existing.isPresent()) {
+            UsualPurchase up = existing.get();
+            up.setTarget_quantity(usualPurchase.getTarget_quantity());
+            return repository.save(up);
+        }
         return repository.save(usualPurchase);
+    }
+
+    private static void requireUserAndProductIds(UsualPurchase usualPurchase) {
+        if (usualPurchase.getUser_id() == null || usualPurchase.getUser_id().getId() == null
+                || usualPurchase.getUser_id().getId().isBlank()) {
+            throw new IllegalArgumentException("user_id es obligatorio");
+        }
+        if (usualPurchase.getProduct_id() == null || usualPurchase.getProduct_id().getId() == null
+                || usualPurchase.getProduct_id().getId().isBlank()) {
+            throw new IllegalArgumentException("product_id es obligatorio");
+        }
     }
 
     @Override

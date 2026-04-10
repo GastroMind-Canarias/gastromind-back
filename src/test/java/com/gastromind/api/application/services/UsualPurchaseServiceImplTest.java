@@ -2,6 +2,7 @@ package com.gastromind.api.application.services;
 
 import com.gastromind.api.domain.exceptions.ForbiddenException;
 import com.gastromind.api.domain.exceptions.NotFoundException;
+import com.gastromind.api.domain.models.Product;
 import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.UsualPurchase;
 import com.gastromind.api.domain.ports.out.UsualPurchaseRepository;
@@ -51,6 +52,10 @@ class UsualPurchaseServiceImplTest {
         assertThrows(NotFoundException.class, () -> service.findById("missing"));
 
         UsualPurchase in = new UsualPurchase();
+        in.setUser_id(new User("user-1"));
+        in.setProduct_id(new Product("prod-1"));
+        in.setTarget_quantity(2f);
+        when(repository.findByUserIdAndProductId("user-1", "prod-1")).thenReturn(Optional.empty());
         when(repository.save(in)).thenReturn(existing);
         assertEquals(existing, service.create(in));
 
@@ -95,5 +100,25 @@ class UsualPurchaseServiceImplTest {
         when(repository.findById("id-1")).thenReturn(Optional.of(existing));
         service.deleteForUser("id-1", "user-1");
         verify(repository).deleteById(eq("id-1"));
+    }
+
+    @Test
+    void create_mergesWhenSameUserAndProduct() {
+        UsualPurchase duplicate = new UsualPurchase();
+        duplicate.setUser_id(new User("user-1"));
+        duplicate.setProduct_id(new Product("prod-1"));
+        duplicate.setTarget_quantity(5f);
+        when(repository.findByUserIdAndProductId("user-1", "prod-1")).thenReturn(Optional.of(existing));
+        when(repository.save(existing)).thenAnswer(inv -> inv.getArgument(0));
+        UsualPurchase out = service.create(duplicate);
+        assertSame(existing, out);
+        assertEquals(5f, out.getTarget_quantity());
+    }
+
+    @Test
+    void create_throwsWhenUserMissing() {
+        UsualPurchase in = new UsualPurchase();
+        in.setProduct_id(new Product("p"));
+        assertThrows(IllegalArgumentException.class, () -> service.create(in));
     }
 }

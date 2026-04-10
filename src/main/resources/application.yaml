@@ -50,6 +50,12 @@ app:
       key-prefix: "gastromind:recipe:suggestion:"
     ticket:
       max-image-bytes: 10485760
+  usual-purchase:
+    history-days: 90
+    min-distinct-tickets: 2
+    low-stock-fraction: 0.3
+    recency-half-life-days: 30
+    ticket-sync-blend-weight: 0.35
   cors:
     allowed-origins:
       - "http://localhost:3000"

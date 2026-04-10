@@ -31,6 +31,8 @@ public interface TicketRestMapper {
     @Mapping(target = "items", expression = "java(mapTicketItemRequests(request.items()))")
     Ticket toDomain(TicketRequest request);
 
+    @Mapping(target = "household_id", source = "houseHold_id.id")
+    @Mapping(target = "uploaded_by_user_id", source = "user_id.id")
     @Mapping(target = "user_id", source = "user_id.id")
     @Mapping(target = "store_id", source = "store_id.id")
     @Mapping(target = "items", source = "items")
