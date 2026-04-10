@@ -77,22 +77,22 @@ public class TicketController {
         return ResponseEntity.ok(ticketMapper.toResponseList(tickets));
     }
 
-    @Operation(summary = "Listar mis tickets", description = "Tickets del usuario autenticado.")
+    @Operation(summary = "Listar tickets del hogar", description = "Tickets del hogar del usuario (incluye los registrados por otros miembros).")
     @ApiStandardDoc
     @GetMapping("/me")
     @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<List<TicketResponse>> listMyTickets(Authentication authentication) {
         User user = getCurrentUser(authentication);
-        return ResponseEntity.ok(ticketMapper.toResponseList(ticketServiceImpl.findAllByUserId(user.getId())));
+        return ResponseEntity.ok(ticketMapper.toResponseList(ticketServiceImpl.findAllVisibleForUserHousehold(user.getId())));
     }
 
-    @Operation(summary = "Obtener uno de mis tickets por ID", description = "Solo si el ticket pertenece al usuario autenticado.")
+    @Operation(summary = "Obtener ticket por ID (hogar)", description = "Si el ticket pertenece al mismo hogar que el usuario autenticado.")
     @ApiStandardDoc
     @GetMapping("/me/{id}")
     @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<TicketResponse> getMyTicketById(Authentication authentication, @PathVariable String id) {
         User user = getCurrentUser(authentication);
-        Ticket ticket = ticketServiceImpl.findByIdForUser(id, user.getId());
+        Ticket ticket = ticketServiceImpl.findByIdForHouseholdMember(id, user.getId());
         return ResponseEntity.ok(ticketMapper.toResponse(ticket));
     }
 

@@ -65,4 +65,22 @@ public class TicketQuantityUnitResolver {
         }
         return "ud";
     }
+
+    /**
+     * Igual que {@link #canonicalCode(Unit)} pero con el nombre tal como viene de BD (join en ticket_items).
+     */
+    public static String canonicalCodeFromDbUnitName(String unitName) {
+        if (unitName == null || unitName.isBlank()) {
+            return "ud";
+        }
+        String n = unitName.trim().toLowerCase(Locale.ROOT);
+        return switch (n) {
+            case "gramos" -> "g";
+            case "kilogramos" -> "kg";
+            case "mililitros" -> "ml";
+            case "litros" -> "l";
+            case "unidades" -> "ud";
+            default -> "ud";
+        };
+    }
 }

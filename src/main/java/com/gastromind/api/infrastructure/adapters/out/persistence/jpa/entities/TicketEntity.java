@@ -23,6 +23,11 @@ public class TicketEntity {
     @JoinColumn(name = "users_id")
     private UserEntity user;
 
+    /** Hogar al que pertenece el ticket (mismo para todos los miembros que comparten nevera). */
+    @ManyToOne
+    @JoinColumn(name = "household_id")
+    private HouseholdEntity household;
+
     @ManyToOne
     @JoinColumn(name = "store_id")
     private StoreEntity store;
@@ -77,6 +82,14 @@ public class TicketEntity {
 
     public void setUser(UserEntity user) {
         this.user = user;
+    }
+
+    public HouseholdEntity getHousehold() {
+        return household;
+    }
+
+    public void setHousehold(HouseholdEntity household) {
+        this.household = household;
     }
 
     public StoreEntity getStore() {

@@ -8,9 +8,11 @@ import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.TicketItem;
 import com.gastromind.api.domain.models.Unit;
 import com.gastromind.api.domain.models.enums.TicketLineVerificationStatus;
+import com.gastromind.api.domain.models.HouseHold;
 import com.gastromind.api.domain.ports.out.ProductRepository;
 import com.gastromind.api.domain.ports.out.TicketRepository;
 import com.gastromind.api.domain.ports.out.UnitRepository;
+import com.gastromind.api.domain.ports.out.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +28,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -39,6 +43,10 @@ class TicketServiceImplTest {
     private ProductRepository productRepository;
     @Mock
     private UnitRepository unitRepository;
+    @Mock
+    private UserRepository userRepository;
+    @Mock
+    private UsualPurchaseTicketSyncService usualPurchaseTicketSyncService;
 
     @InjectMocks
     private TicketServiceImpl service;
@@ -50,6 +58,7 @@ class TicketServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        lenient().when(userRepository.findById(anyString())).thenReturn(Optional.empty());
         existing = new Ticket("t-1");
         existing.setUser_id(new User("owner-1"));
         defaultUd = new Unit("u-def", "Unidades");
@@ -68,6 +77,25 @@ class TicketServiceImplTest {
     void findAllByUserId_delegates() {
         when(repository.findAllByUserId("owner-1")).thenReturn(List.of(existing));
         assertEquals(List.of(existing), service.findAllByUserId("owner-1"));
+    }
+
+    @Test
+    void findAllVisibleForUserHousehold_delegates() {
+        User member = new User("member-1");
+        member.setHouseHold_id(new HouseHold("hh-1"));
+        when(userRepository.findById("member-1")).thenReturn(Optional.of(member));
+        when(repository.findVisibleForHousehold("hh-1")).thenReturn(List.of(existing));
+        assertEquals(List.of(existing), service.findAllVisibleForUserHousehold("member-1"));
+    }
+
+    @Test
+    void findByIdForHouseholdMember_whenTicketHasHousehold() {
+        existing.setHouseHold_id(new HouseHold("hh-1"));
+        User viewer = new User("other");
+        viewer.setHouseHold_id(new HouseHold("hh-1"));
+        when(repository.findById("t-1")).thenReturn(Optional.of(existing));
+        when(userRepository.findById("other")).thenReturn(Optional.of(viewer));
+        assertSame(existing, service.findByIdForHouseholdMember("t-1", "other"));
     }
 
     @Test
@@ -101,6 +129,7 @@ class TicketServiceImplTest {
         when(repository.save(t)).thenReturn(existing);
         assertEquals(existing, service.create(t));
         verify(repository).save(t);
+        verify(usualPurchaseTicketSyncService).syncAfterTicketCreated(existing);
     }
 
     @Test
@@ -125,6 +154,7 @@ class TicketServiceImplTest {
         assertEquals(fullProduct, line.getProduct());
         assertEquals(otherUnit, line.getUnit());
         verify(repository).save(saved);
+        verify(usualPurchaseTicketSyncService).syncAfterTicketCreated(saved);
     }
 
     @Test
@@ -142,9 +172,10 @@ class TicketServiceImplTest {
 
         when(repository.save(any(Ticket.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        service.create(t);
+        Ticket saved = service.create(t);
 
         assertEquals(defaultUd, line.getUnit());
+        verify(usualPurchaseTicketSyncService).syncAfterTicketCreated(saved);
     }
 
     @Test

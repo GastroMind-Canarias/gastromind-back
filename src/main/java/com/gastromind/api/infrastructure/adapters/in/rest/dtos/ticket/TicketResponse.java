@@ -10,7 +10,13 @@ public record TicketResponse(
         @Schema(example = "tk-998877", description = "ID único del ticket")
         String id,
 
-        @Schema(example = "user-123-abc")
+        @Schema(description = "Hogar al que está asociado el ticket")
+        String household_id,
+
+        @Schema(description = "Usuario que registró o importó el ticket")
+        String uploaded_by_user_id,
+
+        @Schema(description = "Igual que uploaded_by_user_id (compatibilidad con clientes antiguos)")
         String user_id,
 
         @Schema(example = "store-mercadona-01")

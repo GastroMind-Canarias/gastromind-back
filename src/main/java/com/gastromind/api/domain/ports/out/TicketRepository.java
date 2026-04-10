@@ -15,4 +15,9 @@ public interface TicketRepository {
     List<Ticket> findAll();
 
     List<Ticket> findAllByUserId(String userId);
+
+    /**
+     * Tickets del hogar: fila con household_id, o legado sin household pero usuario del mismo hogar.
+     */
+    List<Ticket> findVisibleForHousehold(String householdId);
 }

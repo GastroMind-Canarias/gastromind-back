@@ -45,4 +45,9 @@ public class TicketAdapter implements TicketRepository {
     public List<Ticket> findAllByUserId(String userId) {
         return ticketMapper.toDomainList(ticketJpaRepository.findByUser_Id(userId));
     }
+
+    @Override
+    public List<Ticket> findVisibleForHousehold(String householdId) {
+        return ticketMapper.toDomainList(ticketJpaRepository.findVisibleForHousehold(householdId));
+    }
 }

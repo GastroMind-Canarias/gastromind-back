@@ -5,12 +5,14 @@ import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.models.Product;
 import com.gastromind.api.domain.models.Ticket;
 import com.gastromind.api.domain.models.TicketItem;
+import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.Unit;
 import com.gastromind.api.domain.models.enums.TicketLineVerificationStatus;
 import com.gastromind.api.domain.ports.in.ITicketService;
 import com.gastromind.api.domain.ports.out.ProductRepository;
 import com.gastromind.api.domain.ports.out.TicketRepository;
 import com.gastromind.api.domain.ports.out.UnitRepository;
+import com.gastromind.api.domain.ports.out.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,14 +24,20 @@ public class TicketServiceImpl implements ITicketService {
     private final TicketRepository repository;
     private final ProductRepository productRepository;
     private final UnitRepository unitRepository;
+    private final UserRepository userRepository;
+    private final UsualPurchaseTicketSyncService usualPurchaseTicketSyncService;
 
     public TicketServiceImpl(
             TicketRepository repository,
             ProductRepository productRepository,
-            UnitRepository unitRepository) {
+            UnitRepository unitRepository,
+            UserRepository userRepository,
+            UsualPurchaseTicketSyncService usualPurchaseTicketSyncService) {
         this.repository = repository;
         this.productRepository = productRepository;
         this.unitRepository = unitRepository;
+        this.userRepository = userRepository;
+        this.usualPurchaseTicketSyncService = usualPurchaseTicketSyncService;
     }
 
     @Override
@@ -40,6 +48,16 @@ public class TicketServiceImpl implements ITicketService {
     @Override
     public List<Ticket> findAllByUserId(String userId) {
         return repository.findAllByUserId(userId);
+    }
+
+    @Override
+    public List<Ticket> findAllVisibleForUserHousehold(String userId) {
+        User u = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+        if (u.getHouseHold_id() == null || u.getHouseHold_id().getId() == null) {
+            throw new ForbiddenException("El usuario no pertenece a ningún hogar");
+        }
+        return repository.findVisibleForHousehold(u.getHouseHold_id().getId());
     }
 
     @Override
@@ -54,6 +72,33 @@ public class TicketServiceImpl implements ITicketService {
         return ticket;
     }
 
+    @Override
+    public Ticket findByIdForHouseholdMember(String ticketId, String userId) {
+        Ticket ticket = findById(ticketId);
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
+        if (user.getHouseHold_id() == null || user.getHouseHold_id().getId() == null) {
+            throw new ForbiddenException("El usuario no pertenece a ningún hogar");
+        }
+        String householdId = user.getHouseHold_id().getId();
+        if (ticket.getHouseHold_id() != null && ticket.getHouseHold_id().getId() != null) {
+            if (!ticket.getHouseHold_id().getId().equals(householdId)) {
+                throw new ForbiddenException("No tiene acceso a este ticket");
+            }
+            return ticket;
+        }
+        if (ticket.getUser_id() == null || ticket.getUser_id().getId() == null) {
+            throw new ForbiddenException("No tiene acceso a este ticket");
+        }
+        User uploader = userRepository.findById(ticket.getUser_id().getId())
+                .orElseThrow(() -> new ForbiddenException("No tiene acceso a este ticket"));
+        if (uploader.getHouseHold_id() == null || uploader.getHouseHold_id().getId() == null
+                || !uploader.getHouseHold_id().getId().equals(householdId)) {
+            throw new ForbiddenException("No tiene acceso a este ticket");
+        }
+        return ticket;
+    }
+
     private static void requireTicketOwner(Ticket ticket, String userId) {
         if (ticket.getUser_id() == null || ticket.getUser_id().getId() == null
                 || !ticket.getUser_id().getId().equals(userId)) {
@@ -65,7 +110,21 @@ public class TicketServiceImpl implements ITicketService {
     @Transactional
     public Ticket create(Ticket ticket) {
         resolveItemReferences(ticket);
-        return repository.save(ticket);
+        attachHouseholdFromUploader(ticket);
+        Ticket saved = repository.save(ticket);
+        usualPurchaseTicketSyncService.syncAfterTicketCreated(saved);
+        return saved;
+    }
+
+    private void attachHouseholdFromUploader(Ticket ticket) {
+        if (ticket.getUser_id() == null || ticket.getUser_id().getId() == null) {
+            return;
+        }
+        userRepository.findById(ticket.getUser_id().getId()).ifPresent(u -> {
+            if (u.getHouseHold_id() != null && u.getHouseHold_id().getId() != null) {
+                ticket.setHouseHold_id(u.getHouseHold_id());
+            }
+        });
     }
 
     private void resolveItemReferences(Ticket ticket) {
@@ -102,6 +161,7 @@ public class TicketServiceImpl implements ITicketService {
         findById(id);
         ticket.setId(id);
         resolveItemReferences(ticket);
+        attachHouseholdFromUploader(ticket);
         return repository.save(ticket);
     }
 
@@ -112,6 +172,7 @@ public class TicketServiceImpl implements ITicketService {
         ticket.setId(id);
         ticket.setUser_id(existing.getUser_id());
         resolveItemReferences(ticket);
+        attachHouseholdFromUploader(ticket);
         return repository.save(ticket);
     }
 

@@ -1,5 +1,6 @@
 package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
+import com.gastromind.api.application.usecases.ListUsualPurchaseSuggestionsUseCase;
 import com.gastromind.api.application.services.UsualPurchaseServiceImpl;
 import com.gastromind.api.application.services.UserServiceImpl;
 import com.gastromind.api.domain.exceptions.ForbiddenException;
@@ -9,6 +10,7 @@ import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.usualpurchase.UsualPurchaseMeRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.usualpurchase.UsualPurchaseRequest;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.usualpurchase.UsualPurchaseSuggestionResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.usualpurchase.UsualPurchaseResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.UsualPurchaseRestMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -24,6 +26,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/usual-purchases")
@@ -38,6 +41,9 @@ public class UsualPurchaseController {
 
     @Autowired
     private UserServiceImpl userServiceImpl;
+
+    @Autowired
+    private ListUsualPurchaseSuggestionsUseCase listUsualPurchaseSuggestionsUseCase;
 
     private User getCurrentUser(Authentication authentication) {
         if (authentication == null) {
@@ -58,6 +64,34 @@ public class UsualPurchaseController {
         return ResponseEntity.ok(usualPurchaseMapper.toResponseList(purchases));
     }
 
+    @Operation(summary = "Sugerencias inteligentes (hogar)", description = """
+            Productos comprados repetidamente según tickets de todos los miembros del hogar; \
+            compara con stock en nevera. target puede venir de compra manual o de la mediana histórica.\
+            """)
+    @ApiStandardDoc
+    @GetMapping("/me/suggestions")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
+    public ResponseEntity<List<UsualPurchaseSuggestionResponse>> listSuggestions(
+            Authentication authentication,
+            @RequestParam(name = "lowStockOnly", defaultValue = "false") boolean lowStockOnly,
+            @RequestParam(name = "historyDays", required = false) Integer historyDays) {
+        String principal = authentication != null ? authentication.getName() : null;
+        List<ListUsualPurchaseSuggestionsUseCase.UsualPurchaseSuggestion> rows =
+                listUsualPurchaseSuggestionsUseCase.execute(principal, lowStockOnly, historyDays);
+        return ResponseEntity.ok(rows.stream()
+                .map(r -> new UsualPurchaseSuggestionResponse(
+                        r.productId(),
+                        r.productName(),
+                        r.targetQuantity(),
+                        r.quantityUnit(),
+                        r.currentFridgeQuantity(),
+                        r.score(),
+                        r.distinctTicketCount(),
+                        r.lastPurchasedAt(),
+                        r.lowStock()))
+                .collect(Collectors.toList()));
+    }
+
     @Operation(summary = "Listar mis compras habituales", description = "Registros del usuario autenticado.")
     @ApiStandardDoc
     @GetMapping("/me")
@@ -70,7 +104,7 @@ public class UsualPurchaseController {
 
     @Operation(summary = "Obtener uno de mis registros por ID", description = "Solo si pertenece al usuario autenticado.")
     @ApiStandardDoc
-    @GetMapping("/me/{id}")
+    @GetMapping("/me/{id:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}")
     @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<UsualPurchaseResponse> getMineById(Authentication authentication, @PathVariable String id) {
         User user = getCurrentUser(authentication);
@@ -123,7 +157,7 @@ public class UsualPurchaseController {
 
     @Operation(summary = "Actualizar uno de mis registros", description = "Solo si pertenece al usuario autenticado.")
     @ApiStandardDoc
-    @PutMapping("/me/{id}")
+    @PutMapping("/me/{id:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}")
     @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<UsualPurchaseResponse> updateMine(
             Authentication authentication,
@@ -146,7 +180,7 @@ public class UsualPurchaseController {
 
     @Operation(summary = "Eliminar uno de mis registros", description = "Solo si pertenece al usuario autenticado.")
     @ApiStandardDoc
-    @DeleteMapping("/me/{id}")
+    @DeleteMapping("/me/{id:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}")
     @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<Void> deleteMine(Authentication authentication, @PathVariable String id) {
         User user = getCurrentUser(authentication);
