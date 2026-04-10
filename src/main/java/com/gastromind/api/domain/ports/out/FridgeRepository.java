@@ -15,4 +15,6 @@ public interface FridgeRepository {
     List<Fridge> findAll();
 
     List<Fridge> findByHouseholdId(String householdId);
+
+    Optional<Fridge> findFirstByHouseholdId(String householdId);
 }

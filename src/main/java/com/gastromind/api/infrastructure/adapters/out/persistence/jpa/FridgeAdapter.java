@@ -46,4 +46,9 @@ public class FridgeAdapter implements FridgeRepository {
         return fridgeMapper.toDomainList(fridgeJpaRepository.findByHousehold_Id(householdId));
     }
 
+    @Override
+    public Optional<Fridge> findFirstByHouseholdId(String householdId) {
+        return fridgeJpaRepository.findFirstByHousehold_IdOrderByIdAsc(householdId).map(fridgeMapper::toDomain);
+    }
+
 }
