@@ -11,11 +11,8 @@ import com.gastromind.api.domain.models.RecipeIngredientUsage;
 import com.gastromind.api.domain.models.RecipeStockLine;
 import com.gastromind.api.domain.models.enums.Appliance;
 import com.gastromind.api.domain.ports.out.RecipeAiPort;
-import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -29,13 +26,16 @@ import java.util.stream.Collectors;
 public class GeminiRecipeAdapter implements RecipeAiPort {
 
     private final GeminiProperties properties;
+    private final GeminiGenerateContentClient geminiClient;
     private final ObjectMapper objectMapper;
-    private final RestClient restClient;
 
-    public GeminiRecipeAdapter(GeminiProperties properties, ObjectMapper objectMapper) {
+    public GeminiRecipeAdapter(
+            GeminiProperties properties,
+            GeminiGenerateContentClient geminiClient,
+            ObjectMapper objectMapper) {
         this.properties = properties;
+        this.geminiClient = geminiClient;
         this.objectMapper = objectMapper;
-        this.restClient = RestClient.builder().build();
     }
 
     @Override
@@ -45,22 +45,10 @@ public class GeminiRecipeAdapter implements RecipeAiPort {
         }
 
         String prompt = buildPrompt(context);
-        String base = properties.getBaseUrl().replaceAll("/$", "");
-        String url = UriComponentsBuilder
-                .fromUriString(base + "/v1beta/models/" + properties.getModel() + ":generateContent")
-                .queryParam("key", properties.getApiKey().trim())
-                .build()
-                .toUriString();
-
         String requestBody = buildRequestBody(prompt);
 
         try {
-            String raw = restClient.post()
-                    .uri(url)
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(requestBody)
-                    .retrieve()
-                    .body(String.class);
+            String raw = geminiClient.postGenerateContent(requestBody);
             return parseRecipeResponse(raw, context);
         } catch (RestClientException e) {
             throw new AiRecipeException("Error al llamar a Gemini: " + e.getMessage(), e);
