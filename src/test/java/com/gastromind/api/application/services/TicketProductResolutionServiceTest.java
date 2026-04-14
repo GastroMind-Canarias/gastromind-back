@@ -12,8 +12,7 @@ import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -26,25 +25,21 @@ class TicketProductResolutionServiceTest {
     private TicketProductResolutionService service;
 
     @Test
-    void resolveOrCreate_returnsExistingWhenNameMatches() {
+    void findCatalogProductByName_returnsExistingWhenNameMatches() {
         Product p = new Product("p1", "Leche", false, null);
         when(productRepository.findFirstByNameIgnoreCase("leche")).thenReturn(Optional.of(p));
-        assertEquals(p, service.resolveOrCreate("  leche  "));
+        assertEquals(Optional.of(p), service.findCatalogProductByName("  leche  "));
     }
 
     @Test
-    void resolveOrCreate_createsWhenMissing() {
+    void findCatalogProductByName_emptyWhenMissing() {
         when(productRepository.findFirstByNameIgnoreCase("Nuevo")).thenReturn(Optional.empty());
-        Product saved = new Product("n1", "Nuevo", false, null);
-        when(productRepository.save(any(Product.class))).thenReturn(saved);
-        Product result = service.resolveOrCreate("Nuevo");
-        assertEquals("Nuevo", result.getName());
-        verify(productRepository).save(any(Product.class));
+        assertTrue(service.findCatalogProductByName("Nuevo").isEmpty());
     }
 
     @Test
-    void resolveOrCreate_throwsWhenNameBlank() {
-        assertThrows(IllegalArgumentException.class, () -> service.resolveOrCreate("   "));
+    void findCatalogProductByName_throwsWhenNameBlank() {
+        assertThrows(IllegalArgumentException.class, () -> service.findCatalogProductByName("   "));
     }
 
     @Test

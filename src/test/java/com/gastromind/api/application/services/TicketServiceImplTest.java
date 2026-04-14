@@ -192,6 +192,27 @@ class TicketServiceImplTest {
     }
 
     @Test
+    void create_acceptsLineProductNameWithoutCatalogProduct() {
+        when(unitRepository.findFirstByNameIgnoreCase("Unidades")).thenReturn(Optional.of(defaultUd));
+
+        TicketItem line = new TicketItem();
+        line.setLineProductName("Yogur sin catálogo");
+        line.setQuantity(BigDecimal.ONE);
+        line.setUnit(null);
+
+        Ticket t = new Ticket();
+        t.setItems(List.of(line));
+
+        when(repository.save(any(Ticket.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Ticket saved = service.create(t);
+
+        assertEquals("Yogur sin catálogo", line.getLineProductName());
+        assertEquals(defaultUd, line.getUnit());
+        verify(usualPurchaseTicketSyncService).syncAfterTicketCreated(saved);
+    }
+
+    @Test
     void create_throwsWhenDefaultUnitMissing() {
         when(unitRepository.findFirstByNameIgnoreCase("Unidades")).thenReturn(Optional.empty());
 

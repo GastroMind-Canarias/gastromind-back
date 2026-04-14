@@ -33,6 +33,12 @@ public interface IFridgeItemService {
             java.time.LocalDate expirationDate, ItemStatus initialStatus);
 
     /**
+     * Añade un ítem solo con nombre (sin fila en catálogo), p. ej. línea de ticket escaneada sin match.
+     */
+    FridgeItem addLabeledItemToFridge(String fridgeId, String productLabel, java.math.BigDecimal quantity,
+            java.time.LocalDate expirationDate, ItemStatus initialStatus);
+
+    /**
      * Consume parte de la cantidad de un item. Si tras el descuento la cantidad es cero, el ítem se elimina del inventario.
      */
     FridgeItem consumePartially(String itemId, java.math.BigDecimal quantityToConsume);

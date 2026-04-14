@@ -71,6 +71,26 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
 
     @Override
     @Transactional
+    public FridgeItem addLabeledItemToFridge(String fridgeId, String productLabel, BigDecimal quantity,
+            LocalDate expirationDate, ItemStatus initialStatus) {
+        if (productLabel == null || productLabel.isBlank()) {
+            throw new IllegalArgumentException("La etiqueta del producto no puede estar vacía");
+        }
+        fridgeRepository.findById(fridgeId).orElseThrow(() -> new NotFoundException("Nevera no encontrada"));
+
+        FridgeItem newItem = new FridgeItem();
+        newItem.setFridgeId(fridgeId);
+        newItem.setProduct(null);
+        newItem.setProductLabel(productLabel.trim());
+        newItem.setQuantity(quantity);
+        newItem.setExpirationDate(expirationDate);
+        newItem.setStatus(initialStatus != null ? initialStatus : ItemStatus.GOOD);
+
+        return repository.save(newItem);
+    }
+
+    @Override
+    @Transactional
     public FridgeItem consumePartially(String itemId, BigDecimal quantityToConsume) {
         FridgeItem item = findById(itemId);
         if (item.getQuantity().compareTo(quantityToConsume) < 0) {

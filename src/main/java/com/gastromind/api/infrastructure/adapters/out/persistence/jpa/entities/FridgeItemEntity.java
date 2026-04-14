@@ -28,9 +28,12 @@ public class FridgeItemEntity {
     private FridgeEntity fridge;
 
     @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "product_id")
     private ProductEntity product;
-    
+
+    @Column(name = "product_label", length = 200)
+    private String productLabel;
+
     public FridgeItemEntity(String id, BigDecimal quantity, LocalDate expirationDate, ItemStatus status,
             FridgeEntity fridge, ProductEntity product) {
         this.id = id;
@@ -94,6 +97,14 @@ public class FridgeItemEntity {
 
     public void setProduct(ProductEntity product) {
         this.product = product;
+    }
+
+    public String getProductLabel() {
+        return productLabel;
+    }
+
+    public void setProductLabel(String productLabel) {
+        this.productLabel = productLabel;
     }
 
     @Override

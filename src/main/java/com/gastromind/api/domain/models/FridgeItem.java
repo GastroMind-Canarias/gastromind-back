@@ -11,6 +11,8 @@ public class FridgeItem {
     private LocalDate expirationDate;
     private ItemStatus status;
     private Product product;
+    /** Nombre mostrable si el ítem no enlaza catálogo ({@code product} null). */
+    private String productLabel;
     private String fridgeId;
 
     public FridgeItem() {
@@ -64,6 +66,14 @@ public class FridgeItem {
 
     public void setProduct(Product product) {
         this.product = product;
+    }
+
+    public String getProductLabel() {
+        return productLabel;
+    }
+
+    public void setProductLabel(String productLabel) {
+        this.productLabel = productLabel;
     }
 
     public String getFridgeId() {

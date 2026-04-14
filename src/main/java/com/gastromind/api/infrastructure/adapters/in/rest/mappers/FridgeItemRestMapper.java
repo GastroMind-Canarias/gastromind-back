@@ -30,8 +30,15 @@ public interface FridgeItemRestMapper {
      * Transforma el modelo de dominio a una respuesta legible para el cliente (DTO).
      * Extraemos el nombre del producto para facilitar la visualización en el frontend.
      */
-    @Mapping(target = "productName", source = "product.name")
+    @Mapping(target = "productName", expression = "java(resolveFridgeProductName(domain))")
     FridgeItemResponse toResponse(FridgeItem domain);
+
+    default String resolveFridgeProductName(FridgeItem domain) {
+        if (domain.getProduct() != null && domain.getProduct().getName() != null) {
+            return domain.getProduct().getName();
+        }
+        return domain.getProductLabel() != null ? domain.getProductLabel() : "";
+    }
 
 
     List<FridgeItemResponse> toResponseList(List<FridgeItem> domainList);
