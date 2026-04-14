@@ -65,10 +65,11 @@ public interface TicketRestMapper {
                 : TicketLineVerificationStatus.OK.name();
         boolean productNeedsReview = item.getProduct() != null && item.getProduct().isNeedsReview();
         String productReviewNote = item.getProduct() != null ? item.getProduct().getReviewNote() : null;
+        String productName = item.getProduct() != null ? item.getProduct().getName() : item.getLineProductName();
         return new TicketItemResponse(
                 item.getId(),
                 item.getProduct() != null ? item.getProduct().getId() : null,
-                item.getProduct() != null ? item.getProduct().getName() : null,
+                productName,
                 productNeedsReview,
                 productReviewNote,
                 item.getQuantity(),

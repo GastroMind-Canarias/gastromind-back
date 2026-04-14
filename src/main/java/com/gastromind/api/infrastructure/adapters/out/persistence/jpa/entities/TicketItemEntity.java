@@ -28,8 +28,11 @@ public class TicketItemEntity {
     private TicketEntity ticket;
 
     @ManyToOne
-    @JoinColumn(name = "product_id", nullable = false)
+    @JoinColumn(name = "product_id")
     private ProductEntity product;
+
+    @Column(name = "line_product_name", length = 200)
+    private String lineProductName;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "verification_status", nullable = false, length = 32)
@@ -100,6 +103,14 @@ public class TicketItemEntity {
 
     public void setProduct(ProductEntity product) {
         this.product = product;
+    }
+
+    public String getLineProductName() {
+        return lineProductName;
+    }
+
+    public void setLineProductName(String lineProductName) {
+        this.lineProductName = lineProductName;
     }
 
     public TicketLineVerificationStatus getVerificationStatus() {

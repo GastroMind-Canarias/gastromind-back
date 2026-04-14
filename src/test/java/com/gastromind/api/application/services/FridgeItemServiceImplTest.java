@@ -93,6 +93,29 @@ class FridgeItemServiceImplTest {
     }
 
     @Test
+    void addLabeledItemToFridge_buildsItemWithoutCatalogProduct() {
+        when(fridgeRepository.findById("fr-1")).thenReturn(Optional.of(new Fridge("fr-1")));
+        when(repository.save(any(FridgeItem.class))).thenAnswer(inv -> {
+            FridgeItem i = inv.getArgument(0);
+            i.setId("new-id");
+            return i;
+        });
+
+        FridgeItem out = service.addLabeledItemToFridge("fr-1", "  Yogur sin catálogo  ", BigDecimal.ONE, null,
+                ItemStatus.GOOD);
+
+        assertEquals("fr-1", out.getFridgeId());
+        assertEquals("Yogur sin catálogo", out.getProductLabel());
+        assertEquals(ItemStatus.GOOD, out.getStatus());
+    }
+
+    @Test
+    void addLabeledItemToFridge_throwsWhenLabelBlank() {
+        assertThrows(IllegalArgumentException.class,
+                () -> service.addLabeledItemToFridge("fr-1", "  ", BigDecimal.ONE, null, ItemStatus.GOOD));
+    }
+
+    @Test
     void consumePartially_reducesQuantity() {
         FridgeItem half = new FridgeItem();
         half.setQuantity(BigDecimal.TEN);

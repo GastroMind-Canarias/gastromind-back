@@ -16,6 +16,10 @@ public class TicketItem {
     private TicketLineVerificationStatus verificationStatus;
     /** Incidencias de la línea (ej. peso desconocido, cantidad ambigua). */
     private String lineNote;
+    /**
+     * Texto del producto cuando no hay fila en catálogo ({@code product} puede ser null).
+     */
+    private String lineProductName;
 
     public TicketItem() {
     }
@@ -81,6 +85,14 @@ public class TicketItem {
 
     public void setLineNote(String lineNote) {
         this.lineNote = lineNote;
+    }
+
+    public String getLineProductName() {
+        return lineProductName;
+    }
+
+    public void setLineProductName(String lineProductName) {
+        this.lineProductName = lineProductName;
     }
 
     @Override

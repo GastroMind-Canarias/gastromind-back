@@ -2,6 +2,7 @@ package com.gastromind.api.application.usecases;
 
 import com.gastromind.api.application.services.TicketProductResolutionService;
 import com.gastromind.api.application.services.TicketQuantityUnitResolver;
+import com.gastromind.api.domain.models.Fridge;
 import com.gastromind.api.domain.models.Product;
 import com.gastromind.api.domain.models.Store;
 import com.gastromind.api.domain.models.Ticket;
@@ -12,10 +13,14 @@ import com.gastromind.api.domain.models.enums.TicketLineVerificationStatus;
 import com.gastromind.api.domain.models.ticket.ExtractedTicketLine;
 import com.gastromind.api.domain.models.ticket.ExtractedTicketReceipt;
 import com.gastromind.api.domain.exceptions.NotFoundException;
+import com.gastromind.api.domain.ports.in.IFridgeItemService;
 import com.gastromind.api.domain.ports.in.ITicketService;
+import com.gastromind.api.domain.ports.out.FridgeRepository;
+import com.gastromind.api.domain.ports.out.ProductRepository;
 import com.gastromind.api.domain.ports.out.StoreRepository;
 import com.gastromind.api.domain.ports.out.TicketExtractionPort;
 import com.gastromind.api.domain.ports.out.UserRepository;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,30 +29,37 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ImportTicketFromImageUseCase {
 
     private final TicketExtractionPort extraction;
-    private final TicketProductResolutionService productResolution;
+    private final ProductRepository productRepository;
     private final TicketQuantityUnitResolver unitResolver;
     private final ITicketService ticketService;
     private final UserRepository userRepository;
     private final StoreRepository storeRepository;
+    private final FridgeRepository fridgeRepository;
+    private final IFridgeItemService fridgeItemService;
 
     public ImportTicketFromImageUseCase(
             TicketExtractionPort extraction,
-            TicketProductResolutionService productResolution,
+            ProductRepository productRepository,
             TicketQuantityUnitResolver unitResolver,
             ITicketService ticketService,
             UserRepository userRepository,
-            StoreRepository storeRepository) {
+            StoreRepository storeRepository,
+            FridgeRepository fridgeRepository,
+            IFridgeItemService fridgeItemService) {
         this.extraction = extraction;
-        this.productResolution = productResolution;
+        this.productRepository = productRepository;
         this.unitResolver = unitResolver;
         this.ticketService = ticketService;
         this.userRepository = userRepository;
         this.storeRepository = storeRepository;
+        this.fridgeRepository = fridgeRepository;
+        this.fridgeItemService = fridgeItemService;
     }
 
     @Transactional
@@ -60,7 +72,12 @@ public class ImportTicketFromImageUseCase {
 
         List<TicketItem> items = new ArrayList<>();
         for (ExtractedTicketLine line : extracted.lines()) {
-            Product product = productResolution.resolveOrCreate(line.productName());
+            String normalized = TicketProductResolutionService.normalizeName(line.productName());
+            if (normalized.isEmpty()) {
+                throw new IllegalArgumentException("Nombre de producto vacío en una línea del ticket");
+            }
+            Optional<Product> catalog = productRepository.findFirstByNameIgnoreCase(normalized);
+
             BigDecimal qtyAmt = line.quantityAmount().max(BigDecimal.ZERO);
             if (qtyAmt.compareTo(BigDecimal.ZERO) <= 0) {
                 qtyAmt = BigDecimal.ONE;
@@ -70,7 +87,7 @@ public class ImportTicketFromImageUseCase {
             BigDecimal unitPrice = inferUnitPrice(line, qtyAmt, unit);
 
             TicketItem ti = new TicketItem();
-            ti.setProduct(product);
+            catalog.ifPresentOrElse(ti::setProduct, () -> ti.setLineProductName(normalized));
             ti.setQuantity(qtyAmt);
             ti.setUnit(unit);
             ti.setPriceUnit(unitPrice);
@@ -98,7 +115,33 @@ public class ImportTicketFromImageUseCase {
         ticket.setPurchaseDate(purchaseDate);
         ticket.setItems(items);
 
-        return ticketService.create(ticket);
+        Ticket saved = ticketService.create(ticket);
+        pushTicketLinesToFridge(saved);
+        return saved;
+    }
+
+    private void pushTicketLinesToFridge(Ticket ticket) {
+        if (ticket.getHouseHold_id() == null || ticket.getHouseHold_id().getId() == null
+                || ticket.getItems() == null || ticket.getItems().isEmpty()) {
+            return;
+        }
+        Fridge fridge = fridgeRepository.findFirstByHouseholdId(ticket.getHouseHold_id().getId()).orElse(null);
+        if (fridge == null || fridge.getId() == null) {
+            return;
+        }
+        String fridgeId = fridge.getId();
+        for (TicketItem item : ticket.getItems()) {
+            if (item.getQuantity() == null || item.getQuantity().compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+            if (item.getProduct() != null && item.getProduct().getId() != null) {
+                fridgeItemService.addProductToFridge(fridgeId, item.getProduct().getId(), item.getQuantity(), null,
+                        ItemStatus.GOOD);
+            } else if (item.getLineProductName() != null && !item.getLineProductName().isBlank()) {
+                fridgeItemService.addLabeledItemToFridge(fridgeId, item.getLineProductName().trim(),
+                        item.getQuantity(), null, ItemStatus.GOOD);
+            }
+        }
     }
 
     /**
