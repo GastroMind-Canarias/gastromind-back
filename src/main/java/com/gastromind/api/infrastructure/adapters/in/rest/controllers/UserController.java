@@ -1,6 +1,7 @@
 package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
 import com.gastromind.api.application.services.UserServiceImpl;
+import com.gastromind.api.application.usecases.UpdateMyPreferencesUseCase;
 import com.gastromind.api.domain.models.Allergen;
 import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.enums.Role;
@@ -10,6 +11,7 @@ import com.gastromind.api.infrastructure.adapters.in.rest.dtos.allergen.Allergen
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.allergen.AllergenResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.user.UserRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.user.UserResponse;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.user.UpdateMyPreferencesRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.AllergenRestMapper;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.UserRestMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,6 +42,9 @@ public class UserController {
     @Autowired
     private AllergenRestMapper allergenRestMapper;
 
+    @Autowired
+    private UpdateMyPreferencesUseCase updateMyPreferencesUseCase;
+
     @Operation(summary = "Obtener mi perfil", description = "Devuelve la información del usuario autenticado basándose en el token JWT.")
     @ApiStandardDoc
     @GetMapping("/me")
@@ -68,6 +73,16 @@ public class UserController {
         User existingUser = userServiceImpl.findByUsername(authentication.getName());
         User userChanges = userMapper.toDomain(request);
         User updatedUser = userServiceImpl.updateProfile(existingUser.getId(), userChanges);
+        return ResponseEntity.ok(userMapper.toResponse(updatedUser));
+    }
+
+    @Operation(summary = "Editar mis preferencias", description = "Reemplaza en una sola operación los alérgenos del usuario y utensilios del hogar.")
+    @ApiStandardDoc
+    @PatchMapping("/me/preferences")
+    public ResponseEntity<UserResponse> updateMyPreferences(
+            Authentication authentication,
+            @Valid @RequestBody UpdateMyPreferencesRequest request) {
+        User updatedUser = updateMyPreferencesUseCase.execute(authentication.getName(), request.allergenIds(), request.appliances());
         return ResponseEntity.ok(userMapper.toResponse(updatedUser));
     }
 
