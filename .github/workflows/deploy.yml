@@ -18,7 +18,7 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Tests y cobertura (JaCoCo ≥ 85% en paquetes del POM)
+      - name: Tests y cobertura (JaCoCo ≥ 85% en bundle completo)
         run: mvn -B verify "-Djacoco.minimum.covered.ratio=0.85"
 
       - name: Determinar el Tag de la imagen

@@ -47,8 +47,15 @@ public class JwtService implements IJwtService {
 
     @Override
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        try {
+            Claims claims = parseClaims(token);
+            if (!claims.getSubject().equals(userDetails.getUsername())) {
+                return false;
+            }
+            return !claims.getExpiration().before(new Date());
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
 
     @Override
@@ -59,10 +66,6 @@ public class JwtService implements IJwtService {
         } catch (Exception ex) {
             return false;
         }
-    }
-
-    private boolean isTokenExpired(String token) {
-        return parseClaims(token).getExpiration().before(new Date());
     }
 
     private Claims parseClaims(String token) {
