@@ -149,10 +149,14 @@
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>0.8.12</version>
                 <configuration>
-                    <!-- Implementaciones MapStruct generadas: no cuentan para el ratio -->
+                    <!-- Exclusiones mínimas: generado y boilerplate de mapeo/DTO/entidades. -->
                     <excludes>
                         <exclude>**/*MapperImpl</exclude>
                         <exclude>**/*RestMapperImpl</exclude>
+                        <exclude>**/infrastructure/adapters/**/mappers/**</exclude>
+                        <exclude>**/infrastructure/adapters/**/dtos/**</exclude>
+                        <exclude>**/infrastructure/adapters/out/persistence/jpa/entities/**</exclude>
+                        <exclude>**/infrastructure/openapi/**</exclude>
                     </excludes>
                 </configuration>
                 <executions>
@@ -176,15 +180,17 @@
                             <goal>check</goal>
                         </goals>
                         <configuration>
-                            <!-- Filtro de clases para el goal check (no va dentro de &lt;rule&gt;; ver check-mojo de JaCoCo) -->
-                            <!-- Gate CI: servicios, puertos, repos JPA y adaptadores persistencia/caché (sin adaptadores IA). -->
-                            <includes>
-                                <include>com/gastromind/api/application/services/*</include>
-                                <include>com/gastromind/api/domain/ports/out/*</include>
-                                <include>com/gastromind/api/infrastructure/adapters/out/persistence/jpa/repositories/*</include>
-                                <include>com/gastromind/api/infrastructure/adapters/out/persistence/jpa/*Adapter</include>
-                                <include>com/gastromind/api/infrastructure/adapters/out/cache/*Adapter</include>
-                            </includes>
+                            <!-- Gate global con exclusiones mínimas de boilerplate no crítico. -->
+                            <excludes>
+                                <exclude>com/gastromind/api/infrastructure/adapters/**/mappers/*</exclude>
+                                <exclude>com/gastromind/api/infrastructure/adapters/**/dtos/*</exclude>
+                                <exclude>com/gastromind/api/infrastructure/adapters/out/persistence/jpa/entities/*</exclude>
+                                <exclude>com/gastromind/api/infrastructure/adapters/out/persistence/jpa/entities/enums/*</exclude>
+                                <exclude>com/gastromind/api/infrastructure/openapi/*</exclude>
+                                <exclude>com/gastromind/api/infrastructure/adapters/in/rest/handler/*</exclude>
+                                <exclude>com/gastromind/api/domain/exceptions/*</exclude>
+                                <exclude>com/gastromind/api/GastroMindApiApplication</exclude>
+                            </excludes>
                             <rules>
                                 <rule>
                                     <element>BUNDLE</element>
