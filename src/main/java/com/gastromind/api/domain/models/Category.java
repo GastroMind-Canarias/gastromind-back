@@ -60,7 +60,7 @@ public class Category {
             return false;
         if (getClass() != obj.getClass())
             return false;
-        Store other = (Store) obj;
+        Category other = (Category) obj;
         if (id == null) {
             if (other.id != null)
                 return false;
