@@ -157,6 +157,7 @@ class TicketServiceImplTest {
         verify(usualPurchaseTicketSyncService).syncAfterTicketCreated(saved);
     }
 
+
     @Test
     void create_usesDefaultUnitWhenUnitMissing() {
         when(unitRepository.findFirstByNameIgnoreCase("Unidades")).thenReturn(Optional.of(defaultUd));

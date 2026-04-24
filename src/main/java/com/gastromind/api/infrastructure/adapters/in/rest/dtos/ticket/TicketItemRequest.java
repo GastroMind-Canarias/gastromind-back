@@ -1,7 +1,6 @@
 package com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
@@ -10,8 +9,10 @@ import java.math.BigDecimal;
 @Schema(description = "Línea de ticket asociada a un producto del catálogo")
 public record TicketItemRequest(
         @Schema(example = "550e8400-e29b-41d4-a716-446655440000")
-        @NotBlank(message = "El ID de producto es obligatorio en cada línea")
         String product_id,
+
+        @Schema(description = "Nombre libre del producto cuando no existe en catálogo", example = "Pan chapata")
+        String line_product_name,
 
         @Schema(example = "2")
         @NotNull(message = "La cantidad es obligatoria")

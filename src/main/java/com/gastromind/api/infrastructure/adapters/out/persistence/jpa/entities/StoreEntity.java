@@ -3,6 +3,7 @@ package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities;
 import jakarta.persistence.*;
 
 import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Table(name = "store")
@@ -51,6 +52,13 @@ public class StoreEntity {
 
     public void setTickets(List<TicketEntity> tickets) {
         this.tickets = tickets;
+    }
+
+    @PrePersist
+    public void ensureIdBeforeInsert() {
+        if (this.id == null || this.id.isBlank()) {
+            this.id = UUID.randomUUID().toString();
+        }
     }
 
     @Override

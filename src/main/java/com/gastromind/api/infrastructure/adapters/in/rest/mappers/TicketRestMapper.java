@@ -95,24 +95,36 @@ public interface TicketRestMapper {
         List<TicketItem> out = new ArrayList<>();
         for (TicketItemRequest line : lines) {
             TicketItem ti = new TicketItem();
-            Product p = new Product(line.product_id());
-            ti.setProduct(p);
+            if (hasText(line.product_id())) {
+                Product p = new Product(line.product_id().trim());
+                ti.setProduct(p);
+            } else {
+                ti.setProduct(null);
+            }
+            if (hasText(line.line_product_name())) {
+                ti.setLineProductName(line.line_product_name().trim());
+            }
             ti.setQuantity(line.quantity());
             ti.setPriceUnit(line.price_unit());
-            if (line.unit_id() != null && !line.unit_id().isBlank()) {
-                ti.setUnit(new Unit(line.unit_id()));
+            if (hasText(line.unit_id())) {
+                ti.setUnit(new Unit(line.unit_id().trim()));
             }
-            if (line.verification_status() != null && !line.verification_status().isBlank()) {
+            if (hasText(line.verification_status())) {
                 try {
-                    ti.setVerificationStatus(TicketLineVerificationStatus.valueOf(line.verification_status().trim()));
+                    ti.setVerificationStatus(
+                            TicketLineVerificationStatus.valueOf(line.verification_status().trim().toUpperCase()));
                 } catch (IllegalArgumentException ignored) {
                 }
             }
-            if (line.line_note() != null && !line.line_note().isBlank()) {
+            if (hasText(line.line_note())) {
                 ti.setLineNote(line.line_note().trim());
             }
             out.add(ti);
         }
         return out;
+    }
+
+    private static boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 }
