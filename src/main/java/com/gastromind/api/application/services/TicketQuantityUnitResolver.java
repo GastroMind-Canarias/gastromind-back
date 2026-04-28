@@ -6,21 +6,28 @@ import org.springframework.stereotype.Service;
 
 import java.util.Locale;
 
-/**
- * Enlaza códigos de unidad devueltos por la IA (g, kg, ml, l, ud) con filas de {@code unit} en BD.
- */
 @Service
+/**
+ * Traduce unidades detectadas por IA a unidades canónicas del sistema.
+ */
 public class TicketQuantityUnitResolver {
 
     private final UnitRepository unitRepository;
+    /**
+     * Crea el servicio con acceso al repositorio de unidades.
+     * @param unitRepository repositorio de unidades de medida
+     */
 
     public TicketQuantityUnitResolver(UnitRepository unitRepository) {
         this.unitRepository = unitRepository;
     }
-
     /**
-     * Resuelve un código corto de ticket al {@link Unit} persistido (nombre en español en BD).
+     * Resuelve un código de unidad devuelto por IA a una unidad persistida.
+     * @param rawCode código de unidad recibido (por ejemplo, g, kg, ud)
+     * @return unidad de medida equivalente en base de datos
+     * @throws IllegalStateException si no existe la unidad semilla {@code Unidades}
      */
+
     public Unit resolveFromAiCode(String rawCode) {
         String c = rawCode == null ? "ud" : rawCode.trim().toLowerCase(Locale.ROOT);
         if (c.isEmpty()) {
@@ -39,10 +46,12 @@ public class TicketQuantityUnitResolver {
                         .orElseThrow(() -> new IllegalStateException(
                                 "No hay unidad semilla 'Unidades' en la tabla unit. Ejecute data.sql o cree unidades.")));
     }
-
     /**
-     * Código estable para cálculos (precio, importe de línea).
+     * Convierte una unidad de base de datos a su código canónico corto.
+     * @param unit unidad de medida
+     * @return código canónico ({@code g}, {@code kg}, {@code ml}, {@code l} o {@code ud})
      */
+
     public static String canonicalCode(Unit unit) {
         if (unit == null || unit.getName() == null) {
             return "ud";
@@ -65,10 +74,12 @@ public class TicketQuantityUnitResolver {
         }
         return "ud";
     }
-
     /**
-     * Igual que {@link #canonicalCode(Unit)} pero con el nombre tal como viene de BD (join en ticket_items).
+     * Convierte el nombre de una unidad de base de datos a código canónico.
+     * @param unitName nombre de unidad almacenado en base de datos
+     * @return código canónico ({@code g}, {@code kg}, {@code ml}, {@code l} o {@code ud})
      */
+
     public static String canonicalCodeFromDbUnitName(String unitName) {
         if (unitName == null || unitName.isBlank()) {
             return "ud";
@@ -84,3 +95,7 @@ public class TicketQuantityUnitResolver {
         };
     }
 }
+
+
+
+

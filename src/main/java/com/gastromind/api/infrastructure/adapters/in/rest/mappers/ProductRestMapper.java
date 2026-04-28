@@ -9,6 +9,9 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de product rest.
+ */
 public interface ProductRestMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -24,3 +27,9 @@ public interface ProductRestMapper {
 
     List<ProductResponse> toResponseList(List<Product> products);
 }
+
+
+
+
+
+

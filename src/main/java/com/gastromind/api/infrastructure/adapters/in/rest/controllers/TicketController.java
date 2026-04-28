@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
+﻿package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
 import com.gastromind.api.application.services.TicketServiceImpl;
 import com.gastromind.api.application.services.UserServiceImpl;
@@ -34,7 +34,10 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/tickets")
-@Tag(name = "Ticket", description = "Gestión de tickets de compra y registros de transacciones.")
+@Tag(name = "Ticket", description = "GestiAAaAaAaaAAaAAasAAn de tickets de compra y registros de transacciones.")
+/**
+ * Controlador REST para operaciones de ticket.
+ */
 public class TicketController {
 
     private static final Set<String> ALLOWED_IMAGE_TYPES = Set.of(
@@ -67,6 +70,10 @@ public class TicketController {
         }
         return userServiceImpl.findByUsername(authentication.getName());
     }
+    /**
+     * Lista todos los ticket.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Obtener todos los tickets (solo ADMIN)", description = "Lista completa de tickets en el sistema.")
     @ApiStandardDoc
@@ -76,6 +83,11 @@ public class TicketController {
         List<Ticket> tickets = ticketServiceImpl.findAll();
         return ResponseEntity.ok(ticketMapper.toResponseList(tickets));
     }
+    /**
+     * Realiza list my tickets.
+     * @param authentication usuario autenticado.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Listar tickets del hogar", description = "Tickets del hogar del usuario (incluye los registrados por otros miembros).")
     @ApiStandardDoc
@@ -85,6 +97,12 @@ public class TicketController {
         User user = getCurrentUser(authentication);
         return ResponseEntity.ok(ticketMapper.toResponseList(ticketServiceImpl.findAllVisibleForUserHousehold(user.getId())));
     }
+    /**
+     * Devuelve ticket por my ticket by id.
+     * @param authentication usuario autenticado.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Obtener ticket por ID (hogar)", description = "Si el ticket pertenece al mismo hogar que el usuario autenticado.")
     @ApiStandardDoc
@@ -95,6 +113,12 @@ public class TicketController {
         Ticket ticket = ticketServiceImpl.findByIdForHouseholdMember(id, user.getId());
         return ResponseEntity.ok(ticketMapper.toResponse(ticket));
     }
+    /**
+     * Realiza create my ticket.
+     * @param authentication usuario autenticado.
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Crear ticket para mi usuario", description = "Asocia el ticket al usuario autenticado.")
     @ApiPostDoc
@@ -110,15 +134,22 @@ public class TicketController {
     }
 
     @Operation(summary = "Importar ticket desde imagen (usuario autenticado)",
-            description = "Extrae líneas e importes con Gemini y crea el ticket para el usuario actual. "
-                    + "Parámetro opcional store_id.")
+            description = "Extrae lAAaAaAaaAAaAAasAAneas e importes con Gemini y crea el ticket para el usuario actual. "
+                    + "ParAAaAaAaaAAaAAasAAmetro opcional store_id.")
+    /**
+     * Realiza import from image.
+     * @param authentication usuario autenticado.
+     * @param file valor a utilizar.
+     * @param storeId identificador de la tienda (opcional).
+     * @return resultado de la operacion solicitada.
+     */
     @ApiPostDoc
     @PostMapping(value = "/from-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<TicketResponse> importFromImage(
             Authentication authentication,
             @RequestPart("file") MultipartFile file,
-            @Parameter(description = "Tienda (opcional si el ticket muestra nombre y existe en catálogo)")
+            @Parameter(description = "Tienda (opcional si el ticket muestra nombre y existe en catAAaAaAaaAAaAAasAAlogo)")
             @RequestParam(value = "store_id", required = false) String storeId) {
         User user = getCurrentUser(authentication);
         if (file == null || file.isEmpty()) {
@@ -126,7 +157,7 @@ public class TicketController {
         }
         if (file.getSize() > ticketImageProperties.getMaxImageBytes()) {
             throw new IllegalArgumentException(
-                    "La imagen supera el tamaño máximo permitido (" + ticketImageProperties.getMaxImageBytes() + " bytes)");
+                    "La imagen supera el tamaAAaAaAaaAAaAAasAAo mAAaAaAaaAAaAAasAAximo permitido (" + ticketImageProperties.getMaxImageBytes() + " bytes)");
         }
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_IMAGE_TYPES.contains(contentType.toLowerCase(Locale.ROOT))) {
@@ -141,8 +172,13 @@ public class TicketController {
         Ticket saved = importTicketFromImageUseCase.execute(bytes, contentType, user.getId(), storeId);
         return ResponseEntity.status(HttpStatus.CREATED).body(ticketMapper.toResponse(saved));
     }
+    /**
+     * Registra un nuevo ticket.
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Crear ticket (solo ADMIN)", description = "Registra un ticket con user_id explícito en el cuerpo.")
+    @Operation(summary = "Crear ticket (solo ADMIN)", description = "Registra un ticket con user_id explAAaAaAaaAAaAAasAAcito en el cuerpo.")
     @ApiPostDoc
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -151,6 +187,11 @@ public class TicketController {
         Ticket savedTicket = ticketServiceImpl.create(ticketDomain);
         return ResponseEntity.status(HttpStatus.CREATED).body(ticketMapper.toResponse(savedTicket));
     }
+    /**
+     * Devuelve ticket por id.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Buscar ticket por ID (solo ADMIN)", description = "Detalle de un ticket por identificador.")
     @ApiStandardDoc
@@ -162,6 +203,12 @@ public class TicketController {
         Ticket ticket = ticketServiceImpl.findById(id);
         return ResponseEntity.ok(ticketMapper.toResponse(ticket));
     }
+    /**
+     * Define un ticket existente.
+     * @param id el identificador del recurso
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Actualizar ticket (solo ADMIN)", description = "Modifica un ticket existente.")
     @ApiStandardDoc
@@ -172,6 +219,13 @@ public class TicketController {
         Ticket updatedTicket = ticketServiceImpl.update(id, ticketDomain);
         return ResponseEntity.ok(ticketMapper.toResponse(updatedTicket));
     }
+    /**
+     * Realiza update my ticket.
+     * @param authentication usuario autenticado.
+     * @param id el identificador del recurso
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Actualizar uno de mis tickets", description = "Solo si el ticket pertenece al usuario autenticado.")
     @ApiStandardDoc
@@ -186,6 +240,11 @@ public class TicketController {
         Ticket updatedTicket = ticketServiceImpl.updateForUser(id, ticketDomain, user.getId());
         return ResponseEntity.ok(ticketMapper.toResponse(updatedTicket));
     }
+    /**
+     * Elimina un ticket.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Eliminar ticket (solo ADMIN)", description = "Borra un ticket de la base de datos.")
     @ApiStandardDoc
@@ -195,6 +254,12 @@ public class TicketController {
         ticketServiceImpl.delete(id);
         return ResponseEntity.noContent().build();
     }
+    /**
+     * Realiza delete my ticket.
+     * @param authentication usuario autenticado.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Eliminar uno de mis tickets", description = "Solo si el ticket pertenece al usuario autenticado.")
     @ApiStandardDoc
@@ -206,3 +271,7 @@ public class TicketController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+

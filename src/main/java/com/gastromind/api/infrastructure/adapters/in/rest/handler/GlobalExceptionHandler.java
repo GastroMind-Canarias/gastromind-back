@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.in.rest.handler;
+﻿package com.gastromind.api.infrastructure.adapters.in.rest.handler;
 
 import com.gastromind.api.domain.exceptions.AiRecipeException;
 import com.gastromind.api.domain.exceptions.AiTicketException;
@@ -23,37 +23,75 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import java.time.LocalDateTime;
 
 @RestControllerAdvice
+/**
+ * Representa global exception handler dentro del dominio de la aplicacion.
+ */
 public class GlobalExceptionHandler {
+    /**
+     * Realiza handle forbidden exception.
+     * @param ex valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
     @ExceptionHandler(ForbiddenException.class)
     public ResponseEntity<ErrorResponse> handleForbiddenException(ForbiddenException ex) {
         return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
     }
+    /**
+     * Realiza handle unauthorized.
+     * @param ex valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
     @ExceptionHandler({AuthenticationCredentialsNotFoundException.class, AuthenticationException.class, BadCredentialsException.class})
     public ResponseEntity<ErrorResponse> handleUnauthorized(RuntimeException ex) {
         return buildResponse(HttpStatus.UNAUTHORIZED, ex.getMessage());
     }
+    /**
+     * Realiza handle access denied.
+     * @param ex valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
         return buildResponse(HttpStatus.FORBIDDEN, ex.getMessage());
     }
+    /**
+     * Realiza handle not found exception.
+     * @param ex valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException ex) {
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
+    /**
+     * Realiza handle fridge already exists exception.
+     * @param ex valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
     @ExceptionHandler(FridgeAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleFridgeAlreadyExistsException(FridgeAlreadyExistsException ex) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
     }
+    /**
+     * Realiza handle ai recipe exception.
+     * @param ex valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
     @ExceptionHandler(AiRecipeException.class)
     public ResponseEntity<ErrorResponse> handleAiRecipeException(AiRecipeException ex) {
         return buildResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
     }
+    /**
+     * Realiza handle ai ticket exception.
+     * @param ex valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
     @ExceptionHandler(AiTicketException.class)
     public ResponseEntity<ErrorResponse> handleAiTicketException(AiTicketException ex) {
@@ -66,6 +104,11 @@ public class GlobalExceptionHandler {
             MissingServletRequestParameterException.class,
             IllegalArgumentException.class
     })
+    /**
+     * Realiza handle bad request.
+     * @param ex valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
     public ResponseEntity<ErrorResponse> handleBadRequest(Exception ex) {
         String message = ex.getMessage();
         if (ex instanceof MethodArgumentNotValidException validationException
@@ -74,17 +117,32 @@ public class GlobalExceptionHandler {
         }
         return buildResponse(HttpStatus.BAD_REQUEST, message);
     }
+    /**
+     * Realiza handle response status.
+     * @param ex valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorResponse> handleResponseStatus(ResponseStatusException ex) {
         String message = ex.getReason() != null ? ex.getReason() : ex.getMessage();
         return buildResponse(HttpStatus.valueOf(ex.getStatusCode().value()), message);
     }
+    /**
+     * Realiza handle generic error.
+     * @param ex valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleGenericError(RuntimeException ex) {
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
+    /**
+     * Realiza handle domain bad request.
+     * @param ex valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
     @ExceptionHandler({ ImageProcessingException.class, UnsupportedUnitException.class })
     public ResponseEntity<ErrorResponse> handleDomainBadRequest(RuntimeException ex) {
@@ -100,3 +158,7 @@ public class GlobalExceptionHandler {
     }
 
 }
+
+
+
+

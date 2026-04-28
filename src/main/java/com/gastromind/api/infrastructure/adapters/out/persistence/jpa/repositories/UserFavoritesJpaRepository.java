@@ -7,8 +7,17 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
+/**
+ * Define el contrato de user favorites jpa.
+ */
 public interface UserFavoritesJpaRepository extends JpaRepository<UserFavoritesEntity, String> {
 
     List<UserFavoritesEntity> findByUser_Id(String userId);
 }
+
+
+
+
+
+
 

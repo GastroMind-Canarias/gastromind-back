@@ -14,12 +14,24 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+/**
+ * Caso de uso responsable de registrar un usuario y vincularlo a un hogar.
+ * Permite unirse a un hogar existente mediante invitación o crear uno nuevo.
+ */
 public class RegisterUserUseCase {
 
     private final IHouseHoldService householdService;
     private final IUserService userService;
     private final IAllergenService allergenService;
     private final PasswordEncoder passwordEncoder;
+    /**
+     * Constructor con las dependencias necesarias para el flujo de alta de usuario.
+     *
+     * @param householdService servicio de gestión de hogares
+     * @param userService servicio de gestión de usuarios
+     * @param allergenService servicio de consulta de alérgenos
+     * @param passwordEncoder componente para cifrar la contraseña
+     */
 
     public RegisterUserUseCase(
             IHouseHoldService householdService,
@@ -31,6 +43,12 @@ public class RegisterUserUseCase {
         this.allergenService = allergenService;
         this.passwordEncoder = passwordEncoder;
     }
+    /**
+     * Registra al usuario según el modo de alta indicado en la solicitud.
+     *
+     * @param request datos de registro, incluyendo datos personales y de hogar
+     * @throws IllegalArgumentException si faltan datos obligatorios o el modo de alta es inconsistente
+     */
 
     @Transactional
     public void exec(RegisterRequest request) {
@@ -52,7 +70,7 @@ public class RegisterUserUseCase {
         if (joinExisting) {
             String token = request.inviteToken() != null ? request.inviteToken().trim() : "";
             if (token.isEmpty()) {
-                throw new IllegalArgumentException("El código de invitación es obligatorio para unirse a un hogar existente");
+                throw new IllegalArgumentException("El codigo de invitacion es obligatorio para unirse a un hogar existente");
             }
             user.setHouseHold_id(null);
             user.setRole(Role.ROLE_MEMBER);
@@ -81,10 +99,6 @@ public class RegisterUserUseCase {
         userService.create(user);
     }
 
-    /**
-     * JOIN: modo explícito, o modo nulo con token presente.
-     * CREATE: modo explícito, o modo nulo sin token.
-     */
     private boolean resolveJoinExisting(RegisterRequest request) {
         HouseholdRegistrationMode mode = request.householdMode();
         boolean hasToken = request.inviteToken() != null && !request.inviteToken().isBlank();
@@ -98,13 +112,13 @@ public class RegisterUserUseCase {
         }
         if (mode == HouseholdRegistrationMode.CREATE_NEW) {
             if (hasToken) {
-                throw new IllegalArgumentException("No envíe inviteToken si el modo es crear hogar nuevo (CREATE_NEW)");
+                throw new IllegalArgumentException("No envie inviteToken si el modo es crear hogar nuevo (CREATE_NEW)");
             }
             return false;
         }
 
         if (hasToken && hasHouseholdName) {
-            throw new IllegalArgumentException("Indique solo una opción: inviteToken para unirse o householdName para crear un hogar nuevo");
+            throw new IllegalArgumentException("Indique solo una opcion: inviteToken para unirse o householdName para crear un hogar nuevo");
         }
         if (hasToken) {
             return true;
@@ -115,3 +129,7 @@ public class RegisterUserUseCase {
         throw new IllegalArgumentException("Debe enviar inviteToken para unirse a un hogar o householdName para crear uno nuevo");
     }
 }
+
+
+
+

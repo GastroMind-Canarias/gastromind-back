@@ -4,6 +4,9 @@ import com.gastromind.api.domain.models.Store;
 
 import java.util.List;
 
+/**
+ * Define las operaciones de negocio para tiendas.
+ */
 public interface IStoreService {
     List<Store> findAll();
     Store findById(String id);

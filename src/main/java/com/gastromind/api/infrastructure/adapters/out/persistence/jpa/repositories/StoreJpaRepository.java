@@ -5,7 +5,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
+/**
+ * Define el contrato de store jpa.
+ */
 public interface StoreJpaRepository extends JpaRepository<StoreEntity, String> {
 
     java.util.Optional<StoreEntity> findFirstByNameIgnoreCase(String name);
 }
+
+
+
+
+
+

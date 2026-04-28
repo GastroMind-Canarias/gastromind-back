@@ -9,6 +9,9 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de fridge rest.
+ */
 public interface FridgeRestMapper {
     @Mapping(target = "houseHold_id.id", source = "household_id")
     @Mapping(target = "id", ignore = true)
@@ -19,5 +22,11 @@ public interface FridgeRestMapper {
 
     List<FridgeResponse> toResponseList(List<Fridge> fridges);
 }
+
+
+
+
+
+
 
 

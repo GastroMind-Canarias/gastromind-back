@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem;
+﻿package com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem;
 
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -10,6 +10,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Schema(description = "Registrar o actualizar un producto en una nevera concreta (uso administrador; incluye fridgeId)")
+/**
+ * Representa fridge item request dentro del dominio de la aplicacion.
+ */
 public record FridgeItemRequest(
         @Schema(description = "ID del producto maestro", example = "550e8400-e29b-41d4-a716-446655440001")
         @NotBlank(message = "El identificador del producto es obligatorio")
@@ -32,3 +35,9 @@ public record FridgeItemRequest(
         ItemStatus status
 ) {
 }
+
+
+
+
+
+

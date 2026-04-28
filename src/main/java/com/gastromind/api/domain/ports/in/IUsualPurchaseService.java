@@ -4,6 +4,9 @@ import com.gastromind.api.domain.models.UsualPurchase;
 
 import java.util.List;
 
+/**
+ * Define las operaciones de negocio para compras habituales.
+ */
 public interface IUsualPurchaseService {
     List<UsualPurchase> findAll();
 

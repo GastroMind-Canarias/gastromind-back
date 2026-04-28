@@ -8,6 +8,9 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {UserMapper.class, ProductMapper.class})
+/**
+ * Define el contrato de usual purchase.
+ */
 public interface UsualPurchaseMapper {
 
     @Mapping(source = "user_id", target = "user")
@@ -23,3 +26,9 @@ public interface UsualPurchaseMapper {
     List<UsualPurchaseEntity> toEntityList(List<UsualPurchase> domainList);
     List<UsualPurchase> toDomainList(List<UsualPurchaseEntity> entityList);
 }
+
+
+
+
+
+

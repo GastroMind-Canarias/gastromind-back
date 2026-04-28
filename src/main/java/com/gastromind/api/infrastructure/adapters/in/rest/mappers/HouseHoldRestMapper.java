@@ -9,6 +9,9 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring", uses = { UserRestMapper.class })
+/**
+ * Define el contrato de house hold rest.
+ */
 public interface HouseHoldRestMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -21,3 +24,9 @@ public interface HouseHoldRestMapper {
 
     List<HouseHoldResponse> toResponseList(List<HouseHold> houseHolds);
 }
+
+
+
+
+
+

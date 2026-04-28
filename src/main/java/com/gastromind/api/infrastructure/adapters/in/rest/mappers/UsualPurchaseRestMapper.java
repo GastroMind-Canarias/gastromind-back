@@ -12,6 +12,9 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de usual purchase rest.
+ */
 public interface UsualPurchaseRestMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -33,3 +36,9 @@ public interface UsualPurchaseRestMapper {
         return u;
     }
 }
+
+
+
+
+
+

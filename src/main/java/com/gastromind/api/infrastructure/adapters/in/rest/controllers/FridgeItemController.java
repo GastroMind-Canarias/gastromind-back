@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
+﻿package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
 import com.gastromind.api.application.services.FridgeItemServiceImpl;
 import com.gastromind.api.application.usecases.ConsumeMyFridgeItemUseCase;
@@ -30,7 +30,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/fridge-items")
-@Tag(name = "Items de Nevera", description = "Gestión de productos y stock en neveras. Rutas /me: Solo Owner y Admin. Rutas globales: Solo Admin.")
+@Tag(name = "Items de Nevera", description = "GestiAAaAaAaaAAaAAasAAn de productos y stock en neveras. Rutas /me: Solo Owner y Admin. Rutas globales: Solo Admin.")
+/**
+ * Controlador REST para operaciones de fridge item.
+ */
 public class FridgeItemController {
 
     @Autowired
@@ -54,6 +57,10 @@ public class FridgeItemController {
     private ListMyExpiringFridgeItemsUseCase listMyExpiringFridgeItemsUseCase;
     @Autowired
     private ListMyFridgeItemsByCategoryUseCase listMyFridgeItemsByCategoryUseCase;
+    /**
+     * Lista todos los fridge item.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Obtener todos los items (Solo Admin)", description = "Devuelve una lista global de todos los productos en todas las neveras.")
     @ApiStandardDoc
@@ -62,8 +69,13 @@ public class FridgeItemController {
     public ResponseEntity<List<FridgeItemResponse>> getAll() {
         return ResponseEntity.ok(fridgeItemRestMapper.toResponseList(fridgeItemService.findAll()));
     }
+    /**
+     * Devuelve fridge item por id.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Buscar item por ID (Solo Admin)", description = "Devuelve los detalles de un producto específico en la nevera.")
+    @Operation(summary = "Buscar item por ID (Solo Admin)", description = "Devuelve los detalles de un producto especAAaAaAaaAAaAAasAAfico en la nevera.")
     @ApiStandardDoc
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -71,8 +83,13 @@ public class FridgeItemController {
             @Parameter(description = "ID del item a buscar", example = "uuid-item-123") @PathVariable String id) {
         return ResponseEntity.ok(fridgeItemRestMapper.toResponse(fridgeItemService.findById(id)));
     }
+    /**
+     * Devuelve fridge item por fridge id.
+     * @param fridgeId identificador de la nevera.
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Listar items de una nevera (Solo Admin)", description = "Devuelve todos los productos contenidos en una nevera específica.")
+    @Operation(summary = "Listar items de una nevera (Solo Admin)", description = "Devuelve todos los productos contenidos en una nevera especAAaAaAaaAAaAAasAAfica.")
     @ApiStandardDoc
     @GetMapping("/fridge/{fridgeId}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -80,6 +97,11 @@ public class FridgeItemController {
             @Parameter(description = "ID de la nevera", example = "uuid-fridge-456") @PathVariable String fridgeId) {
         return ResponseEntity.ok(fridgeItemRestMapper.toResponseList(fridgeItemService.findByFridgeId(fridgeId)));
     }
+    /**
+     * Realiza list my items.
+     * @param authentication usuario autenticado.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Listar items de mi nevera (Solo Owner y Admin)", description = "Devuelve los productos de la nevera del hogar del usuario autenticado.")
     @ApiStandardDoc
@@ -88,8 +110,13 @@ public class FridgeItemController {
     public ResponseEntity<List<FridgeItemResponse>> listMyItems(Authentication authentication) {
         return ResponseEntity.ok(fridgeItemRestMapper.toResponseList(listMyFridgeItemsUseCase.execute(authentication.getName())));
     }
+    /**
+     * Registra un nuevo fridge item.
+     * @param fridgeItem el producto de la nevera
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Añadir item a la nevera (Solo Admin)", description = "Registra un nuevo producto o lote en el inventario.")
+    @Operation(summary = "AAAaAaAaaAAaAAasAAadir item a la nevera (Solo Admin)", description = "Registra un nuevo producto o lote en el inventario.")
     @ApiPostDoc
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -102,8 +129,14 @@ public class FridgeItemController {
                         fridgeItem.expirationDate(),
                         fridgeItem.status())));
     }
+    /**
+     * Realiza create my item.
+     * @param authentication usuario autenticado.
+     * @param body datos enviados en el cuerpo de la solicitud.
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Añadir item a mi nevera (Solo Owner y Admin)", description = "Registra un nuevo producto en la nevera del hogar autenticado. No incluye fridgeId: se toma de tu hogar.")
+    @Operation(summary = "AAAaAaAaaAAaAAasAAadir item a mi nevera (Solo Owner y Admin)", description = "Registra un nuevo producto en la nevera del hogar autenticado. No incluye fridgeId: se toma de tu hogar.")
     @ApiPostDoc
     @PostMapping("/me")
     @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
@@ -117,6 +150,12 @@ public class FridgeItemController {
                         body.expirationDate(),
                         body.status())));
     }
+    /**
+     * Define un fridge item existente.
+     * @param id el identificador del recurso
+     * @param fridgeItem el producto de la nevera
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Actualizar stock de un item (Solo Admin)", description = "Modifica la cantidad o estado de un producto existente (ej. tras cocinar).")
     @ApiStandardDoc
@@ -127,6 +166,13 @@ public class FridgeItemController {
         return ResponseEntity.ok(fridgeItemRestMapper
                 .toResponse(fridgeItemService.update(id, fridgeItemRestMapper.toDomain(fridgeItem))));
     }
+    /**
+     * Realiza update my item.
+     * @param authentication usuario autenticado.
+     * @param itemId identificador del item.
+     * @param body datos enviados en el cuerpo de la solicitud.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Actualizar item de mi nevera (Solo Owner y Admin)", description = "Modifica un producto de la nevera del hogar autenticado.")
     @ApiStandardDoc
@@ -140,8 +186,14 @@ public class FridgeItemController {
                 itemId,
                 fridgeItemRestMapper.toDomain(body))));
     }
+    /**
+     * Realiza consume partially.
+     * @param id el identificador del recurso
+     * @param quantity la cantidad
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Consumir parte de un item (Solo Admin)", description = "Descuenta una cantidad del stock. Si el stock llega a cero, el ítem se elimina del inventario.")
+    @Operation(summary = "Consumir parte de un item (Solo Admin)", description = "Descuenta una cantidad del stock. Si el stock llega a cero, el AAaAaAaaAAaAAasAAtem se elimina del inventario.")
     @ApiStandardDoc
     @PutMapping("/{id}/consume")
     @PreAuthorize("hasRole('ADMIN')")
@@ -150,8 +202,15 @@ public class FridgeItemController {
             @Parameter(description = "Cantidad a consumir", example = "0.5") @RequestBody java.math.BigDecimal quantity) {
         return ResponseEntity.ok(fridgeItemRestMapper.toResponse(fridgeItemService.consumePartially(id, quantity)));
     }
+    /**
+     * Realiza consume partially my item.
+     * @param authentication usuario autenticado.
+     * @param itemId identificador del item.
+     * @param quantity la cantidad
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Consumir parte de un item de mi nevera (Solo Owner y Admin)", description = "Descuenta cantidad del stock; si queda en cero, el ítem se elimina del inventario.")
+    @Operation(summary = "Consumir parte de un item de mi nevera (Solo Owner y Admin)", description = "Descuenta cantidad del stock; si queda en cero, el AAaAaAaaAAaAAasAAtem se elimina del inventario.")
     @ApiStandardDoc
     @PutMapping("/me/{itemId}/consume")
     @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
@@ -161,8 +220,13 @@ public class FridgeItemController {
         return ResponseEntity.ok(fridgeItemRestMapper.toResponse(
                 consumeMyFridgeItemUseCase.execute(authentication.getName(), itemId, quantity)));
     }
+    /**
+     * Realiza mark as consumed.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Marcar como consumido (Solo Admin)", description = "Elimina el ítem del inventario (equivalente a haberlo consumido por completo).")
+    @Operation(summary = "Marcar como consumido (Solo Admin)", description = "Elimina el AAaAaAaaAAaAAasAAtem del inventario (equivalente a haberlo consumido por completo).")
     @ApiStandardDoc
     @PutMapping("/{id}/mark-consumed")
     @PreAuthorize("hasRole('ADMIN')")
@@ -170,8 +234,14 @@ public class FridgeItemController {
         fridgeItemService.markAsConsumed(id);
         return ResponseEntity.ok().build();
     }
+    /**
+     * Realiza mark my item as consumed.
+     * @param authentication usuario autenticado.
+     * @param itemId identificador del item.
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Marcar item de mi nevera como consumido (Solo Owner y Admin)", description = "Quita el ítem del inventario de tu nevera (consumido por completo).")
+    @Operation(summary = "Marcar item de mi nevera como consumido (Solo Owner y Admin)", description = "Quita el AAaAaAaaAAaAAasAAtem del inventario de tu nevera (consumido por completo).")
     @ApiStandardDoc
     @PutMapping("/me/{itemId}/mark-consumed")
     @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
@@ -179,19 +249,31 @@ public class FridgeItemController {
         markMyFridgeItemConsumedUseCase.execute(authentication.getName(), itemId);
         return ResponseEntity.ok().build();
     }
+    /**
+     * Devuelve fridge item por expiring.
+     * @param fridgeId identificador de la nevera.
+     * @param days dias de anticipacion para filtrar caducidades.
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Listar items por caducar (Solo Admin)", description = "Recupera los productos próximos a caducar para una nevera específica.")
+    @Operation(summary = "Listar items por caducar (Solo Admin)", description = "Recupera los productos prAAaAaAaaAAaAAasAAximos a caducar para una nevera especAAaAaAaaAAaAAasAAfica.")
     @ApiStandardDoc
     @GetMapping("/fridge/{fridgeId}/expiring")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<FridgeItemResponse>> getExpiring(
             @PathVariable String fridgeId,
-            @Parameter(description = "Número de días de antelación", example = "5") @org.springframework.web.bind.annotation.RequestParam(defaultValue = "7") int days) {
+            @Parameter(description = "NAAaAaAaaAAaAAasAAmero de dAAaAaAaaAAaAAasAAas de antelaciAAaAaAaaAAaAAasAAn", example = "5") @org.springframework.web.bind.annotation.RequestParam(defaultValue = "7") int days) {
         return ResponseEntity
                 .ok(fridgeItemRestMapper.toResponseList(fridgeItemService.getExpiringItems(fridgeId, days)));
     }
+    /**
+     * Devuelve fridge item por my expiring.
+     * @param authentication usuario autenticado.
+     * @param days dias de anticipacion para filtrar caducidades.
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Listar mis items por caducar (Solo Owner y Admin)", description = "Recupera productos próximos a caducar para la nevera del hogar autenticado.")
+    @Operation(summary = "Listar mis items por caducar (Solo Owner y Admin)", description = "Recupera productos prAAaAaAaaAAaAAasAAximos a caducar para la nevera del hogar autenticado.")
     @ApiStandardDoc
     @GetMapping("/me/expiring")
     @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
@@ -201,8 +283,14 @@ public class FridgeItemController {
         return ResponseEntity.ok(fridgeItemRestMapper.toResponseList(
                 listMyExpiringFridgeItemsUseCase.execute(authentication.getName(), days)));
     }
+    /**
+     * Devuelve fridge item por category.
+     * @param fridgeId identificador de la nevera.
+     * @param categoryId identificador de la categoria.
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Filtrar por categoría (Solo Admin)", description = "Devuelve el inventario de una nevera filtrado por una categoría de producto específica.")
+    @Operation(summary = "Filtrar por categorAAaAaAaaAAaAAasAAa (Solo Admin)", description = "Devuelve el inventario de una nevera filtrado por una categorAAaAaAaaAAaAAasAAa de producto especAAaAaAaaAAaAAasAAfica.")
     @ApiStandardDoc
     @GetMapping("/fridge/{fridgeId}/category/{categoryId}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -211,8 +299,14 @@ public class FridgeItemController {
         return ResponseEntity.ok(
                 fridgeItemRestMapper.toResponseList(fridgeItemService.getInventoryByCategory(fridgeId, categoryId)));
     }
+    /**
+     * Devuelve fridge item por my by category.
+     * @param authentication usuario autenticado.
+     * @param categoryId identificador de la categoria.
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Filtrar mi inventario por categoría (Solo Owner y Admin)", description = "Devuelve el inventario de la nevera autenticada filtrado por categoría.")
+    @Operation(summary = "Filtrar mi inventario por categorAAaAaAaaAAaAAasAAa (Solo Owner y Admin)", description = "Devuelve el inventario de la nevera autenticada filtrado por categorAAaAaAaaAAaAAasAAa.")
     @ApiStandardDoc
     @GetMapping("/me/category/{categoryId}")
     @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
@@ -221,6 +315,11 @@ public class FridgeItemController {
         return ResponseEntity.ok(fridgeItemRestMapper.toResponseList(
                 listMyFridgeItemsByCategoryUseCase.execute(authentication.getName(), categoryId)));
     }
+    /**
+     * Elimina un fridge item.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Eliminar item (Solo Admin)", description = "Borra un producto del inventario (consumido o desechado).")
     @ApiStandardDoc
@@ -230,6 +329,12 @@ public class FridgeItemController {
         fridgeItemService.delete(id);
         return ResponseEntity.noContent().build();
     }
+    /**
+     * Realiza delete my item.
+     * @param authentication usuario autenticado.
+     * @param itemId identificador del item.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Eliminar item de mi nevera (Solo Owner y Admin)", description = "Borra un producto del inventario de la nevera autenticada.")
     @ApiStandardDoc
@@ -240,3 +345,7 @@ public class FridgeItemController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+

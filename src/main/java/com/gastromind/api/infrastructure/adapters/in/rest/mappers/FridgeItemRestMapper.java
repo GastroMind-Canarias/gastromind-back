@@ -10,15 +10,14 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de fridge item rest.
+ */
 public interface FridgeItemRestMapper {
 
-    /**
-     * Transforma la petición del cliente (DTO) al modelo de dominio.
-     * Mapeamos los IDs planos del DTO a la estructura de objetos del dominio.
-     */
     @Mapping(target = "product.id", source = "productId")
     @Mapping(target = "fridgeId", source = "fridgeId")
-    @Mapping(target = "id", ignore = true) // El ID suele ser gestionado por la base de datos en la creación
+    @Mapping(target = "id", ignore = true) // El ID suele ser gestionado por la base de datos en la creaciAAn
     FridgeItem toDomain(FridgeItemRequest request);
 
     @Mapping(target = "product.id", source = "productId")
@@ -26,10 +25,6 @@ public interface FridgeItemRestMapper {
     @Mapping(target = "id", ignore = true)
     FridgeItem toDomain(MyFridgeItemRequest request);
 
-    /**
-     * Transforma el modelo de dominio a una respuesta legible para el cliente (DTO).
-     * Extraemos el nombre del producto para facilitar la visualización en el frontend.
-     */
     @Mapping(target = "productName", expression = "java(resolveFridgeProductName(domain))")
     FridgeItemResponse toResponse(FridgeItem domain);
 
@@ -43,3 +38,9 @@ public interface FridgeItemRestMapper {
 
     List<FridgeItemResponse> toResponseList(List<FridgeItem> domainList);
 }
+
+
+
+
+
+

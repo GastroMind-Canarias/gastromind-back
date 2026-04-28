@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.in.rest.dtos.usualpurchase;
+﻿package com.gastromind.api.infrastructure.adapters.in.rest.dtos.usualpurchase;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
@@ -6,6 +6,9 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Schema(description = "Sugerencia de producto habitual con stock en nevera y prioridad")
+/**
+ * Representa usual purchase suggestion response dentro del dominio de la aplicacion.
+ */
 public record UsualPurchaseSuggestionResponse(
 
         @Schema(example = "prod-uuid")
@@ -14,7 +17,7 @@ public record UsualPurchaseSuggestionResponse(
         @Schema(example = "Leche entera")
         String product_name,
 
-        @Schema(description = "Cantidad objetivo (kg, l o ud según quantity_unit)")
+        @Schema(description = "Cantidad objetivo (kg, l o ud segAAn quantity_unit)")
         BigDecimal target_quantity,
 
         @Schema(example = "kg", allowableValues = {"kg", "l", "ud"})
@@ -23,15 +26,21 @@ public record UsualPurchaseSuggestionResponse(
         @Schema(description = "Cantidad agregada actual en la nevera del hogar")
         BigDecimal current_fridge_quantity,
 
-        @Schema(description = "Puntuación (frecuencia × decaimiento por antigüedad)")
+        @Schema(description = "PuntuaciAAn (frecuencia Aa decaimiento por antigAAedad)")
         double score,
 
-        @Schema(description = "Número de tickets distintos con este producto en el periodo")
+        @Schema(description = "NAAmero de tickets distintos con este producto en el periodo")
         int distinct_ticket_count,
 
-        @Schema(description = "Fecha/hora de la última compra registrada en un ticket")
+        @Schema(description = "Fecha/hora de la AAltima compra registrada en un ticket")
         LocalDateTime last_purchased_at,
 
-        @Schema(description = "True si el stock está por debajo del umbral configurado respecto al target")
+        @Schema(description = "True si el stock estAA por debajo del umbral configurado respecto al target")
         boolean low_stock
 ) {}
+
+
+
+
+
+

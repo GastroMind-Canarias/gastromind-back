@@ -1,8 +1,11 @@
-package com.gastromind.api.infrastructure.security.auth.dtos;
+﻿package com.gastromind.api.infrastructure.security.auth.dtos;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Respuesta que contiene el token de acceso generado tras una autenticacion exitosa")
+/**
+ * Representa token response dentro del dominio de la aplicacion.
+ */
 public record TokenResponse(
 
         @Schema(
@@ -11,3 +14,9 @@ public record TokenResponse(
         )
         String token
 ) {}
+
+
+
+
+
+

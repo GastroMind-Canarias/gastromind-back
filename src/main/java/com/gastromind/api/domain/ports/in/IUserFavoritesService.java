@@ -4,6 +4,9 @@ import com.gastromind.api.domain.models.UserFavorites;
 
 import java.util.List;
 
+/**
+ * Define las operaciones de negocio para favoritos del usuario.
+ */
 public interface IUserFavoritesService {
     List<UserFavorites> findAll();
 

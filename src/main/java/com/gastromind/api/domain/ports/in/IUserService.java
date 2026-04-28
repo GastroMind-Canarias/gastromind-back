@@ -6,6 +6,9 @@ import com.gastromind.api.domain.models.enums.Role;
 
 import java.util.List;
 
+/**
+ * Define las operaciones de negocio para usuarios.
+ */
 public interface IUserService {
     List<User> findAll();
 
@@ -29,7 +32,6 @@ public interface IUserService {
 
     void removeAllergensBulk(String userId, List<String> allergenIds);
 
-    /** Sustituye el conjunto de alérgenos del usuario por el listado indicado. */
     void replaceAllergens(String userId, List<String> allergenIds);
 
     List<Allergen> listAllergens(String userId);

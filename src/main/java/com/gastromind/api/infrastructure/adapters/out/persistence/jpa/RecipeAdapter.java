@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.out.persistence.jpa;
+﻿package com.gastromind.api.infrastructure.adapters.out.persistence.jpa;
 
 import com.gastromind.api.domain.models.Recipe;
 import com.gastromind.api.domain.ports.out.RecipeRepository;
@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 @Component
+/**
+ * Representa recipe dentro del dominio de la aplicacion.
+ */
 public class RecipeAdapter implements RecipeRepository {
 
     @Autowired
@@ -18,22 +21,40 @@ public class RecipeAdapter implements RecipeRepository {
 
     @Autowired
     RecipeMapper recipeMapper;
+    /**
+     * Registra un nuevo recipe.
+     * @param recipe la receta
+     * @return resultado de la operacion solicitada.
+     */
 
     @Override
     public Recipe save(Recipe recipe) {
         RecipeEntity entity = recipeMapper.toEntity(recipe);
         return recipeMapper.toDomain(recipeJpaRepository.save(entity));
     }
+    /**
+     * Devuelve recipe por id.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
     @Override
     public Optional<Recipe> findById(String id) {
         return recipeJpaRepository.findById(id).map(recipeMapper::toDomain);
     }
+    /**
+     * Realiza delete by id.
+     * @param id el identificador del recurso
+     */
 
     @Override
     public void deleteById(String id) {
         recipeJpaRepository.deleteById(id);
     }
+    /**
+     * Lista todos los recipe.
+     * @return lista actual.
+     */
 
     @Override
     public List<Recipe> findAll() {
@@ -42,3 +63,7 @@ public class RecipeAdapter implements RecipeRepository {
     }
 
 }
+
+
+
+

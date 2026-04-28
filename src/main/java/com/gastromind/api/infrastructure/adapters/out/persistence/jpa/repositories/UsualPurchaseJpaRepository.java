@@ -8,9 +8,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+/**
+ * Define el contrato de usual purchase jpa.
+ */
 public interface UsualPurchaseJpaRepository extends JpaRepository<UsualPurchaseEntity, String> {
 
     List<UsualPurchaseEntity> findByUser_Id(String userId);
 
     Optional<UsualPurchaseEntity> findByUser_IdAndProduct_Id(String userId, String productId);
 }
+
+
+
+
+
+

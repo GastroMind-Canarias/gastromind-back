@@ -1,24 +1,27 @@
-package com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket;
+﻿package com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 
-@Schema(description = "Línea de ticket devuelta por la API")
+@Schema(description = "LAAnea de ticket devuelta por la API")
+/**
+ * Representa ticket item response dentro del dominio de la aplicacion.
+ */
 public record TicketItemResponse(
-        @Schema(description = "ID de la línea")
+        @Schema(description = "ID de la lAAnea")
         String id,
 
-        @Schema(description = "ID del producto en catálogo")
+        @Schema(description = "ID del producto en catAAlogo")
         String product_id,
 
         @Schema(description = "Nombre del producto")
         String product_name,
 
-        @Schema(description = "Del catálogo: conviene revisar el producto (p. ej. alta automática desde ticket)")
+        @Schema(description = "Del catAAlogo: conviene revisar el producto (p. ej. alta automAAtica desde ticket)")
         boolean product_needs_review,
 
-        @Schema(description = "Del catálogo: motivo de revisión del producto")
+        @Schema(description = "Del catAAlogo: motivo de revisiAAn del producto")
         String product_review_note,
 
         @Schema(description = "Cantidad comprada (en la unidad indicada por unit_id)")
@@ -30,16 +33,22 @@ public record TicketItemResponse(
         @Schema(description = "Nombre de la unidad (ej. Gramos, Unidades)")
         String unit_name,
 
-        @Schema(description = "Código corto coherente con la unidad: g, kg, ml, l, ud")
+        @Schema(description = "CAAdigo corto coherente con la unidad: g, kg, ml, l, ud")
         String unit_code,
 
         @Schema(description = "Precio por kg (g/kg), por litro (ml/l) o por unidad (ud), coherente con la unidad")
         BigDecimal price_unit,
 
-        @Schema(description = "PENDING_REVIEW si la línea requiere confirmación; OK si está clara", example = "PENDING_REVIEW")
+        @Schema(description = "PENDING_REVIEW si la lAAnea requiere confirmaciAAn; OK si estAA clara", example = "PENDING_REVIEW")
         String verification_status,
 
-        @Schema(description = "Incidencias de la línea (ej. peso no legible, cantidad ambigua)")
+        @Schema(description = "Incidencias de la lAAnea (ej. peso no legible, cantidad ambigua)")
         String line_note
 ) {
 }
+
+
+
+
+
+

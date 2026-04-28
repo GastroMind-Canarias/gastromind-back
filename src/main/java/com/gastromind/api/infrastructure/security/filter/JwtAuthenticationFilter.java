@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.security.filter;
+﻿package com.gastromind.api.infrastructure.security.filter;
 
 import com.gastromind.api.infrastructure.security.auth.services.IJwtService;
 import jakarta.servlet.FilterChain;
@@ -16,15 +16,31 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
+/**
+ * Representa jwt authentication filter dentro del dominio de la aplicacion.
+ */
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final IJwtService jwtService;
     private final UserDetailsService userDetailsService;
+    /**
+     * Constructor de jwt authentication filter.
+     * @param jwtService valor a utilizar.
+     * @param userDetailsService valor a utilizar.
+     */
 
     public JwtAuthenticationFilter(IJwtService jwtService, UserDetailsService userDetailsService) {
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
     }
+    /**
+     * Realiza do filter internal.
+     * @param request los datos de la solicitud
+     * @param response la respuesta generada
+     * @param filterChain valor a utilizar.
+     * @throws ServletException si ocurre una condicion de error en la operacion
+     * @throws IOException si ocurre una condicion de error en la operacion
+     */
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -32,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        // DEBUG 1: ¿Llega el header?
+        // DEBUG 1: AAaAAAasAAAAAaAAasAALlega el header?
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -46,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                // Aquí suele fallar: si el nombre no coincide exacto con la DB
+                // AquAAaAaAaaAAaAAasAA suele fallar: si el nombre no coincide exacto con la DB
                 UserDetails user = userDetailsService.loadUserByUsername(username);
                 System.out.println("DEBUG: Usuario encontrado en DB -> " + user.getUsername());
                 System.out.println("DEBUG: Autoridades -> " + user.getAuthorities());
@@ -59,9 +75,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(auth);
-                    System.out.println("DEBUG: ¡Autenticación establecida con éxito!");
+                    System.out.println("DEBUG: AAaAAAasAAAAAaAAasAAAutenticaciAAaAaAaaAAaAAasAAn establecida con AAaAaAaaAAaAAasAAxito!");
                 } else {
-                    System.out.println("DEBUG: El token no es válido para este usuario");
+                    System.out.println("DEBUG: El token no es vAAaAaAaaAAaAAasAAlido para este usuario");
                 }
             }
         } catch (Exception e) {
@@ -72,3 +88,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 }
+
+
+
+

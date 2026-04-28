@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket;
+﻿package com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
@@ -11,6 +11,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Schema(description = "Registrar un ticket para el usuario autenticado (sin user_id en cuerpo)")
+/**
+ * Representa ticket me request dentro del dominio de la aplicacion.
+ */
 public record TicketMeRequest(
 
         @Schema(example = "store-mercadona-01", description = "ID del establecimiento")
@@ -27,6 +30,12 @@ public record TicketMeRequest(
         @PastOrPresent(message = "La fecha no puede ser futura")
         LocalDate purchaseDate,
 
-        @Schema(description = "Líneas del ticket (opcional; vacío = solo cabecera)")
+        @Schema(description = "LAAneas del ticket (opcional; vacAAo = solo cabecera)")
         List<@Valid TicketItemRequest> items
 ) {}
+
+
+
+
+
+

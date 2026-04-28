@@ -10,6 +10,9 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de user.
+ */
 public interface UserMapper {
 
     @Mapping(source = "houseHold_id", target = "household", qualifiedByName = "toHouseholdEntityShallow")
@@ -43,3 +46,9 @@ public interface UserMapper {
         return entity;
     }
 }
+
+
+
+
+
+

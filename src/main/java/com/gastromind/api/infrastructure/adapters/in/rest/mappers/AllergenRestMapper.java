@@ -9,6 +9,9 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de allergen rest.
+ */
 public interface AllergenRestMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -18,3 +21,9 @@ public interface AllergenRestMapper {
 
     List<AllergenResponse> toResponseList(List<Allergen> allergens);
 }
+
+
+
+
+
+

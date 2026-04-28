@@ -5,6 +5,9 @@ import com.gastromind.api.domain.models.FridgeItem;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Define el contrato de persistencia o integracion para fridge item.
+ */
 public interface FridgeItemRepository {
     FridgeItem save(FridgeItem fridgeItem);
 

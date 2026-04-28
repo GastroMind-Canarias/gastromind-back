@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.out.ai;
+﻿package com.gastromind.api.infrastructure.adapters.out.ai;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,29 +10,31 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 
-/**
- * Ejecuta {@code :generateContent} contra Gemini, probando el modelo principal y los configurados
- * como fallback ante saturación del servicio, límites de tasa o fallos transitorios.
- */
 @Component
+/**
+ * Representa gemini generate content client dentro del dominio de la aplicacion.
+ */
 public class GeminiGenerateContentClient {
 
     private static final Logger log = LoggerFactory.getLogger(GeminiGenerateContentClient.class);
 
     private final GeminiProperties properties;
     private final RestClient restClient;
+    /**
+     * Constructor de gemini generate content client.
+     * @param properties valor a utilizar.
+     */
 
     public GeminiGenerateContentClient(GeminiProperties properties) {
         this.properties = properties;
         this.restClient = RestClient.builder().build();
     }
-
     /**
-     * POST al endpoint generateContent; si la petición falla de forma recuperable y hay más modelos,
-     * reintenta con el siguiente.
-     *
-     * @throws RestClientException si todos los intentos fallan o el error no es recuperable con otro modelo
+     * Realiza post generate content.
+     * @param requestBody valor a utilizar.
+     * @return resultado de la operacion solicitada.
      */
+
     public String postGenerateContent(String requestBody) {
         List<String> models = properties.getModelAttemptOrder();
         if (models.isEmpty()) {
@@ -74,3 +76,7 @@ public class GeminiGenerateContentClient {
                 .toUriString();
     }
 }
+
+
+
+

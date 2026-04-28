@@ -4,6 +4,9 @@ import com.gastromind.api.domain.models.Recipe;
 
 import java.util.List;
 
+/**
+ * Define las operaciones de negocio para recetas.
+ */
 public interface IRecipeService {
     List<Recipe> findAll();
     Recipe findById(String id);

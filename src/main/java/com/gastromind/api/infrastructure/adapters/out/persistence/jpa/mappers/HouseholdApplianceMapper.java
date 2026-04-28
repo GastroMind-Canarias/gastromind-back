@@ -9,6 +9,9 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring", imports = { HouseholdEntity.class })
+/**
+ * Define el contrato de household appliance.
+ */
 public interface HouseholdApplianceMapper {
 
     @Mapping(target = "household", expression = "java(domain.getHouseholdId() != null ? new HouseholdEntity(domain.getHouseholdId()) : null)")
@@ -20,3 +23,9 @@ public interface HouseholdApplianceMapper {
     List<HouseholdApplianceEntity> toEntityList(List<HouseholdAppliance> domainList);
     List<HouseholdAppliance> toDomainList(List<HouseholdApplianceEntity> entityList);
 }
+
+
+
+
+
+

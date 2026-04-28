@@ -10,10 +10,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+/**
+ * Caso de uso para crear la nevera del hogar autenticado.
+ * Solo admite la operación para usuarios con rol OWNER y hogares sin nevera previa.
+ */
 public class CreateMyFridgeUseCase {
 
     private final ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase;
     private final FridgeRepository fridgeRepository;
+    /**
+     * Constructor con dependencias para validar contexto y crear nevera.
+     *
+     * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
+     * @param fridgeRepository repositorio de neveras
+     */
 
     public CreateMyFridgeUseCase(
             ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase,
@@ -22,6 +32,15 @@ public class CreateMyFridgeUseCase {
         this.resolveAuthenticatedHouseholdContextUseCase = resolveAuthenticatedHouseholdContextUseCase;
         this.fridgeRepository = fridgeRepository;
     }
+    /**
+     * Crea la nevera del hogar del usuario autenticado.
+     *
+     * @param principal identificador del usuario autenticado
+     * @param fridge datos de la nevera a crear
+     * @return nevera creada
+     * @throws ForbiddenException si el usuario no tiene permisos de OWNER
+     * @throws FridgeAlreadyExistsException si el hogar ya dispone de una nevera
+     */
 
     @Transactional
     public Fridge execute(String principal, Fridge fridge) {
@@ -40,3 +59,7 @@ public class CreateMyFridgeUseCase {
         return fridgeRepository.save(fridge);
     }
 }
+
+
+
+

@@ -9,11 +9,22 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+/**
+ * Caso de uso para eliminar un item de la nevera del usuario autenticado.
+ * Incluye validación de pertenencia del item al hogar.
+ */
 public class DeleteMyFridgeItemUseCase {
 
     private final ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase;
     private final FridgeItemRepository fridgeItemRepository;
     private final FridgeItemServiceImpl fridgeItemService;
+    /**
+     * Constructor con dependencias para validar y eliminar items de nevera.
+     *
+     * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
+     * @param fridgeItemRepository repositorio de items de nevera
+     * @param fridgeItemService servicio de eliminación de items
+     */
 
     public DeleteMyFridgeItemUseCase(
             ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase,
@@ -24,6 +35,14 @@ public class DeleteMyFridgeItemUseCase {
         this.fridgeItemRepository = fridgeItemRepository;
         this.fridgeItemService = fridgeItemService;
     }
+    /**
+     * Elimina un item de la nevera del usuario autenticado.
+     *
+     * @param principal identificador del usuario autenticado
+     * @param itemId identificador del item a eliminar
+     * @throws NotFoundException si el item no existe
+     * @throws ForbiddenException si el item no pertenece a la nevera del usuario
+     */
 
     @Transactional
     public void execute(String principal, String itemId) {
@@ -40,3 +59,7 @@ public class DeleteMyFridgeItemUseCase {
         }
     }
 }
+
+
+
+

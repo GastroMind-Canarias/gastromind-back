@@ -8,6 +8,9 @@ import org.mapstruct.ReportingPolicy;
 import java.util.List;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+/**
+ * Define el contrato de allergen.
+ */
 public interface AllergenMapper {
 
     AllergenEntity toEntity(Allergen domain);
@@ -16,3 +19,9 @@ public interface AllergenMapper {
     List<AllergenEntity> toEntityList(List<Allergen> domainList);
     List<Allergen> toDomainList(List<AllergenEntity> entityList);
 }
+
+
+
+
+
+
