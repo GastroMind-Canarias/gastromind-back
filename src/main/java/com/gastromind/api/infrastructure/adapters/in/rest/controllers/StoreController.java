@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
+﻿package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
 import com.gastromind.api.application.services.StoreServiceImpl;
 import com.gastromind.api.domain.models.Store;
@@ -21,7 +21,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/stores")
-@Tag(name = "Tienda", description = "Gestión del catálogo de tiendas y establecimientos comerciales.")
+@Tag(name = "Tienda", description = "Gestión del catálogo de tiendas y establecimientos.")
+/**
+ * Controlador REST para gestionar tiendas.
+ */
 public class StoreController {
 
     @Autowired
@@ -29,6 +32,11 @@ public class StoreController {
 
     @Autowired
     private StoreRestMapper storeMapper;
+    /**
+     * Lista todas las tiendas.
+     *
+     * @return colección de tiendas
+     */
 
     @Operation(summary = "Obtener todas las tiendas", description = "Devuelve una lista completa de todas las tiendas registradas.")
     @ApiStandardDoc
@@ -38,8 +46,14 @@ public class StoreController {
         List<Store> stores = storeServiceImpl.findAll();
         return ResponseEntity.ok(storeMapper.toResponseList(stores));
     }
+    /**
+     * Recupera una tienda por ID.
+     *
+     * @param id identificador de la tienda
+     * @return tienda encontrada
+     */
 
-    @Operation(summary = "Buscar tienda por ID", description = "Devuelve una única tienda basándose en su identificador único.")
+    @Operation(summary = "Buscar tienda por ID", description = "Devuelve una tienda concreta a partir de su identificador.")
     @ApiStandardDoc
     @GetMapping("/{id}")
     @PreAuthorize("isAuthenticated()")
@@ -49,6 +63,12 @@ public class StoreController {
         Store store = storeServiceImpl.findById(id);
         return ResponseEntity.ok(storeMapper.toResponse(store));
     }
+    /**
+     * Crea una tienda.
+     *
+     * @param request datos de alta
+     * @return tienda creada
+     */
 
     @Operation(summary = "Crear nueva tienda", description = "Registra una nueva tienda en el sistema.")
     @ApiPostDoc
@@ -59,6 +79,13 @@ public class StoreController {
         Store savedStore = storeServiceImpl.create(storeDomain);
         return ResponseEntity.status(HttpStatus.CREATED).body(storeMapper.toResponse(savedStore));
     }
+    /**
+     * Define una tienda existente.
+     *
+     * @param id identificador de la tienda
+     * @param request datos actualizados
+     * @return tienda actualizada
+     */
 
     @Operation(summary = "Actualizar tienda", description = "Modifica los datos de una tienda existente.")
     @ApiStandardDoc
@@ -69,8 +96,14 @@ public class StoreController {
         Store updatedStore = storeServiceImpl.update(id, storeDomain);
         return ResponseEntity.ok(storeMapper.toResponse(updatedStore));
     }
+    /**
+     * Elimina una tienda.
+     *
+     * @param id identificador de la tienda
+     * @return respuesta sin contenido
+     */
 
-    @Operation(summary = "Eliminar tienda", description = "Borra físicamente una tienda de la base de datos.")
+    @Operation(summary = "Eliminar tienda", description = "Elimina una tienda de forma permanente.")
     @ApiStandardDoc
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
@@ -79,3 +112,7 @@ public class StoreController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+

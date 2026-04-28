@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.security.auth.services.impl;
+﻿package com.gastromind.api.infrastructure.security.auth.services.impl;
 
 import com.gastromind.api.domain.exceptions.ForbiddenException;
 import com.gastromind.api.domain.models.User;
@@ -11,10 +11,18 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component("securityService")
+/**
+ * Representa security dentro del dominio de la aplicacion.
+ */
 public class SecurityService {
 
     @Autowired
     private UserRepository userRepository;
+    /**
+     * Realiza is owner of household.
+     * @param householdId el identificador del hogar
+     * @return true si cumple la condicion; false en caso contrario.
+     */
 
     public boolean isOwnerOfHousehold(String householdId) {
         User currentUser = getCurrentUser();
@@ -25,8 +33,12 @@ public class SecurityService {
                 && currentUser.getHouseHold_id() != null
                 && currentUser.getHouseHold_id().getId().equals(householdId);
     }
+    /**
+     * Realiza is member of household.
+     * @param householdId el identificador del hogar
+     * @return true si cumple la condicion; false en caso contrario.
+     */
 
-    /** Miembro del hogar (solo lectura) o administrador global. */
     public boolean isMemberOfHousehold(String householdId) {
         User currentUser = getCurrentUser();
         if (currentUser.getRole() == Role.ROLE_ADMIN) {
@@ -50,3 +62,7 @@ public class SecurityService {
                 .orElseThrow(() -> new ForbiddenException("No se pudo resolver el usuario autenticado"));
     }
 }
+
+
+
+

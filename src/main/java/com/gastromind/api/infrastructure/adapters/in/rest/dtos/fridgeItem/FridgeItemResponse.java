@@ -1,11 +1,14 @@
-package com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem;
+﻿package com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Schema(description = "Respuesta detallada de un producto en la nevera (el id de nevera no se repite: en /me es implícito; en rutas admin puede inferirse del path)")
+@Schema(description = "Respuesta detallada de un producto en la nevera (el id de nevera no se repite: en /me es implAAcito; en rutas admin puede inferirse del path)")
+/**
+ * Representa fridge item response dentro del dominio de la aplicacion.
+ */
 public record FridgeItemResponse(
         @Schema(example = "uuid-item-12345")
         String id,
@@ -23,3 +26,9 @@ public record FridgeItemResponse(
         String productName
 ) {
 }
+
+
+
+
+
+

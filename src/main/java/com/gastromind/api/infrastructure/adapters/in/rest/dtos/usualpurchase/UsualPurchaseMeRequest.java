@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.in.rest.dtos.usualpurchase;
+﻿package com.gastromind.api.infrastructure.adapters.in.rest.dtos.usualpurchase;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
@@ -8,6 +8,9 @@ import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
 
 @Schema(description = "Compra habitual para el usuario autenticado (sin user_id en cuerpo)")
+/**
+ * Representa usual purchase me request dentro del dominio de la aplicacion.
+ */
 public record UsualPurchaseMeRequest(
 
         @Schema(example = "prod-789-xyz", description = "ID del producto")
@@ -19,3 +22,9 @@ public record UsualPurchaseMeRequest(
         @Positive(message = "La target_quantity debe ser mayor que cero")
         BigDecimal target_quantity
 ) {}
+
+
+
+
+
+

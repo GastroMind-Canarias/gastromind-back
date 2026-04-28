@@ -5,6 +5,9 @@ import com.gastromind.api.domain.models.Category;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Define el contrato de persistencia o integracion para category.
+ */
 public interface CategoryRepository {
     Category save(Category category);
 

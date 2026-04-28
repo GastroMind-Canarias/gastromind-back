@@ -5,6 +5,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
+/**
+ * Define el contrato de category jpa.
+ */
 public interface CategoryJpaRepository extends JpaRepository<CategoryEntity, String> {
     
 } 
+
+
+
+
+
+

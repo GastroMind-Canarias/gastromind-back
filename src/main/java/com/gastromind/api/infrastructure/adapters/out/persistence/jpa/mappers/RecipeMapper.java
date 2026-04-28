@@ -12,6 +12,9 @@ import java.util.List;
 import java.util.Locale;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de recipe.
+ */
 public interface RecipeMapper {
 
     @BeanMapping(ignoreUnmappedSourceProperties = "ingredientsUsed")
@@ -31,9 +34,6 @@ public interface RecipeMapper {
     List<RecipeEntity> toEntityList(List<Recipe> domainList);
     List<Recipe> toDomainList(List<RecipeEntity> entityList);
 
-    /**
-     * La IA y el dominio usan texto libre (p. ej. "Media"); la entidad JPA usa {@link DifficultyLevel} en inglés.
-     */
     @Named("mapDifficultyLevel")
     default DifficultyLevel mapDifficultyLevel(String difficulty) {
         if (difficulty == null || difficulty.isBlank()) {
@@ -46,7 +46,7 @@ public interface RecipeMapper {
             }
         }
         switch (s.toLowerCase(Locale.ROOT)) {
-            case "fácil":
+            case "fAAcil":
             case "facil":
             case "easy":
                 return DifficultyLevel.EASY;
@@ -55,7 +55,7 @@ public interface RecipeMapper {
             case "medium":
                 return DifficultyLevel.MEDIUM;
             case "alta":
-            case "difícil":
+            case "difAAcil":
             case "dificil":
             case "hard":
                 return DifficultyLevel.HARD;
@@ -69,3 +69,9 @@ public interface RecipeMapper {
         return level == null ? null : level.name();
     }
 }
+
+
+
+
+
+

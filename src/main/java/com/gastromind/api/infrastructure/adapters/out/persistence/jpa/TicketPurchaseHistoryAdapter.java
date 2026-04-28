@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.out.persistence.jpa;
+﻿package com.gastromind.api.infrastructure.adapters.out.persistence.jpa;
 
 import com.gastromind.api.domain.ports.out.TicketPurchaseHistoryLine;
 import com.gastromind.api.domain.ports.out.TicketPurchaseHistoryRepository;
@@ -10,13 +10,26 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Component
+/**
+ * Representa ticket purchase history dentro del dominio de la aplicacion.
+ */
 public class TicketPurchaseHistoryAdapter implements TicketPurchaseHistoryRepository {
 
     private final TicketItemJpaRepository ticketItemJpaRepository;
+    /**
+     * Constructor de ticket purchase history.
+     * @param ticketItemJpaRepository valor a utilizar.
+     */
 
     public TicketPurchaseHistoryAdapter(TicketItemJpaRepository ticketItemJpaRepository) {
         this.ticketItemJpaRepository = ticketItemJpaRepository;
     }
+    /**
+     * Realiza find lines for household since.
+     * @param householdId el identificador del hogar
+     * @param since valor a utilizar.
+     * @return lista actual.
+     */
 
     @Override
     public List<TicketPurchaseHistoryLine> findLinesForHouseholdSince(String householdId, LocalDateTime since) {
@@ -35,3 +48,7 @@ public class TicketPurchaseHistoryAdapter implements TicketPurchaseHistoryReposi
                 .toList();
     }
 }
+
+
+
+

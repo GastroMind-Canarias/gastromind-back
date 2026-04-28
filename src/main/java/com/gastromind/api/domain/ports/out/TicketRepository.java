@@ -5,6 +5,9 @@ import com.gastromind.api.domain.models.Ticket;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Define el contrato de persistencia o integracion para ticket.
+ */
 public interface TicketRepository {
     Ticket save(Ticket ticket);
 
@@ -16,8 +19,5 @@ public interface TicketRepository {
 
     List<Ticket> findAllByUserId(String userId);
 
-    /**
-     * Tickets del hogar: fila con household_id, o legado sin household pero usuario del mismo hogar.
-     */
     List<Ticket> findVisibleForHousehold(String householdId);
 }

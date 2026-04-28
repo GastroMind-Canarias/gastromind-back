@@ -9,6 +9,9 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de category rest.
+ */
 public interface CategoryRestMapper {
     @Mapping(target = "id", ignore = true)
     Category toDomain(CategoryRequest request);
@@ -17,3 +20,9 @@ public interface CategoryRestMapper {
 
     List<CategoryResponse> toResponseList(List<Category> categories);
 }
+
+
+
+
+
+

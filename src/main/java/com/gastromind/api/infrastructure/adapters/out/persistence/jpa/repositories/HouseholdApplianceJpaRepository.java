@@ -7,8 +7,17 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
+/**
+ * Define el contrato de household appliance jpa.
+ */
 public interface HouseholdApplianceJpaRepository extends JpaRepository<HouseholdApplianceEntity, String> {
     List<HouseholdApplianceEntity> findByHousehold_Id(String householdId);
 
     void deleteAllByHousehold_Id(String householdId);
 }
+
+
+
+
+
+

@@ -22,6 +22,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de ticket rest.
+ */
 public interface TicketRestMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -128,3 +131,9 @@ public interface TicketRestMapper {
         return value != null && !value.isBlank();
     }
 }
+
+
+
+
+
+

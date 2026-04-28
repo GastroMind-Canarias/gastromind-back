@@ -15,6 +15,9 @@ import java.util.List;
 
 // Usamos los mappers de User y Store para resolver las relaciones internas
 @Mapper(componentModel = "spring", uses = { UserMapper.class, StoreMapper.class, TicketItemMapper.class })
+/**
+ * Define el contrato de ticket.
+ */
 public interface TicketMapper {
 
     @Mapping(source = "user_id", target = "user")
@@ -69,3 +72,9 @@ public interface TicketMapper {
         }
     }
 }
+
+
+
+
+
+

@@ -10,15 +10,33 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+/**
+ * Caso de uso que resuelve el contexto de hogar del usuario autenticado.
+ * Valida la identidad del principal y comprueba su pertenencia a un hogar.
+ */
 public class ResolveAuthenticatedHouseholdContextUseCase {
 
     private final UserRepository userRepository;
     private final FridgeRepository fridgeRepository;
+    /**
+     * Constructor con los repositorios necesarios para resolver contexto autenticado.
+     *
+     * @param userRepository repositorio de usuarios
+     * @param fridgeRepository repositorio de neveras
+     */
 
     public ResolveAuthenticatedHouseholdContextUseCase(UserRepository userRepository, FridgeRepository fridgeRepository) {
         this.userRepository = userRepository;
         this.fridgeRepository = fridgeRepository;
     }
+    /**
+     * Resuelve el contexto completo del usuario, incluyendo la nevera principal del hogar.
+     *
+     * @param principal nombre de usuario o correo autenticado
+     * @return contexto autenticado con usuario, hogar y nevera
+     * @throws ForbiddenException si el principal no es válido o el usuario no pertenece a un hogar
+     * @throws NotFoundException si el hogar no tiene nevera asociada
+     */
 
     @Transactional(readOnly = true)
     public AuthenticatedHouseholdContext execute(String principal) {
@@ -28,6 +46,13 @@ public class ResolveAuthenticatedHouseholdContextUseCase {
 
         return new AuthenticatedHouseholdContext(context.user(), context.householdId(), fridge);
     }
+    /**
+     * Resuelve el contexto del usuario sin exigir nevera asociada.
+     *
+     * @param principal nombre de usuario o correo autenticado
+     * @return contexto autenticado con usuario y hogar, sin nevera
+     * @throws ForbiddenException si el principal no es válido o el usuario no pertenece a un hogar
+     */
 
     @Transactional(readOnly = true)
     public AuthenticatedHouseholdContext executeWithoutFridge(String principal) {
@@ -44,7 +69,7 @@ public class ResolveAuthenticatedHouseholdContextUseCase {
                 .orElseThrow(() -> new ForbiddenException("No se pudo resolver el usuario autenticado"));
 
         if (user.getHouseHold_id() == null || user.getHouseHold_id().getId() == null || user.getHouseHold_id().getId().isBlank()) {
-            throw new ForbiddenException("El usuario no pertenece a ningún hogar");
+            throw new ForbiddenException("El usuario no pertenece a ningun hogar");
         }
 
         String householdId = user.getHouseHold_id().getId();
@@ -54,3 +79,7 @@ public class ResolveAuthenticatedHouseholdContextUseCase {
     public record AuthenticatedHouseholdContext(User user, String householdId, Fridge fridge) {
     }
 }
+
+
+
+

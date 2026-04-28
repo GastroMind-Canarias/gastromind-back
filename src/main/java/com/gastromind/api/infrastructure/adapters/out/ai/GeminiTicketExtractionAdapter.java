@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.out.ai;
+﻿package com.gastromind.api.infrastructure.adapters.out.ai;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -20,6 +20,9 @@ import java.util.Locale;
 import java.util.Set;
 
 @Component
+/**
+ * Representa gemini ticket extraction dentro del dominio de la aplicacion.
+ */
 public class GeminiTicketExtractionAdapter implements TicketExtractionPort {
 
     private static final Set<String> ALLOWED_UNITS = Set.of("g", "kg", "ml", "l", "ud");
@@ -27,6 +30,12 @@ public class GeminiTicketExtractionAdapter implements TicketExtractionPort {
     private final GeminiProperties properties;
     private final GeminiGenerateContentClient geminiClient;
     private final ObjectMapper objectMapper;
+    /**
+     * Constructor de gemini ticket extraction.
+     * @param properties valor a utilizar.
+     * @param geminiClient valor a utilizar.
+     * @param objectMapper valor a utilizar.
+     */
 
     public GeminiTicketExtractionAdapter(
             GeminiProperties properties,
@@ -36,14 +45,20 @@ public class GeminiTicketExtractionAdapter implements TicketExtractionPort {
         this.geminiClient = geminiClient;
         this.objectMapper = objectMapper;
     }
+    /**
+     * Realiza extract from image.
+     * @param imageBytes valor a utilizar.
+     * @param mimeType valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Override
     public ExtractedTicketReceipt extractFromImage(byte[] imageBytes, String mimeType) {
         if (!properties.isConfigured()) {
-            throw new AiTicketException("Extracción de tickets por IA no configurada (falta app.ai.gemini.api-key)");
+            throw new AiTicketException("Extraccion de tickets por IA no configurada (falta app.ai.gemini.api-key)");
         }
         if (imageBytes == null || imageBytes.length == 0) {
-            throw new AiTicketException("La imagen del ticket está vacía");
+            throw new AiTicketException("La imagen del ticket esta vacia");
         }
 
         String prompt = buildPrompt();
@@ -64,7 +79,7 @@ public class GeminiTicketExtractionAdapter implements TicketExtractionPort {
     private String buildPrompt() {
         return """
                 Eres un extractor especializado en tickets de SUPERMERCADO para una app de cocina y despensa.
-                Analiza la imagen y responde SOLO con un JSON válido (sin markdown ni texto fuera del JSON) con exactamente esta forma:
+                Analiza la imagen y responde SOLO con un JSON vAAaAaAaaAAaAAasAAlido (sin markdown ni texto fuera del JSON) con exactamente esta forma:
                 {
                   "store_name": string o null,
                   "purchase_date": string o null (YYYY-MM-DD),
@@ -82,33 +97,33 @@ public class GeminiTicketExtractionAdapter implements TicketExtractionPort {
                   ]
                 }
 
-                INCLUSIÓN DE LÍNEAS (solo alimentación y hogar relacionado con cocina):
-                - Incluye: alimentos, bebidas comestibles, frescos, ultramarinos, congelados, panadería, lácteos, aceites COMESTIBLES, etc.
-                - NO incluyas: motor/coche (aceites de motor, limpiacristales coche, parachoques…), ferretería no alimentaria, bolsas de plástico de compra solas, pilas, revistas, medicamentos si no es relevante, productos de limpieza no alimentarios salvo que sean claramente para cocina (p. ej. lavavajillas podría excluirse si la app es solo comida — en caso de duda, excluye lo que no sea comestible o ingrediente de cocina).
-                - Si una línea no es claramente producto de alimentación/cocina, no la incluyas.
+                INCLUSIAAaAaAaaAAAAAAaAAAAaAaAN DE LAAaAaAaaAAaAAasAANEAS (solo alimentaciAAaAaAaaAAaAAasAAn y hogar relacionado con cocina):
+                - Incluye: alimentos, bebidas comestibles, frescos, ultramarinos, congelados, panaderAAaAaAaaAAaAAasAAa, lAAaAaAaaAAaAAasAActeos, aceites COMESTIBLES, etc.
+                - NO incluyas: motor/coche (aceites de motor, limpiacristales coche, parachoquesAAaAasAAAAAAAAasAAAAasAAAAaAAasAA), ferreterAAaAaAaaAAaAAasAAa no alimentaria, bolsas de plAAaAaAaaAAaAAasAAstico de compra solas, pilas, revistas, medicamentos si no es relevante, productos de limpieza no alimentarios salvo que sean claramente para cocina (p. ej. lavavajillas podrAAaAaAaaAAaAAasAAa excluirse si la app es solo comida AAaAasAAAAAAAAasAAAAasAAAAAAAAaAAAAasAA en caso de duda, excluye lo que no sea comestible o ingrediente de cocina).
+                - Si una lAAaAaAaaAAaAAasAAnea no es claramente producto de alimentaciAAaAaAaaAAaAAasAAn/cocina, no la incluyas.
 
                 NOMBRES:
-                - Escribe product_name en español correcto, SIN abreviaturas de ticket: expande (ej. "S/GRA" → "sin grasa", "ATÚN" puede quedarse, "PAVO" → "pavo").
-                - Capitalización natural (no todo en mayúsculas salvo marcas conocidas).
+                - Escribe product_name en espaAAaAaAaaAAaAAasAAol correcto, SIN abreviaturas de ticket: expande (ej. "S/GRA" AAaAasAAAAAAAAaAAAAasAAAAAAAAaAAAAAAaAAA "sin grasa", "ATAAaAaAaaAAaAAasAAN" puede quedarse, "PAVO" AAaAasAAAAAAAAaAAAAasAAAAAAAAaAAAAAAaAAA "pavo").
+                - CapitalizaciAAaAaAaaAAaAAasAAn natural (no todo en mayAAaAaAaaAAaAAasAAsculas salvo marcas conocidas).
 
                 CANTIDAD Y UNIDAD:
                 - quantity_amount y quantity_unit deben reflejar lo COMPRADO, no el precio por peso:
                   - Si el ticket dice 450 g de pechuga, quantity_amount=450 y quantity_unit="g" (no uses 1 ud para peso vendido a granel/precio/kg).
-                  - Si son 2 bricks de leche de 1 L, quantity_amount=2 y quantity_unit="ud" (o si el ticket muestra 2 L total, puedes usar quantity_amount=2 y quantity_unit="l" si es más fiel al ticket).
-                  - Para packs "x6" zumos: si es un pack de 6 unidades, quantity_amount=1 y quantity_unit="ud" si se cobra el pack entero, o refleja botellas si el ticket separa líneas.
+                  - Si son 2 bricks de leche de 1 L, quantity_amount=2 y quantity_unit="ud" (o si el ticket muestra 2 L total, puedes usar quantity_amount=2 y quantity_unit="l" si es mAAaAaAaaAAaAAasAAs fiel al ticket).
+                  - Para packs "x6" zumos: si es un pack de 6 unidades, quantity_amount=1 y quantity_unit="ud" si se cobra el pack entero, o refleja botellas si el ticket separa lAAaAaAaaAAaAAasAAneas.
                 - quantity_unit solo puede ser: g, kg, ml, l, ud.
 
                 PRECIOS:
-                - unit_price: precio unitario que permita entender la línea (típicamente €/kg si venden a peso, €/ud si es unidad). Si no es legible, null.
-                - line_total: importe de la línea si aparece.
+                - unit_price: precio unitario que permita entender la lAAaAaAaaAAaAAasAAnea (tAAaAaAaaAAaAAasAApicamente AAaAasAAAAAAAAaAAAAaAAAAaAAasAA/kg si venden a peso, AAaAasAAAAAAAAaAAAAaAAAAaAAasAA/ud si es unidad). Si no es legible, null.
+                - line_total: importe de la lAAaAaAaaAAaAAasAAnea si aparece.
 
-                REVISIÓN DE LÍNEA (para la app):
-                - line_needs_verification: true si hay dudas reales: peso/volumen no legible o ambiguo, cantidad incierta, precio ilegible, o solo ves precio/unidad pero no cuánto se compró en gramos/ml.
-                - line_quality_note: en español, breve (ej. "No se distingue el peso en gramos; se asume 1 ud."). Si no hay incidencias, null y line_needs_verification false.
+                REVISIAAaAaAaaAAAAAAaAAAAaAaAN DE LAAaAaAaaAAaAAasAANEA (para la app):
+                - line_needs_verification: true si hay dudas reales: peso/volumen no legible o ambiguo, cantidad incierta, precio ilegible, o solo ves precio/unidad pero no cuAAaAaAaaAAaAAasAAnto se comprAAaAaAaaAAaAAasAA en gramos/ml.
+                - line_quality_note: en espaAAaAaAaaAAaAAasAAol, breve (ej. "No se distingue el peso en gramos; se asume 1 ud."). Si no hay incidencias, null y line_needs_verification false.
 
                 OTROS:
-                - Agrupa líneas duplicadas del mismo producto sumando quantity_amount (misma unidad).
-                - Omite cabeceras, totales duplicados y líneas de IVA sin detalle.
+                - Agrupa lAAaAaAaaAAaAAasAAneas duplicadas del mismo producto sumando quantity_amount (misma unidad).
+                - Omite cabeceras, totales duplicados y lAAaAaAaaAAaAAasAAneas de IVA sin detalle.
                 - total_amount: total del ticket si se ve; si no, 0.
                 """;
     }
@@ -129,7 +144,7 @@ public class GeminiTicketExtractionAdapter implements TicketExtractionPort {
             gen.put("responseMimeType", "application/json");
             return objectMapper.writeValueAsString(root);
         } catch (Exception e) {
-            throw new AiTicketException("Error construyendo petición multimodal a Gemini", e);
+            throw new AiTicketException("Error construyendo peticiAAaAaAaaAAaAAasAAn multimodal a Gemini", e);
         }
     }
 
@@ -141,7 +156,7 @@ public class GeminiTicketExtractionAdapter implements TicketExtractionPort {
         }
         String text = candidates.get(0).path("content").path("parts").get(0).path("text").asText();
         if (text.isBlank()) {
-            throw new AiTicketException("Respuesta de Gemini vacía");
+            throw new AiTicketException("Respuesta de Gemini vacia");
         }
 
         JsonNode receipt = objectMapper.readTree(text);
@@ -211,7 +226,7 @@ public class GeminiTicketExtractionAdapter implements TicketExtractionPort {
         }
 
         if (lines.isEmpty()) {
-            throw new AiTicketException("No se detectaron líneas de producto de alimentación en el ticket");
+            throw new AiTicketException("No se detectaron lineas de producto de alimentacion en el ticket");
         }
 
         return new ExtractedTicketReceipt(storeName, purchaseDate, totalAmount, lines);
@@ -243,3 +258,7 @@ public class GeminiTicketExtractionAdapter implements TicketExtractionPort {
         return u;
     }
 }
+
+
+
+

@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities;
+﻿package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities;
 
 import jakarta.persistence.*;
 
@@ -7,6 +7,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "product")
+/**
+ * Entidad JPA para persistir productos del catálogo.
+ */
 public class ProductEntity {
 
     @Id
@@ -19,7 +22,6 @@ public class ProductEntity {
     @Column(name = "is_essential")
     private Boolean isEssential;
 
-    /** Alta desde ticket u otro origen que requiera revisar el producto en catálogo. */
     @Column(name = "needs_review")
     private Boolean needsReview;
 
@@ -48,13 +50,16 @@ public class ProductEntity {
 
     @OneToMany(mappedBy = "product")
     private List<RecipeIngredientEntity> recipeIngredients;
+    /** Constructor vacío requerido por JPA. */
 
     public ProductEntity() {
     }
+    /** Constructor auxiliar cuando solo se conoce el identificador. */
 
     public ProductEntity(String id) {
         this.id = id;
     }
+    /** Constructor completo de la entidad de producto. */
 
     public ProductEntity(String id, String name, Boolean isEssential, CategoryEntity category,
             Set<AllergenEntity> allergens, List<TicketItemEntity> ticketItems, List<FridgeItemEntity> fridgeItems,
@@ -68,86 +73,170 @@ public class ProductEntity {
         this.fridgeItems = fridgeItems;
         this.recipeIngredients = recipeIngredients;
     }
+    /**
+     * Devuelve id.
+     * @return valor actual.
+     */
 
     public String getId() {
         return id;
     }
+    /**
+     * Define id.
+     * @param id el identificador del recurso
+     */
 
     public void setId(String id) {
         this.id = id;
     }
+    /**
+     * Devuelve name.
+     * @return valor actual.
+     */
 
     public String getName() {
         return name;
     }
+    /**
+     * Define name.
+     * @param name el nombre
+     */
 
     public void setName(String name) {
         this.name = name;
     }
+    /**
+     * Devuelve is essential.
+     * @return true si cumple la condicion; false en caso contrario.
+     */
 
     public Boolean getIsEssential() {
         return isEssential;
     }
+    /**
+     * Define is essential.
+     * @param isEssential valor a utilizar.
+     */
 
     public void setIsEssential(Boolean isEssential) {
         this.isEssential = isEssential;
     }
+    /**
+     * Devuelve needs review.
+     * @return true si cumple la condicion; false en caso contrario.
+     */
 
     public Boolean getNeedsReview() {
         return needsReview;
     }
+    /**
+     * Define needs review.
+     * @param needsReview valor a utilizar.
+     */
 
     public void setNeedsReview(Boolean needsReview) {
         this.needsReview = needsReview;
     }
+    /**
+     * Devuelve review note.
+     * @return valor actual.
+     */
 
     public String getReviewNote() {
         return reviewNote;
     }
+    /**
+     * Define review note.
+     * @param reviewNote valor a utilizar.
+     */
 
     public void setReviewNote(String reviewNote) {
         this.reviewNote = reviewNote;
     }
+    /**
+     * Devuelve category.
+     * @return resultado de la operacion solicitada.
+     */
 
     public CategoryEntity getCategory() {
         return category;
     }
+    /**
+     * Define category.
+     * @param category la categoria
+     */
 
     public void setCategory(CategoryEntity category) {
         this.category = category;
     }
+    /**
+     * Devuelve allergens.
+     * @return resultado de la operacion solicitada.
+     */
 
     public Set<AllergenEntity> getAllergens() {
         return allergens;
     }
+    /**
+     * Define allergens.
+     * @param allergens valor a utilizar.
+     */
 
     public void setAllergens(Set<AllergenEntity> allergens) {
         this.allergens = allergens;
     }
+    /**
+     * Devuelve ticket items.
+     * @return lista actual.
+     */
 
     public List<TicketItemEntity> getTicketItems() {
         return ticketItems;
     }
+    /**
+     * Define ticket items.
+     * @param ticketItems valor a utilizar.
+     */
 
     public void setTicketItems(List<TicketItemEntity> ticketItems) {
         this.ticketItems = ticketItems;
     }
+    /**
+     * Devuelve fridge items.
+     * @return lista actual.
+     */
 
     public List<FridgeItemEntity> getFridgeItems() {
         return fridgeItems;
     }
+    /**
+     * Define fridge items.
+     * @param fridgeItems valor a utilizar.
+     */
 
     public void setFridgeItems(List<FridgeItemEntity> fridgeItems) {
         this.fridgeItems = fridgeItems;
     }
+    /**
+     * Devuelve recipe ingredients.
+     * @return lista actual.
+     */
 
     public List<RecipeIngredientEntity> getRecipeIngredients() {
         return recipeIngredients;
     }
+    /**
+     * Define recipe ingredients.
+     * @param recipeIngredients valor a utilizar.
+     */
 
     public void setRecipeIngredients(List<RecipeIngredientEntity> recipeIngredients) {
         this.recipeIngredients = recipeIngredients;
     }
+    /**
+     * Calcula el hash de la instancia.
+     * @return valor configurado.
+     */
 
     @Override
     public int hashCode() {
@@ -156,6 +245,11 @@ public class ProductEntity {
         result = prime * result + ((id == null) ? 0 : id.hashCode());
         return result;
     }
+    /**
+     * Compara esta instancia con otro objeto.
+     * @param obj valor a utilizar.
+     * @return true si cumple la condicion; false en caso contrario.
+     */
 
     @Override
     public boolean equals(Object obj) {
@@ -175,3 +269,7 @@ public class ProductEntity {
     }
 
 }
+
+
+
+

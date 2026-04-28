@@ -7,10 +7,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+/**
+ * Caso de uso para eliminar la nevera del hogar autenticado.
+ * Solo usuarios con rol OWNER pueden ejecutar esta operación.
+ */
 public class DeleteMyFridgeUseCase {
 
     private final ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase;
     private final FridgeRepository fridgeRepository;
+    /**
+     * Constructor con dependencias para resolver contexto y eliminar nevera.
+     *
+     * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
+     * @param fridgeRepository repositorio de neveras
+     */
 
     public DeleteMyFridgeUseCase(
             ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase,
@@ -19,6 +29,12 @@ public class DeleteMyFridgeUseCase {
         this.resolveAuthenticatedHouseholdContextUseCase = resolveAuthenticatedHouseholdContextUseCase;
         this.fridgeRepository = fridgeRepository;
     }
+    /**
+     * Elimina la nevera asociada al hogar del usuario autenticado.
+     *
+     * @param principal identificador del usuario autenticado
+     * @throws ForbiddenException si el usuario no tiene permisos de OWNER
+     */
 
     @Transactional
     public void execute(String principal) {
@@ -32,3 +48,7 @@ public class DeleteMyFridgeUseCase {
         fridgeRepository.deleteById(context.fridge().getId());
     }
 }
+
+
+
+

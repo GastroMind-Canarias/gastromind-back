@@ -14,6 +14,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de recipe rest.
+ */
 public interface RecipeRestMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "ingredientsUsed", ignore = true)
@@ -38,3 +41,9 @@ public interface RecipeRestMapper {
                 .collect(Collectors.toList());
     }
 }
+
+
+
+
+
+

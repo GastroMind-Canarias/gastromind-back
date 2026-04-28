@@ -1,4 +1,4 @@
-package com.gastromind.api.application.usecases;
+﻿package com.gastromind.api.application.usecases;
 
 import com.gastromind.api.domain.exceptions.ForbiddenException;
 import com.gastromind.api.domain.models.Fridge;
@@ -9,10 +9,20 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+/**
+ * Caso de uso para actualizar los datos de la nevera del hogar autenticado.
+ * Solo permite la operación a usuarios con rol OWNER.
+ */
 public class UpdateMyFridgeUseCase {
 
     private final ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase;
     private final FridgeRepository fridgeRepository;
+    /**
+     * Constructor con dependencias para resolver contexto y persistir nevera.
+     *
+     * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
+     * @param fridgeRepository repositorio de neveras
+     */
 
     public UpdateMyFridgeUseCase(
             ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase,
@@ -21,6 +31,14 @@ public class UpdateMyFridgeUseCase {
         this.resolveAuthenticatedHouseholdContextUseCase = resolveAuthenticatedHouseholdContextUseCase;
         this.fridgeRepository = fridgeRepository;
     }
+    /**
+     * Define la nevera asociada al hogar del usuario autenticado.
+     *
+     * @param principal identificador del usuario autenticado
+     * @param fridge datos de nevera a persistir
+     * @return nevera actualizada
+     * @throws ForbiddenException si el usuario no tiene permisos de OWNER
+     */
 
     @Transactional
     public Fridge execute(String principal, Fridge fridge) {
@@ -36,3 +54,7 @@ public class UpdateMyFridgeUseCase {
         return fridgeRepository.save(fridge);
     }
 }
+
+
+
+

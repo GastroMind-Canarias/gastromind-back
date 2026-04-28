@@ -5,6 +5,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
+/**
+ * Define el contrato de allergen jpa.
+ */
 public interface AllergenJpaRepository extends JpaRepository<AllergenEntity, String> {
 
 }
+
+
+
+
+
+

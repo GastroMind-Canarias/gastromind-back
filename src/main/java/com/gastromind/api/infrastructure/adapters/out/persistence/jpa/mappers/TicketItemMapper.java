@@ -8,6 +8,9 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring", uses = { ProductMapper.class, UnitMapper.class })
+/**
+ * Define el contrato de ticket item.
+ */
 public interface TicketItemMapper {
 
     @Mapping(target = "ticket", ignore = true)
@@ -19,3 +22,9 @@ public interface TicketItemMapper {
 
     List<TicketItem> toDomainList(List<TicketItemEntity> entities);
 }
+
+
+
+
+
+

@@ -1,19 +1,22 @@
-package com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket;
+﻿package com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.time.LocalDate;
 import java.util.List;
 
-@Schema(description = "Información del ticket devuelta por la API")
+@Schema(description = "InformaciAAn del ticket devuelta por la API")
+/**
+ * Representa ticket response dentro del dominio de la aplicacion.
+ */
 public record TicketResponse(
-        @Schema(example = "tk-998877", description = "ID único del ticket")
+        @Schema(example = "tk-998877", description = "ID AAnico del ticket")
         String id,
 
-        @Schema(description = "Hogar al que está asociado el ticket")
+        @Schema(description = "Hogar al que estAA asociado el ticket")
         String household_id,
 
-        @Schema(description = "Usuario que registró o importó el ticket")
+        @Schema(description = "Usuario que registrAA o importAA el ticket")
         String uploaded_by_user_id,
 
         @Schema(description = "Igual que uploaded_by_user_id (compatibilidad con clientes antiguos)")
@@ -28,6 +31,12 @@ public record TicketResponse(
         @Schema(example = "2024-03-15")
         LocalDate purchaseDate,
 
-        @Schema(description = "Líneas del ticket con productos del catálogo")
+        @Schema(description = "LAAneas del ticket con productos del catAAlogo")
         List<TicketItemResponse> items
 ) {}
+
+
+
+
+
+

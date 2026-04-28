@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
+﻿package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
 import com.gastromind.api.application.services.AllergenServiceImpl;
 import com.gastromind.api.domain.models.Allergen;
@@ -21,6 +21,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/allergens")
 @Tag(name = "Alérgeno", description = "Gestión del catálogo de alérgenos e intolerancias alimentarias.")
+/**
+ * Controlador REST para consultar y mantener el catálogo de alérgenos.
+ */
 public class AllergenController {
 
     @Autowired
@@ -28,16 +31,27 @@ public class AllergenController {
 
     @Autowired
     private AllergenRestMapper allergenMapper;
+    /**
+     * Lista todos los alérgenos registrados.
+     *
+     * @return colección de alérgenos
+     */
 
-    @Operation(summary = "Obtener todos los alérgenos", description = "Devuelve una lista completa de todos los alérgenos registrados en el sistema.")
+    @Operation(summary = "Obtener todos los alérgenos", description = "Devuelve la lista completa de alérgenos registrados en el sistema.")
     @GetMapping
     @ApiStandardDoc
     public ResponseEntity<List<AllergenResponse>> getAll() {
         List<Allergen> allergens = allergenServiceImpl.findAll();
         return ResponseEntity.ok(allergenMapper.toResponseList(allergens));
     }
+    /**
+     * Recupera un alérgeno por su identificador.
+     *
+     * @param id identificador del alérgeno
+     * @return alérgeno encontrado
+     */
 
-    @Operation(summary = "Buscar alérgeno por ID", description = "Devuelve un único alérgeno basándose en su identificador único.")
+    @Operation(summary = "Buscar alérgeno por ID", description = "Devuelve un alérgeno concreto a partir de su identificador.")
     @ApiStandardDoc
     @GetMapping("/{id}")
     public ResponseEntity<AllergenResponse> getById(
@@ -45,6 +59,12 @@ public class AllergenController {
         Allergen allergen = allergenServiceImpl.findById(id);
         return ResponseEntity.ok(allergenMapper.toResponse(allergen));
     }
+    /**
+     * Registra un nuevo alérgeno.
+     *
+     * @param request datos de alta del alérgeno
+     * @return alérgeno creado
+     */
 
     @Operation(summary = "Crear nuevo alérgeno", description = "Registra un nuevo alérgeno en el sistema.")
     @ApiPostDoc
@@ -54,6 +74,13 @@ public class AllergenController {
         Allergen savedAllergen = allergenServiceImpl.create(allergenDomain);
         return ResponseEntity.status(HttpStatus.CREATED).body(allergenMapper.toResponse(savedAllergen));
     }
+    /**
+     * Define un alérgeno existente.
+     *
+     * @param id identificador del alérgeno
+     * @param request datos actualizados
+     * @return alérgeno actualizado
+     */
 
     @Operation(summary = "Actualizar alérgeno", description = "Modifica los datos de un alérgeno existente.")
     @PutMapping("/{id}")
@@ -63,8 +90,14 @@ public class AllergenController {
         Allergen updatedAllergen = allergenServiceImpl.update(id, allergenDomain);
         return ResponseEntity.ok(allergenMapper.toResponse(updatedAllergen));
     }
+    /**
+     * Elimina un alérgeno.
+     *
+     * @param id identificador del alérgeno
+     * @return respuesta sin contenido
+     */
 
-    @Operation(summary = "Eliminar alérgeno", description = "Borra físicamente un alérgeno de la base de datos.")
+    @Operation(summary = "Eliminar alérgeno", description = "Elimina un alérgeno de forma permanente.")
     @DeleteMapping("/{id}")
     @ApiStandardDoc
     public ResponseEntity<Void> delete(@PathVariable String id) {
@@ -72,3 +105,7 @@ public class AllergenController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+

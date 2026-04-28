@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.out.ai;
+﻿package com.gastromind.api.infrastructure.adapters.out.ai;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -23,11 +23,20 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Component
+/**
+ * Representa gemini recipe dentro del dominio de la aplicacion.
+ */
 public class GeminiRecipeAdapter implements RecipeAiPort {
 
     private final GeminiProperties properties;
     private final GeminiGenerateContentClient geminiClient;
     private final ObjectMapper objectMapper;
+    /**
+     * Constructor de gemini recipe.
+     * @param properties valor a utilizar.
+     * @param geminiClient valor a utilizar.
+     * @param objectMapper valor a utilizar.
+     */
 
     public GeminiRecipeAdapter(
             GeminiProperties properties,
@@ -37,11 +46,16 @@ public class GeminiRecipeAdapter implements RecipeAiPort {
         this.geminiClient = geminiClient;
         this.objectMapper = objectMapper;
     }
+    /**
+     * Realiza generate one recipe.
+     * @param context valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Override
     public Recipe generateOneRecipe(HouseholdRecipeContext context) {
         if (!properties.isConfigured()) {
-            throw new AiRecipeException("Generación de recetas por IA no configurada (falta app.ai.gemini.api-key)");
+            throw new AiRecipeException("Generacion de recetas por IA no configurada (falta app.ai.gemini.api-key)");
         }
 
         String prompt = buildPrompt(context);
@@ -71,7 +85,7 @@ public class GeminiRecipeAdapter implements RecipeAiPort {
             gen.put("responseMimeType", "application/json");
             return objectMapper.writeValueAsString(root);
         } catch (Exception e) {
-            throw new AiRecipeException("Error construyendo petición a Gemini", e);
+            throw new AiRecipeException("Error construyendo peticiAAaAaAaaAAaAAasAAn a Gemini", e);
         }
     }
 
@@ -86,11 +100,11 @@ public class GeminiRecipeAdapter implements RecipeAiPort {
                 ? "ninguno indicado"
                 : String.join(", ", ctx.allergenNamesToAvoid());
         String appliances = ctx.availableAppliances().isEmpty()
-                ? "ninguno específico (elige el electrodoméstico más razonable)"
+                ? "ninguno especAAaAaAaaAAaAAasAAfico (elige el electrodomAAaAaAaaAAaAAasAAstico mAAaAaAaaAAaAAasAAs razonable)"
                 : ctx.availableAppliances().stream().map(Enum::name).collect(Collectors.joining(", "));
 
         return """
-                Eres un chef asistente. Debes responder SOLO con un JSON válido (sin markdown ni texto fuera del JSON) con exactamente estas claves y tipos:
+                Eres un chef asistente. Debes responder SOLO con un JSON vAAaAaAaaAAaAAasAAlido (sin markdown ni texto fuera del JSON) con exactamente estas claves y tipos:
                 {
                   "title": string,
                   "instructions": string (pasos numerados o claros),
@@ -100,22 +114,22 @@ public class GeminiRecipeAdapter implements RecipeAiPort {
                   "difficulty": string (exactamente uno de: EASY, MEDIUM, HARD),
                   "ingredients_used": array de { "product_id": string (uuid del inventario), "quantity_used": number }
                 }
-                Inventario del hogar (cantidades numéricas en las mismas unidades que la nevera; NO puedes usar más de quantity_available por product_id):
+                Inventario del hogar (cantidades numAAaAaAaaAAaAAasAAricas en las mismas unidades que la nevera; NO puedes usar mAAaAaAaaAAaAAasAAs de quantity_available por product_id):
                 %s
                 Reglas:
                 - Una sola receta.
                 - Solo puedes incluir en ingredients_used product_id que aparezcan en el inventario anterior.
-                - Para cada producto usado, quantity_used debe ser > 0 y ≤ quantity_available del inventario.
-                - Si el inventario está vacío, ingredients_used puede ser [] y sugiere una receta muy sencilla con ingredientes habituales (sin inventario estructurado).
+                - Para cada producto usado, quantity_used debe ser > 0 y AAaAasAAAAAAAAaAAAAasAAAAaAAasAA quantity_available del inventario.
+                - Si el inventario estAAaAaAaaAAaAAasAA vacAAaAaAaaAAaAAasAAo, ingredients_used puede ser [] y sugiere una receta muy sencilla con ingredientes habituales (sin inventario estructurado).
                 - Raciones objetivo (comensales): %d
-                - Evita completamente alérgenos o ingredientes que contengan: %s
+                - Evita completamente alAAaAaAaaAAaAAasAArgenos o ingredientes que contengan: %s
                 - Prioriza utensilios disponibles en el hogar: %s; el campo appliance_needed debe ser uno de la lista permitida y coherente con la receta.
                 """.formatted(stockBlock, ctx.servings(), allergens, appliances);
     }
 
     private String buildStockBlock(List<RecipeStockLine> stock) throws java.io.IOException {
         if (stock == null || stock.isEmpty()) {
-            return "(vacío — no hay líneas en nevera con cantidad disponible)";
+            return "(vacAAaAaAaaAAaAAasAAo AAaAasAAAAAAAAasAAAAasAAAAAAAAaAAAAasAA no hay lAAaAaAaaAAaAAasAAneas en nevera con cantidad disponible)";
         }
         ArrayNode arr = objectMapper.createArrayNode();
         for (RecipeStockLine line : stock) {
@@ -136,7 +150,7 @@ public class GeminiRecipeAdapter implements RecipeAiPort {
         }
         String text = candidates.get(0).path("content").path("parts").get(0).path("text").asText();
         if (text.isBlank()) {
-            throw new AiRecipeException("Respuesta de Gemini vacía");
+            throw new AiRecipeException("Respuesta de Gemini vacia");
         }
 
         JsonNode recipeJson = objectMapper.readTree(text);
@@ -204,3 +218,7 @@ public class GeminiRecipeAdapter implements RecipeAiPort {
         return out;
     }
 }
+
+
+
+

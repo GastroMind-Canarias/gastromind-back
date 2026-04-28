@@ -4,6 +4,9 @@ import com.gastromind.api.domain.models.Product;
 
 import java.util.List;
 
+/**
+ * Define las operaciones de negocio para productos.
+ */
 public interface IProductService {
     List<Product> findAll();
     Product findById(String id);

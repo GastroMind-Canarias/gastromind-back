@@ -1,4 +1,4 @@
-package com.gastromind.api.application.usecases;
+﻿package com.gastromind.api.application.usecases;
 
 import com.gastromind.api.application.services.UsualPurchaseQuantityMath;
 import com.gastromind.api.application.services.TicketQuantityUnitResolver;
@@ -27,11 +27,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Sugerencias de compra habituales a partir del historial de tickets de todo el hogar
- * (propietario y miembros) y stock actual en nevera.
- */
 @Service
+/**
+ * Caso de uso que genera sugerencias de compra habitual para un hogar.
+ * Calcula cantidades objetivo a partir del histórico de tickets y del stock actual en nevera.
+ */
 public class ListUsualPurchaseSuggestionsUseCase {
 
     private final ResolveAuthenticatedHouseholdContextUseCase resolveHouseholdContext;
@@ -40,6 +40,16 @@ public class ListUsualPurchaseSuggestionsUseCase {
     private final IFridgeItemService fridgeItemService;
     private final UsualPurchaseRepository usualPurchaseRepository;
     private final UsualPurchaseProperties properties;
+    /**
+     * Constructor con los servicios y repositorios necesarios para calcular sugerencias.
+     *
+     * @param resolveHouseholdContext resolvedor de contexto autenticado del hogar
+     * @param ticketHistory repositorio de líneas históricas de tickets
+     * @param fridgeRepository repositorio de neveras por hogar
+     * @param fridgeItemService servicio de inventario de nevera
+     * @param usualPurchaseRepository repositorio de objetivos manuales de compra habitual
+     * @param properties configuración de umbrales y ventanas de cálculo
+     */
 
     public ListUsualPurchaseSuggestionsUseCase(
             ResolveAuthenticatedHouseholdContextUseCase resolveHouseholdContext,
@@ -67,6 +77,14 @@ public class ListUsualPurchaseSuggestionsUseCase {
             LocalDateTime lastPurchasedAt,
             boolean lowStock
     ) {}
+    /**
+     * Devuelve sugerencias ordenadas por relevancia para el usuario autenticado.
+     *
+     * @param principal identificador del usuario autenticado
+     * @param lowStockOnly indica si se filtran solo productos con bajo stock
+     * @param historyDaysOverride días de histórico a considerar; si es nulo o inválido, se usa la configuración
+     * @return lista de sugerencias de compra habitual
+     */
 
     @Transactional(readOnly = true)
     public List<UsualPurchaseSuggestion> execute(String principal, boolean lowStockOnly, Integer historyDaysOverride) {
@@ -219,3 +237,7 @@ public class ListUsualPurchaseSuggestionsUseCase {
         return byProduct;
     }
 }
+
+
+
+

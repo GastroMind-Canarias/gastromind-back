@@ -1,4 +1,4 @@
-package com.gastromind.api.application.services;
+﻿package com.gastromind.api.application.services;
 
 import com.gastromind.api.domain.models.Product;
 import com.gastromind.api.domain.models.Ticket;
@@ -13,15 +13,19 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.Optional;
 
-/**
- * Tras crear un ticket, actualiza o crea {@code usual_purchase} del usuario que registró el ticket
- * (sin duplicar user+product) mezclando la cantidad observada con el valor previo.
- */
 @Service
+/**
+ * Sincroniza compras habituales a partir de tickets confirmados.
+ */
 public class UsualPurchaseTicketSyncService {
 
     private final UsualPurchaseRepository usualPurchaseRepository;
     private final UsualPurchaseProperties properties;
+    /**
+     * Crea el servicio con sus dependencias de persistencia y configuración.
+     * @param usualPurchaseRepository repositorio de compras habituales
+     * @param properties propiedades de ajuste del algoritmo de sincronización
+     */
 
     public UsualPurchaseTicketSyncService(
             UsualPurchaseRepository usualPurchaseRepository,
@@ -29,6 +33,10 @@ public class UsualPurchaseTicketSyncService {
         this.usualPurchaseRepository = usualPurchaseRepository;
         this.properties = properties;
     }
+    /**
+     * Define sugerencias de compra habitual a partir de un ticket recién creado.
+     * @param ticket ticket sobre el que se calculará la sincronización
+     */
 
     public void syncAfterTicketCreated(Ticket ticket) {
         if (ticket == null || ticket.getUser_id() == null || ticket.getUser_id().getId() == null
@@ -69,3 +77,7 @@ public class UsualPurchaseTicketSyncService {
         }
     }
 }
+
+
+
+

@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 /**
- * Línea de ticket para agregar historial de compras (hogar: varios usuarios).
+ * Define el contrato de persistencia o integracion para ticket purchase history line.
  */
 public record TicketPurchaseHistoryLine(
         String productId,

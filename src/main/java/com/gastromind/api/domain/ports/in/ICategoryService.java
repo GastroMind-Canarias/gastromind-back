@@ -4,6 +4,9 @@ import com.gastromind.api.domain.models.Category;
 
 import java.util.List;
 
+/**
+ * Define las operaciones de negocio para categorías.
+ */
 public interface ICategoryService {
     List<Category> findAll();
     Category findById(String id);

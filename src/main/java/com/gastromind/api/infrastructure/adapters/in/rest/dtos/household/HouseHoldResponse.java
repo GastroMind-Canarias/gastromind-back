@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.in.rest.dtos.household;
+﻿package com.gastromind.api.infrastructure.adapters.in.rest.dtos.household;
 
 import com.gastromind.api.domain.models.enums.Appliance;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.user.UserResponse;
@@ -7,6 +7,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.util.List;
 
 @Schema(description = "Respuesta detallada del hogar")
+/**
+ * Representa house hold response dentro del dominio de la aplicacion.
+ */
 public record HouseHoldResponse(
         @Schema(example = "550e8400-e29b-41d4-a716-446655440000")
         String id,
@@ -20,3 +23,9 @@ public record HouseHoldResponse(
         List<Appliance> appliances
 ) {
 }
+
+
+
+
+
+

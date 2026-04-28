@@ -14,10 +14,16 @@ import java.time.Instant;
 import java.util.Date;
 
 @Service
+/**
+ * Servicio de utilidades JWT para emisión y validación de tokens.
+ */
 public class JwtService implements IJwtService {
 
     private final SecretKey key;
     private final long expirationMinutes;
+    /**
+     * Inicializa la firma criptográfica y la expiración configurada para los tokens.
+     */
 
     public JwtService(
             @Value("${app.jwt.secret}") String secret,
@@ -26,6 +32,7 @@ public class JwtService implements IJwtService {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMinutes = expirationMinutes;
     }
+    /** Genera un token firmado para el usuario indicado. */
 
     @Override
     public String generateToken(String username) {
@@ -39,11 +46,13 @@ public class JwtService implements IJwtService {
                 .signWith(key)
                 .compact();
     }
+    /** Extrae el nombre de usuario contenido en el token. */
 
     @Override
     public String extractUsername(String token) {
         return parseClaims(token).getSubject();
     }
+    /** Valida que el token corresponda al usuario y no esté expirado. */
 
     @Override
     public boolean isTokenValid(String token, UserDetails userDetails) {
@@ -57,6 +66,7 @@ public class JwtService implements IJwtService {
             return false;
         }
     }
+    /** Comprueba si el token es estructuralmente válido y vigente. */
 
     @Override
     public boolean isValid(String token) {
@@ -76,3 +86,7 @@ public class JwtService implements IJwtService {
                 .getPayload();
     }
 }
+
+
+
+

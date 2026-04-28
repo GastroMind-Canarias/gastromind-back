@@ -7,6 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
+/**
+ * Define el contrato de fridge item jpa.
+ */
 public interface FridgeItemJpaRepository extends JpaRepository<FridgeItemEntity, String> {
     List<FridgeItemEntity> findByFridgeId(String fridgeId);
 
@@ -14,3 +17,9 @@ public interface FridgeItemJpaRepository extends JpaRepository<FridgeItemEntity,
 
     List<FridgeItemEntity> findByFridgeIdAndProductCategoryId(String fridgeId, String categoryId);
 }
+
+
+
+
+
+

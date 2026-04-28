@@ -5,9 +5,7 @@ import com.gastromind.api.domain.models.enums.Appliance;
 import java.util.List;
 
 /**
- * Contexto de cocina del hogar para una única petición de sugerencia de receta (sin persistir en SQL).
- *
- * @param availableStock inventario por producto (cantidades agregadas de la nevera); la IA no debe superarlas.
+ * Contexto de dominio usado para sugerir recetas en un hogar.
  */
 public record HouseholdRecipeContext(
         String householdId,

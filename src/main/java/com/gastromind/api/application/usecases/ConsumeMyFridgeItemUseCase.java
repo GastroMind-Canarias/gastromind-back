@@ -11,11 +11,22 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 
 @Service
+/**
+ * Caso de uso para consumir parcialmente un item de la nevera del usuario.
+ * Valida primero que el item pertenezca al hogar autenticado.
+ */
 public class ConsumeMyFridgeItemUseCase {
 
     private final ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase;
     private final FridgeItemRepository fridgeItemRepository;
     private final FridgeItemServiceImpl fridgeItemService;
+    /**
+     * Constructor con dependencias para validación de pertenencia y consumo.
+     *
+     * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
+     * @param fridgeItemRepository repositorio de items de nevera
+     * @param fridgeItemService servicio de operaciones sobre items de nevera
+     */
 
     public ConsumeMyFridgeItemUseCase(
             ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase,
@@ -26,6 +37,16 @@ public class ConsumeMyFridgeItemUseCase {
         this.fridgeItemRepository = fridgeItemRepository;
         this.fridgeItemService = fridgeItemService;
     }
+    /**
+     * Aplica un consumo parcial sobre un item de nevera.
+     *
+     * @param principal identificador del usuario autenticado
+     * @param itemId identificador del item a consumir
+     * @param quantityToConsume cantidad que se desea consumir
+     * @return item actualizado tras el consumo
+     * @throws NotFoundException si el item no existe
+     * @throws ForbiddenException si el item no pertenece a la nevera del usuario
+     */
 
     @Transactional
     public FridgeItem execute(String principal, String itemId, BigDecimal quantityToConsume) {
@@ -42,3 +63,7 @@ public class ConsumeMyFridgeItemUseCase {
         }
     }
 }
+
+
+
+
