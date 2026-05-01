@@ -5,6 +5,9 @@ import com.gastromind.api.domain.models.Product;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Define el contrato de persistencia o integracion para product.
+ */
 public interface ProductRepository {
     Product save(Product product);
 
@@ -14,8 +17,5 @@ public interface ProductRepository {
 
     List<Product> findAll();
 
-    /**
-     * Empareja por nombre sin distinguir mayúsculas (nombre único en catálogo).
-     */
     Optional<Product> findFirstByNameIgnoreCase(String name);
 }

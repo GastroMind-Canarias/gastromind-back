@@ -9,6 +9,9 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de unit rest.
+ */
 public interface UnitRestMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -18,3 +21,9 @@ public interface UnitRestMapper {
 
     List<UnitResponse> toResponseList(List<Unit> units);
 }
+
+
+
+
+
+

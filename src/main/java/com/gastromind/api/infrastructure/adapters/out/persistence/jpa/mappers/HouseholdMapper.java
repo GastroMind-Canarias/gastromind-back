@@ -13,6 +13,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", uses = {UserMapper.class})
+/**
+ * Define el contrato de household.
+ */
 public interface HouseholdMapper {
 
     @Mapping(target = "members", source = "members")
@@ -59,3 +62,9 @@ public interface HouseholdMapper {
     List<HouseholdEntity> toEntityList(List<HouseHold> domainList);
     List<HouseHold> toDomainList(List<HouseholdEntity> entityList);
 }
+
+
+
+
+
+

@@ -12,7 +12,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ApiSecurityAndGlobalErrors 
 @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "Operación realizada con éxito"),
-    @ApiResponse(responseCode = "404", description = "No encontrado - El recurso solicitado no existe")
+    @ApiResponse(responseCode = "200", description = "Operación realizada correctamente"),
+    @ApiResponse(responseCode = "404", description = "Recurso no encontrado")
 })
 public @interface ApiStandardDoc {}
+

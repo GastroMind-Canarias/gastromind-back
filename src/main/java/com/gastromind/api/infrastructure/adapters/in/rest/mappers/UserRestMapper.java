@@ -11,6 +11,9 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de user rest.
+ */
 public interface UserRestMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -24,3 +27,9 @@ public interface UserRestMapper {
 
     List<UserResponse> toResponseList(List<User> users);
 }
+
+
+
+
+
+

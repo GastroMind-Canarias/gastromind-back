@@ -5,12 +5,20 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
+/**
+ * Define el contrato de unit jpa.
+ */
 public interface UnitJpaRepository extends JpaRepository<UnitEntity,String> {
 
     java.util.Optional<UnitEntity> findByName(String name);
 
-    /** Reserva: si existiera datos legacy duplicados antes de aplicar UNIQUE(name). */
     java.util.Optional<UnitEntity> findFirstByNameOrderByIdAsc(String name);
 
     java.util.Optional<UnitEntity> findFirstByNameIgnoreCase(String name);
 }
+
+
+
+
+
+

@@ -5,5 +5,14 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
+/**
+ * Define el contrato de recipe ingredient jpa.
+ */
 public interface RecipeIngredientJpaRepository extends JpaRepository<RecipeIngredientEntity, String> {
 }
+
+
+
+
+
+

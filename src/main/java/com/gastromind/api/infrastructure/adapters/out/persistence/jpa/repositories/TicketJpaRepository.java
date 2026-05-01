@@ -9,6 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
+/**
+ * Define el contrato de ticket jpa.
+ */
 public interface TicketJpaRepository extends JpaRepository<TicketEntity, String> {
 
     List<TicketEntity> findByUser_Id(String userId);
@@ -21,3 +24,9 @@ public interface TicketJpaRepository extends JpaRepository<TicketEntity, String>
             """)
     List<TicketEntity> findVisibleForHousehold(@Param("hid") String householdId);
 }
+
+
+
+
+
+

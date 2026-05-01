@@ -10,6 +10,9 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
+/**
+ * Define el contrato de ticket item jpa.
+ */
 public interface TicketItemJpaRepository extends JpaRepository<TicketItemEntity, String> {
 
     @Query("""
@@ -29,3 +32,9 @@ public interface TicketItemJpaRepository extends JpaRepository<TicketItemEntity,
             @Param("householdId") String householdId,
             @Param("since") LocalDateTime since);
 }
+
+
+
+
+
+

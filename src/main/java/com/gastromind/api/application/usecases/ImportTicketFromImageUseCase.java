@@ -32,6 +32,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+/**
+ * Caso de uso que importa un ticket desde una imagen y lo persiste en el sistema.
+ * Además, proyecta sus líneas al inventario de nevera del hogar cuando corresponde.
+ */
 public class ImportTicketFromImageUseCase {
 
     private final TicketExtractionPort extraction;
@@ -42,6 +46,18 @@ public class ImportTicketFromImageUseCase {
     private final StoreRepository storeRepository;
     private final FridgeRepository fridgeRepository;
     private final IFridgeItemService fridgeItemService;
+    /**
+     * Constructor con las dependencias necesarias para extraer, normalizar y guardar tickets.
+     *
+     * @param extraction puerto de extracción OCR/IA de tickets
+     * @param productRepository repositorio de productos del catálogo
+     * @param unitResolver resolvedor de unidades detectadas en líneas del ticket
+     * @param ticketService servicio de persistencia de tickets
+     * @param userRepository repositorio de usuarios
+     * @param storeRepository repositorio de tiendas
+     * @param fridgeRepository repositorio de neveras
+     * @param fridgeItemService servicio para añadir líneas de ticket a nevera
+     */
 
     public ImportTicketFromImageUseCase(
             TicketExtractionPort extraction,
@@ -61,6 +77,17 @@ public class ImportTicketFromImageUseCase {
         this.fridgeRepository = fridgeRepository;
         this.fridgeItemService = fridgeItemService;
     }
+    /**
+     * Procesa la imagen del ticket y devuelve el ticket persistido con sus líneas.
+     *
+     * @param imageBytes contenido binario de la imagen
+     * @param mimeType tipo MIME de la imagen
+     * @param userId identificador del usuario propietario del ticket
+     * @param storeIdOrNull identificador de tienda opcional; si es nulo, se intenta resolver por nombre extraído
+     * @return ticket guardado en base de datos
+     * @throws NotFoundException si el usuario o la tienda indicada no existen
+     * @throws IllegalArgumentException si faltan datos mínimos para resolver productos o tienda
+     */
 
     @Transactional
     public Ticket execute(byte[] imageBytes, String mimeType, String userId, String storeIdOrNull) {
@@ -74,7 +101,7 @@ public class ImportTicketFromImageUseCase {
         for (ExtractedTicketLine line : extracted.lines()) {
             String normalized = TicketProductResolutionService.normalizeName(line.productName());
             if (normalized.isEmpty()) {
-                throw new IllegalArgumentException("Nombre de producto vacío en una línea del ticket");
+                throw new IllegalArgumentException("Nombre de producto vacio en una linea del ticket");
             }
             Optional<Product> catalog = productRepository.findFirstByNameIgnoreCase(normalized);
 
@@ -144,9 +171,6 @@ public class ImportTicketFromImageUseCase {
         }
     }
 
-    /**
-     * Precio referido a la unidad de medida: €/kg (g o kg), €/l (ml o l), €/unidad (ud).
-     */
     private static BigDecimal inferUnitPrice(ExtractedTicketLine line, BigDecimal qtyAmt, Unit unit) {
         if (line.unitPrice() != null && line.unitPrice().compareTo(BigDecimal.ZERO) > 0) {
             return line.unitPrice().setScale(4, RoundingMode.HALF_UP);
@@ -195,11 +219,11 @@ public class ImportTicketFromImageUseCase {
         if (!name.isEmpty()) {
             return storeRepository.findFirstByNameIgnoreCase(name)
                     .orElseThrow(() -> new IllegalArgumentException(
-                            "No se indicó store_id y no hay tienda en catálogo con nombre: " + name
-                                    + ". Cree la tienda o envíe store_id."));
+                            "No se indicAAaAaAaaAAaAAasAA store_id y no hay tienda en catAAaAaAaaAAaAAasAAlogo con nombre: " + name
+                                    + ". Cree la tienda o envAAaAaAaaAAaAAasAAe store_id."));
         }
         throw new IllegalArgumentException(
-                "No se indicó store_id y el ticket no muestra un nombre de tienda reconocible. Envíe store_id.");
+                "No se indicAAaAaAaaAAaAAasAA store_id y el ticket no muestra un nombre de tienda reconocible. EnvAAaAaAaaAAaAAasAAe store_id.");
     }
 
     private static float sumLineTotals(List<TicketItem> items) {
@@ -222,3 +246,7 @@ public class ImportTicketFromImageUseCase {
         };
     }
 }
+
+
+
+

@@ -6,13 +6,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Normaliza cantidades de ticket a unidades base (kg, l, ud) para comparar y mediana.
- */
 public final class UsualPurchaseQuantityMath {
 
     private UsualPurchaseQuantityMath() {
     }
+    /**
+     * Convierte una cantidad observada a la unidad canónica de cálculo.
+     * @param quantityRaw cantidad original detectada
+     * @param canonicalUnitCode código canónico de unidad
+     * @return cantidad normalizada para cálculos de compra habitual
+     */
 
     public static BigDecimal toCanonicalAmount(BigDecimal quantityRaw, String canonicalUnitCode) {
         if (quantityRaw == null) {
@@ -25,10 +28,12 @@ public final class UsualPurchaseQuantityMath {
             default -> quantityRaw;
         };
     }
-
     /**
-     * Unidad de presentación para la API: kg, l o ud (g/ml se convierten arriba).
+     * Devuelve la unidad de presentación asociada a una unidad canónica.
+     * @param canonicalUnitCode código canónico de unidad
+     * @return unidad de presentación ({@code kg}, {@code l} o {@code ud})
      */
+
     public static String presentationUnit(String canonicalUnitCode) {
         String c = canonicalUnitCode == null ? "ud" : canonicalUnitCode;
         return switch (c) {
@@ -37,6 +42,11 @@ public final class UsualPurchaseQuantityMath {
             default -> "ud";
         };
     }
+    /**
+     * Calcula la mediana de una colección de cantidades.
+     * @param values valores sobre los que calcular la mediana
+     * @return mediana redondeada a cuatro decimales
+     */
 
     public static BigDecimal median(List<BigDecimal> values) {
         if (values == null || values.isEmpty()) {
@@ -53,3 +63,7 @@ public final class UsualPurchaseQuantityMath {
                 .divide(BigDecimal.valueOf(2), 4, RoundingMode.HALF_UP);
     }
 }
+
+
+
+

@@ -5,7 +5,7 @@ import com.gastromind.api.domain.models.RecipeIngredientUsage;
 import java.util.List;
 
 /**
- * Persistencia de líneas de ingredientes asociadas a una receta ya guardada.
+ * Define el contrato de persistencia o integracion para recipe ingredient write.
  */
 public interface RecipeIngredientWritePort {
 

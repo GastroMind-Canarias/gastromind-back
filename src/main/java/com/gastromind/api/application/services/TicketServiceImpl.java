@@ -1,4 +1,4 @@
-package com.gastromind.api.application.services;
+﻿package com.gastromind.api.application.services;
 
 import com.gastromind.api.domain.exceptions.ForbiddenException;
 import com.gastromind.api.domain.exceptions.NotFoundException;
@@ -19,6 +19,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 
 @Service
+/**
+ * Servicio de aplicación para gestionar tickets de compra.
+ */
 public class TicketServiceImpl implements ITicketService {
 
     private final TicketRepository repository;
@@ -26,6 +29,14 @@ public class TicketServiceImpl implements ITicketService {
     private final UnitRepository unitRepository;
     private final UserRepository userRepository;
     private final UsualPurchaseTicketSyncService usualPurchaseTicketSyncService;
+    /**
+     * Crea el servicio con sus dependencias de persistencia y sincronización.
+     * @param repository repositorio de tickets
+     * @param productRepository repositorio de productos
+     * @param unitRepository repositorio de unidades
+     * @param userRepository repositorio de usuarios
+     * @param usualPurchaseTicketSyncService servicio de sincronización de compras habituales
+     */
 
     public TicketServiceImpl(
             TicketRepository repository,
@@ -39,31 +50,57 @@ public class TicketServiceImpl implements ITicketService {
         this.userRepository = userRepository;
         this.usualPurchaseTicketSyncService = usualPurchaseTicketSyncService;
     }
+    /**
+     * Devuelve todos los tickets registrados.
+     * @return listado completo de tickets
+     */
 
     @Override
     public List<Ticket> findAll() {
         return repository.findAll();
     }
+    /**
+     * Devuelve los tickets creados por un usuario.
+     * @param userId identificador del usuario
+     * @return tickets del usuario
+     */
 
     @Override
     public List<Ticket> findAllByUserId(String userId) {
         return repository.findAllByUserId(userId);
     }
+    /**
+     * Devuelve los tickets visibles para el hogar del usuario.
+     * @param userId identificador del usuario
+     * @return tickets visibles en el contexto de su hogar
+     */
 
     @Override
     public List<Ticket> findAllVisibleForUserHousehold(String userId) {
         User u = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
         if (u.getHouseHold_id() == null || u.getHouseHold_id().getId() == null) {
-            throw new ForbiddenException("El usuario no pertenece a ningún hogar");
+            throw new ForbiddenException("El usuario no pertenece a ningun hogar");
         }
         return repository.findVisibleForHousehold(u.getHouseHold_id().getId());
     }
+    /**
+     * Busca un ticket por su identificador.
+     * @param id identificador del ticket
+     * @return ticket encontrado
+     * @throws NotFoundException si el ticket no existe
+     */
 
     @Override
     public Ticket findById(String id) {
         return repository.findById(id).orElseThrow(() -> new NotFoundException("Ticket no encontrado"));
     }
+    /**
+     * Busca un ticket y valida que pertenezca al usuario indicado.
+     * @param ticketId identificador del ticket
+     * @param userId identificador del usuario
+     * @return ticket autorizado para el usuario
+     */
 
     @Override
     public Ticket findByIdForUser(String ticketId, String userId) {
@@ -71,6 +108,12 @@ public class TicketServiceImpl implements ITicketService {
         requireTicketOwner(ticket, userId);
         return ticket;
     }
+    /**
+     * Busca un ticket y valida acceso para un miembro del mismo hogar.
+     * @param ticketId identificador del ticket
+     * @param userId identificador del usuario solicitante
+     * @return ticket autorizado para el hogar
+     */
 
     @Override
     public Ticket findByIdForHouseholdMember(String ticketId, String userId) {
@@ -78,7 +121,7 @@ public class TicketServiceImpl implements ITicketService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
         if (user.getHouseHold_id() == null || user.getHouseHold_id().getId() == null) {
-            throw new ForbiddenException("El usuario no pertenece a ningún hogar");
+            throw new ForbiddenException("El usuario no pertenece a ningun hogar");
         }
         String householdId = user.getHouseHold_id().getId();
         if (ticket.getHouseHold_id() != null && ticket.getHouseHold_id().getId() != null) {
@@ -105,6 +148,11 @@ public class TicketServiceImpl implements ITicketService {
             throw new ForbiddenException("No tiene acceso a este ticket");
         }
     }
+    /**
+     * Crea un ticket nuevo resolviendo referencias de líneas y hogar.
+     * @param ticket ticket a crear
+     * @return ticket persistido
+     */
 
     @Override
     @Transactional
@@ -133,13 +181,13 @@ public class TicketServiceImpl implements ITicketService {
         }
         Unit defaultUd = unitRepository.findFirstByNameIgnoreCase("Unidades")
                 .orElseThrow(() -> new NotFoundException(
-                        "Unidad 'Unidades' no encontrada en catálogo. Revise la tabla unit / data.sql."));
+                        "Unidad 'Unidades' no encontrada en catAAaAaAaaAAaAAasAAlogo. Revise la tabla unit / data.sql."));
         for (TicketItem item : ticket.getItems()) {
             boolean hasProductId = item.getProduct() != null && item.getProduct().getId() != null;
             boolean hasLineName = item.getLineProductName() != null && !item.getLineProductName().isBlank();
             if (!hasProductId && !hasLineName) {
                 throw new IllegalArgumentException(
-                        "Cada línea del ticket debe tener un producto con id o un nombre de línea (sin catálogo)");
+                        "Cada lAAaAaAaaAAaAAasAAnea del ticket debe tener un producto con id o un nombre de lAAaAaAaaAAaAAasAAnea (sin catAAaAaAaaAAaAAasAAlogo)");
             }
             if (hasProductId) {
                 Product fullProduct = productRepository.findById(item.getProduct().getId())
@@ -162,6 +210,12 @@ public class TicketServiceImpl implements ITicketService {
             }
         }
     }
+    /**
+     * Define un ticket existente.
+     * @param id identificador del ticket
+     * @param ticket nuevos datos del ticket
+     * @return ticket actualizado
+     */
 
     @Override
     @Transactional
@@ -172,6 +226,13 @@ public class TicketServiceImpl implements ITicketService {
         attachHouseholdFromUploader(ticket);
         return repository.save(ticket);
     }
+    /**
+     * Define un ticket validando que pertenezca al usuario.
+     * @param id identificador del ticket
+     * @param ticket nuevos datos del ticket
+     * @param userId identificador del usuario
+     * @return ticket actualizado
+     */
 
     @Override
     @Transactional
@@ -183,12 +244,21 @@ public class TicketServiceImpl implements ITicketService {
         attachHouseholdFromUploader(ticket);
         return repository.save(ticket);
     }
+    /**
+     * Elimina un ticket por su identificador.
+     * @param id identificador del ticket
+     */
 
     @Override
     public void delete(String id) {
         findById(id);
         repository.deleteById(id);
     }
+    /**
+     * Elimina un ticket validando que pertenezca al usuario.
+     * @param id identificador del ticket
+     * @param userId identificador del usuario
+     */
 
     @Override
     public void deleteForUser(String id, String userId) {
@@ -196,3 +266,7 @@ public class TicketServiceImpl implements ITicketService {
         repository.deleteById(id);
     }
 }
+
+
+
+

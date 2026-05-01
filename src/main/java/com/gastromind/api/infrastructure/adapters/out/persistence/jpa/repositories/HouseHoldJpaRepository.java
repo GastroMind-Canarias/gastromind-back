@@ -8,7 +8,16 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
+/**
+ * Define el contrato de house hold jpa.
+ */
 public interface HouseHoldJpaRepository extends JpaRepository<HouseholdEntity, String> {
     @EntityGraph(attributePaths = {"members", "fridges"})
     Optional<HouseholdEntity> findById(String id);
 }
+
+
+
+
+
+

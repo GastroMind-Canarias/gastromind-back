@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
+﻿package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
 import com.gastromind.api.application.usecases.ListUsualPurchaseSuggestionsUseCase;
 import com.gastromind.api.application.services.UsualPurchaseServiceImpl;
@@ -30,7 +30,10 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/usual-purchases")
-@Tag(name = "Producto más comprado", description = "Gestión de los registros de producto más comprado de un usuario.")
+@Tag(name = "Producto mAAaAaAaaAAaAAasAAs comprado", description = "GestiAAaAaAaaAAaAAasAAn de los registros de producto mAAaAaAaaAAaAAasAAs comprado de un usuario.")
+/**
+ * Controlador REST para operaciones de usual purchase.
+ */
 public class UsualPurchaseController {
 
     @Autowired
@@ -54,6 +57,10 @@ public class UsualPurchaseController {
         }
         return userServiceImpl.findByUsername(authentication.getName());
     }
+    /**
+     * Lista todos los usual purchase.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Obtener todos los registros (solo ADMIN)", description = "Lista completa de compras habituales.")
     @ApiStandardDoc
@@ -65,9 +72,16 @@ public class UsualPurchaseController {
     }
 
     @Operation(summary = "Sugerencias inteligentes (hogar)", description = """
-            Productos comprados repetidamente según tickets de todos los miembros del hogar; \
-            compara con stock en nevera. target puede venir de compra manual o de la mediana histórica.\
+            Productos comprados repetidamente segAAaAaAaaAAaAAasAAn tickets de todos los miembros del hogar; \
+            compara con stock en nevera. target puede venir de compra manual o de la mediana histAAaAaAaaAAaAAasAArica.\
             """)
+    /**
+     * Realiza list suggestions.
+     * @param authentication usuario autenticado.
+     * @param lowStockOnly valor a utilizar.
+     * @param historyDays valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
     @ApiStandardDoc
     @GetMapping("/me/suggestions")
     @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
@@ -91,6 +105,11 @@ public class UsualPurchaseController {
                         r.lowStock()))
                 .collect(Collectors.toList()));
     }
+    /**
+     * Realiza list mine.
+     * @param authentication usuario autenticado.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Listar mis compras habituales", description = "Registros del usuario autenticado.")
     @ApiStandardDoc
@@ -101,6 +120,12 @@ public class UsualPurchaseController {
         return ResponseEntity.ok(usualPurchaseMapper.toResponseList(
                 usualPurchaseServiceImpl.findAllByUserId(user.getId())));
     }
+    /**
+     * Devuelve usual purchase por mine by id.
+     * @param authentication usuario autenticado.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Obtener uno de mis registros por ID", description = "Solo si pertenece al usuario autenticado.")
     @ApiStandardDoc
@@ -111,6 +136,12 @@ public class UsualPurchaseController {
         UsualPurchase purchase = usualPurchaseServiceImpl.findByIdForUser(id, user.getId());
         return ResponseEntity.ok(usualPurchaseMapper.toResponse(purchase));
     }
+    /**
+     * Realiza create mine.
+     * @param authentication usuario autenticado.
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Crear mi compra habitual", description = "Asocia el registro al usuario autenticado.")
     @ApiPostDoc
@@ -124,6 +155,11 @@ public class UsualPurchaseController {
         UsualPurchase saved = usualPurchaseServiceImpl.create(domain);
         return ResponseEntity.status(HttpStatus.CREATED).body(usualPurchaseMapper.toResponse(saved));
     }
+    /**
+     * Devuelve usual purchase por id.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Buscar por ID (solo ADMIN)", description = "Detalle de un registro por identificador.")
     @ApiStandardDoc
@@ -134,6 +170,11 @@ public class UsualPurchaseController {
         UsualPurchase purchase = usualPurchaseServiceImpl.findById(id);
         return ResponseEntity.ok(usualPurchaseMapper.toResponse(purchase));
     }
+    /**
+     * Registra un nuevo usual purchase.
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Crear registro (solo ADMIN)", description = "Incluye user_id en el cuerpo.")
     @ApiPostDoc
@@ -144,6 +185,12 @@ public class UsualPurchaseController {
         UsualPurchase saved = usualPurchaseServiceImpl.create(domain);
         return ResponseEntity.status(HttpStatus.CREATED).body(usualPurchaseMapper.toResponse(saved));
     }
+    /**
+     * Define un usual purchase existente.
+     * @param id el identificador del recurso
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Actualizar registro (solo ADMIN)", description = "Modifica un registro existente.")
     @ApiStandardDoc
@@ -154,6 +201,13 @@ public class UsualPurchaseController {
         UsualPurchase updated = usualPurchaseServiceImpl.update(id, domain);
         return ResponseEntity.ok(usualPurchaseMapper.toResponse(updated));
     }
+    /**
+     * Realiza update mine.
+     * @param authentication usuario autenticado.
+     * @param id el identificador del recurso
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Actualizar uno de mis registros", description = "Solo si pertenece al usuario autenticado.")
     @ApiStandardDoc
@@ -168,6 +222,11 @@ public class UsualPurchaseController {
         UsualPurchase updated = usualPurchaseServiceImpl.updateForUser(id, domain, user.getId());
         return ResponseEntity.ok(usualPurchaseMapper.toResponse(updated));
     }
+    /**
+     * Elimina un usual purchase.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Eliminar registro (solo ADMIN)", description = "Borra un registro de la base de datos.")
     @ApiStandardDoc
@@ -177,6 +236,12 @@ public class UsualPurchaseController {
         usualPurchaseServiceImpl.delete(id);
         return ResponseEntity.noContent().build();
     }
+    /**
+     * Realiza delete mine.
+     * @param authentication usuario autenticado.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Eliminar uno de mis registros", description = "Solo si pertenece al usuario autenticado.")
     @ApiStandardDoc
@@ -188,3 +253,7 @@ public class UsualPurchaseController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+

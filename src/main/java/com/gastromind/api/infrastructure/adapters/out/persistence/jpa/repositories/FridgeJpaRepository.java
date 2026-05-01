@@ -8,9 +8,18 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+/**
+ * Define el contrato de fridge jpa.
+ */
 public interface FridgeJpaRepository extends JpaRepository<FridgeEntity,String>{
 
     List<FridgeEntity> findByHousehold_Id(String householdId);
 
     Optional<FridgeEntity> findFirstByHousehold_IdOrderByIdAsc(String householdId);
 }
+
+
+
+
+
+

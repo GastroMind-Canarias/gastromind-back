@@ -8,6 +8,9 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring", uses = {HouseholdMapper.class})
+/**
+ * Define el contrato de fridge.
+ */
 public interface FridgeMapper {
 
     @Mapping(source = "houseHold_id", target = "household")
@@ -19,3 +22,9 @@ public interface FridgeMapper {
     List<FridgeEntity> toEntityList(List<Fridge> domainList);
     List<Fridge> toDomainList(List<FridgeEntity> entityList);
 }
+
+
+
+
+
+

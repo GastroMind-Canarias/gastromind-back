@@ -7,6 +7,9 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de store.
+ */
 public interface StoreMapper {
 
     StoreEntity toEntity(Store domain);
@@ -16,3 +19,9 @@ public interface StoreMapper {
     List<StoreEntity> toEntityList(List<Store> domainList);
     List<Store> toDomainList(List<StoreEntity> entityList);
 }
+
+
+
+
+
+

@@ -1,10 +1,22 @@
-package com.gastromind.api.domain.exceptions;
+﻿package com.gastromind.api.domain.exceptions;
 
+/**
+ * Excepción de dominio en generación de recetas con IA.
+ */
 public class AiRecipeException extends RuntimeException {
+    /**
+     * Crea una nueva instancia.
+     * @param message detalle del error
+     */
 
     public AiRecipeException(String message) {
         super(message);
     }
+    /**
+     * Crea una nueva instancia.
+     * @param message detalle del error
+     * @param cause valor a utilizar.
+     */
 
     public AiRecipeException(String message, Throwable cause) {
         super(message, cause);

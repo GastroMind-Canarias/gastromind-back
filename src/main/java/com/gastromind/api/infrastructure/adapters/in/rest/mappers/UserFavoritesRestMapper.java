@@ -12,6 +12,9 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de user favorites rest.
+ */
 public interface UserFavoritesRestMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user_id.id", source = "user_id")
@@ -31,3 +34,9 @@ public interface UserFavoritesRestMapper {
         return uf;
     }
 }
+
+
+
+
+
+

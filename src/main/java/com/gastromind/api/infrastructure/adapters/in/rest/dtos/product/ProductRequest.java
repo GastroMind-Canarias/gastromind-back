@@ -1,10 +1,13 @@
-package com.gastromind.api.infrastructure.adapters.in.rest.dtos.product;
+﻿package com.gastromind.api.infrastructure.adapters.in.rest.dtos.product;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 @Schema(description = "Objeto para registrar un nuevo producto")
+/**
+ * Representa product request dentro del dominio de la aplicacion.
+ */
 public record ProductRequest(
         @Schema(example = "Floppy pistacho")
         @NotBlank(message = "El nombre del producto es obligatorio")
@@ -12,7 +15,7 @@ public record ProductRequest(
         @Schema(example = "true", allowableValues = {"true", "false"})
         @NotNull(message = "Debe tener alguno de los dos valores")
         boolean is_essential,
-        @Schema(description = "Si el producto debe revisarse en catálogo (p. ej. creado desde ticket). Omitir = false.")
+        @Schema(description = "Si el producto debe revisarse en catAAlogo (p. ej. creado desde ticket). Omitir = false.")
         Boolean needs_review,
         @Schema(description = "Motivo o detalle para el usuario")
         String review_note,
@@ -20,3 +23,9 @@ public record ProductRequest(
         String allergen_id
 ) {
 }
+
+
+
+
+
+

@@ -1,4 +1,4 @@
-package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
+﻿package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
 import com.gastromind.api.application.services.UnitServiceImpl;
 import com.gastromind.api.domain.models.Unit;
@@ -20,7 +20,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/units")
-@Tag(name = "Unidad", description = "Gestión del catálogo de unidades de medida para los ingredientes y productos.")
+@Tag(name = "Unidad", description = "Gestión del catálogo de unidades de medida.")
+/**
+ * Controlador REST para gestionar unidades de medida.
+ */
 public class UnitController {
 
     @Autowired
@@ -28,6 +31,11 @@ public class UnitController {
 
     @Autowired
     private UnitRestMapper unitMapper;
+    /**
+     * Lista todas las unidades.
+     *
+     * @return colección de unidades
+     */
 
     @Operation(summary = "Obtener todas las unidades", description = "Devuelve una lista completa de todas las unidades de medida registradas.")
     @ApiStandardDoc
@@ -36,8 +44,14 @@ public class UnitController {
         List<Unit> units = unitServiceImpl.findAll();
         return ResponseEntity.ok(unitMapper.toResponseList(units));
     }
+    /**
+     * Recupera una unidad por ID.
+     *
+     * @param id identificador de la unidad
+     * @return unidad encontrada
+     */
 
-    @Operation(summary = "Buscar unidad por ID", description = "Devuelve una única unidad basándose en su identificador único.")
+    @Operation(summary = "Buscar unidad por ID", description = "Devuelve una unidad concreta a partir de su identificador.")
     @ApiStandardDoc
     @GetMapping("/{id}")
     public ResponseEntity<UnitResponse> getById(
@@ -46,6 +60,12 @@ public class UnitController {
         Unit unit = unitServiceImpl.findById(id);
         return ResponseEntity.ok(unitMapper.toResponse(unit));
     }
+    /**
+     * Crea una unidad.
+     *
+     * @param request datos de alta
+     * @return unidad creada
+     */
 
     @Operation(summary = "Crear nueva unidad", description = "Registra una nueva unidad de medida en el sistema.")
     @ApiPostDoc
@@ -55,6 +75,13 @@ public class UnitController {
         Unit savedUnit = unitServiceImpl.create(unitDomain);
         return ResponseEntity.status(HttpStatus.CREATED).body(unitMapper.toResponse(savedUnit));
     }
+    /**
+     * Define una unidad existente.
+     *
+     * @param id identificador de la unidad
+     * @param request datos actualizados
+     * @return unidad actualizada
+     */
 
     @Operation(summary = "Actualizar unidad", description = "Modifica los datos de una unidad de medida existente.")
     @ApiStandardDoc
@@ -64,8 +91,14 @@ public class UnitController {
         Unit updatedUnit = unitServiceImpl.update(id, unitDomain);
         return ResponseEntity.ok(unitMapper.toResponse(updatedUnit));
     }
+    /**
+     * Elimina una unidad.
+     *
+     * @param id identificador de la unidad
+     * @return respuesta sin contenido
+     */
 
-    @Operation(summary = "Eliminar unidad", description = "Borra físicamente una unidad de medida de la base de datos.")
+    @Operation(summary = "Eliminar unidad", description = "Elimina una unidad de medida de forma permanente.")
     @ApiStandardDoc
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {
@@ -73,3 +106,7 @@ public class UnitController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+
