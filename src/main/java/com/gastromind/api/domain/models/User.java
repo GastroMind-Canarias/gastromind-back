@@ -7,7 +7,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * Modelo de dominio para un usuario de la aplicación.
+ * Modelo de dominio para un usuario de la aplicacion.
  */
 public class User {
 

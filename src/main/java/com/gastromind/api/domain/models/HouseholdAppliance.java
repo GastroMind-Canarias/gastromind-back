@@ -3,7 +3,7 @@ package com.gastromind.api.domain.models;
 import com.gastromind.api.domain.models.enums.Appliance;
 
 /**
- * Modelo de dominio para un electrodoméstico asociado al hogar.
+ * Modelo de dominio para un electrodomestico asociado al hogar.
  */
 public class HouseholdAppliance {
     private String id;

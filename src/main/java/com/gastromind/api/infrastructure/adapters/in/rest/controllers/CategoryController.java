@@ -20,9 +20,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/categories")
-@Tag(name = "Categoría", description = "Gestión del catálogo de categorías para productos y recetas.")
+@Tag(name = "Categoria", description = "Gestion del catalogo de categorias para productos y recetas.")
 /**
- * Controlador REST para gestionar categorías.
+ * Controlador REST para gestionar categorias.
  */
 public class CategoryController {
 
@@ -32,12 +32,12 @@ public class CategoryController {
     @Autowired
     private CategoryRestMapper categoryMapper;
     /**
-     * Lista todas las categorías.
+     * Lista todas las categorias.
      *
-     * @return colección de categorías
+     * @return coleccion de categorias
      */
 
-    @Operation(summary = "Obtener todas las categorías", description = "Devuelve la lista completa de categorías registradas.")
+    @Operation(summary = "Obtener todas las categorias", description = "Devuelve la lista completa de categorias registradas.")
     @GetMapping
     @ApiStandardDoc
     public ResponseEntity<List<CategoryResponse>> getAll() {
@@ -45,28 +45,28 @@ public class CategoryController {
         return ResponseEntity.ok(categoryMapper.toResponseList(categories));
     }
     /**
-     * Recupera una categoría por ID.
+     * Recupera una categoria por ID.
      *
-     * @param id identificador de la categoría
-     * @return categoría encontrada
+     * @param id identificador de la categoria
+     * @return categoria encontrada
      */
 
-    @Operation(summary = "Buscar categoría por ID", description = "Devuelve una categoría concreta a partir de su identificador.")
+    @Operation(summary = "Buscar categoria por ID", description = "Devuelve una categoria concreta a partir de su identificador.")
     @ApiStandardDoc
     @GetMapping("/{id}")
     public ResponseEntity<CategoryResponse> getById(
-            @Parameter(description = "ID de la categoría a buscar", example = "1") @PathVariable String id) {
+            @Parameter(description = "ID de la categoria a buscar", example = "1") @PathVariable String id) {
         Category category = categoryServiceImpl.findById(id);
         return ResponseEntity.ok(categoryMapper.toResponse(category));
     }
     /**
-     * Crea una categoría.
+     * Crea una categoria.
      *
      * @param categoryRequest datos de alta
-     * @return categoría creada
+     * @return categoria creada
      */
 
-    @Operation(summary = "Crear nueva categoría", description = "Registra una nueva categoría en el sistema.")
+    @Operation(summary = "Crear nueva categoria", description = "Registra una nueva categoria en el sistema.")
     @ApiPostDoc
     @PostMapping
     public ResponseEntity<CategoryResponse> create(@Valid @RequestBody CategoryRequest categoryRequest) {
@@ -75,14 +75,14 @@ public class CategoryController {
         return ResponseEntity.status(HttpStatus.CREATED).body(categoryMapper.toResponse(savedCategory));
     }
     /**
-     * Define una categoría existente.
+     * Define una categoria existente.
      *
-     * @param id identificador de la categoría
+     * @param id identificador de la categoria
      * @param categoryRequest datos actualizados
-     * @return categoría actualizada
+     * @return categoria actualizada
      */
 
-    @Operation(summary = "Actualizar categoría", description = "Modifica los datos de una categoría existente.")
+    @Operation(summary = "Actualizar categoria", description = "Modifica los datos de una categoria existente.")
     @PutMapping("/{id}")
     @ApiStandardDoc
     public ResponseEntity<CategoryResponse> update(@PathVariable String id, @Valid @RequestBody CategoryRequest categoryRequest) {
@@ -91,13 +91,13 @@ public class CategoryController {
         return ResponseEntity.ok(categoryMapper.toResponse(updatedCategory));
     }
     /**
-     * Elimina una categoría.
+     * Elimina una categoria.
      *
-     * @param id identificador de la categoría
+     * @param id identificador de la categoria
      * @return respuesta sin contenido
      */
 
-    @Operation(summary = "Eliminar categoría", description = "Elimina una categoría de forma permanente.")
+    @Operation(summary = "Eliminar categoria", description = "Elimina una categoria de forma permanente.")
     @ApiStandardDoc
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> delete(@PathVariable String id) {

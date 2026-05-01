@@ -12,10 +12,10 @@ import java.util.List;
  */
 public record UpdateMyPreferencesRequest(
         @NotNull
-        @Schema(description = "Ids de alAArgenos. Se reemplaza conjunto completo.")
+        @Schema(description = "Ids de alergenos. Se reemplaza conjunto completo.")
         List<String> allergenIds,
         @NotNull
-        @Schema(description = "Tipos de electrodomAAstico del hogar. Se reemplaza conjunto completo.")
+        @Schema(description = "Tipos de electrodomestico del hogar. Se reemplaza conjunto completo.")
         List<Appliance> appliances
 ) {
 }

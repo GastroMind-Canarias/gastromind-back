@@ -20,7 +20,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/units")
-@Tag(name = "Unidad", description = "Gestión del catálogo de unidades de medida.")
+@Tag(name = "Unidad", description = "Gestion del catalogo de unidades de medida.")
 /**
  * Controlador REST para gestionar unidades de medida.
  */
@@ -34,7 +34,7 @@ public class UnitController {
     /**
      * Lista todas las unidades.
      *
-     * @return colección de unidades
+     * @return coleccion de unidades
      */
 
     @Operation(summary = "Obtener todas las unidades", description = "Devuelve una lista completa de todas las unidades de medida registradas.")

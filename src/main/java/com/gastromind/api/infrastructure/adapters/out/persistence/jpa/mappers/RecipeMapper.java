@@ -46,7 +46,6 @@ public interface RecipeMapper {
             }
         }
         switch (s.toLowerCase(Locale.ROOT)) {
-            case "fAAcil":
             case "facil":
             case "easy":
                 return DifficultyLevel.EASY;
@@ -55,7 +54,6 @@ public interface RecipeMapper {
             case "medium":
                 return DifficultyLevel.MEDIUM;
             case "alta":
-            case "difAAcil":
             case "dificil":
             case "hard":
                 return DifficultyLevel.HARD;

@@ -15,16 +15,16 @@ import java.util.List;
 
 @Service
 /**
- * Servicio de aplicación para gestionar usuarios y sus alérgenos.
+ * Servicio de aplicacion para gestionar usuarios y sus alergenos.
  */
 public class UserServiceImpl implements IUserService {
 
     private final UserRepository userRepository;
     private final AllergenRepository allergenRepository;
     /**
-     * Crea el servicio con sus repositorios de usuarios y alérgenos.
+     * Crea el servicio con sus repositorios de usuarios y alergenos.
      * @param userRepository repositorio de usuarios
-     * @param allergenRepository repositorio de alérgenos
+     * @param allergenRepository repositorio de alergenos
      */
 
     public UserServiceImpl(UserRepository userRepository, AllergenRepository allergenRepository) {
@@ -86,7 +86,7 @@ public class UserServiceImpl implements IUserService {
         return userRepository.save(user);
     }
     /**
-     * Define los datos de perfil de un usuario y su lista de alérgenos.
+     * Define los datos de perfil de un usuario y su lista de alergenos.
      * @param id identificador del usuario
      * @param userChanges cambios de perfil a aplicar
      * @return usuario actualizado
@@ -104,7 +104,7 @@ public class UserServiceImpl implements IUserService {
             existingUser.getAllergens().clear();
 
             userChanges.getAllergens().forEach(allergenChanges -> {
-                Allergen realAllergen = allergenRepository.findById(allergenChanges.getId()).orElseThrow(() -> new NotFoundException("AlAAaAaAaaAAaAAasAArgeno no encontrado: " + allergenChanges.getId()));
+                Allergen realAllergen = allergenRepository.findById(allergenChanges.getId()).orElseThrow(() -> new NotFoundException("Alergeno no encontrado: " + allergenChanges.getId()));
                 existingUser.addAllergen(realAllergen);
             });
         }
@@ -122,23 +122,23 @@ public class UserServiceImpl implements IUserService {
         userRepository.deleteById(id);
     }
     /**
-     * Asocia un alérgeno concreto al usuario.
+     * Asocia un alergeno concreto al usuario.
      * @param userId identificador del usuario
-     * @param allergenId identificador del alérgeno
+     * @param allergenId identificador del alergeno
      */
 
     @Override
     @Transactional
     public void addAllergen(String userId, String allergenId) {
         User user = userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
-        Allergen allergen = allergenRepository.findById(allergenId).orElseThrow(() -> new NotFoundException("AlAAaAaAaaAAaAAasAArgeno no encontrado"));
+        Allergen allergen = allergenRepository.findById(allergenId).orElseThrow(() -> new NotFoundException("Alergeno no encontrado"));
         user.addAllergen(allergen);
         userRepository.save(user);
     }
     /**
-     * Asocia varios alérgenos al usuario, evitando duplicados.
+     * Asocia varios alergenos al usuario, evitando duplicados.
      * @param userId identificador del usuario
-     * @param allergenIds lista de identificadores de alérgeno
+     * @param allergenIds lista de identificadores de alergeno
      */
 
     @Override
@@ -155,9 +155,9 @@ public class UserServiceImpl implements IUserService {
         }
     }
     /**
-     * Elimina un alérgeno de la lista de un usuario.
+     * Elimina un alergeno de la lista de un usuario.
      * @param userId identificador del usuario
-     * @param allergenId identificador del alérgeno
+     * @param allergenId identificador del alergeno
      */
 
     @Override
@@ -168,9 +168,9 @@ public class UserServiceImpl implements IUserService {
         userRepository.save(user);
     }
     /**
-     * Elimina varios alérgenos de la lista del usuario.
+     * Elimina varios alergenos de la lista del usuario.
      * @param userId identificador del usuario
-     * @param allergenIds lista de identificadores de alérgeno
+     * @param allergenIds lista de identificadores de alergeno
      */
 
     @Override
@@ -187,9 +187,9 @@ public class UserServiceImpl implements IUserService {
         }
     }
     /**
-     * Sustituye la lista completa de alérgenos de un usuario.
+     * Sustituye la lista completa de alergenos de un usuario.
      * @param userId identificador del usuario
-     * @param allergenIds nueva lista de identificadores de alérgeno
+     * @param allergenIds nueva lista de identificadores de alergeno
      */
 
     @Override
@@ -204,9 +204,9 @@ public class UserServiceImpl implements IUserService {
         addAllergensBulk(userId, allergenIds);
     }
     /**
-     * Devuelve los alérgenos configurados para un usuario.
+     * Devuelve los alergenos configurados para un usuario.
      * @param userId identificador del usuario
-     * @return lista de alérgenos asociados
+     * @return lista de alergenos asociados
      */
 
     @Override

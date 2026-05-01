@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 /**
- * Caso de uso para listar items de la nevera filtrados por categoría.
+ * Caso de uso para listar items de la nevera filtrados por categoria.
  */
 public class ListMyFridgeItemsByCategoryUseCase {
 
@@ -19,7 +19,7 @@ public class ListMyFridgeItemsByCategoryUseCase {
      * Constructor con servicios de contexto autenticado e inventario.
      *
      * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
-     * @param fridgeItemService servicio de consulta de inventario por categoría
+     * @param fridgeItemService servicio de consulta de inventario por categoria
      */
 
     public ListMyFridgeItemsByCategoryUseCase(
@@ -30,11 +30,11 @@ public class ListMyFridgeItemsByCategoryUseCase {
         this.fridgeItemService = fridgeItemService;
     }
     /**
-     * Devuelve los items de la nevera del usuario para una categoría concreta.
+     * Devuelve los items de la nevera del usuario para una categoria concreta.
      *
      * @param principal identificador del usuario autenticado
-     * @param categoryId identificador de la categoría de producto
-     * @return lista de items pertenecientes a la categoría
+     * @param categoryId identificador de la categoria de producto
+     * @return lista de items pertenecientes a la categoria
      */
 
     @Transactional(readOnly = true)

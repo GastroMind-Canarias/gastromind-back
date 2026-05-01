@@ -9,7 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 /**
  * Caso de uso para eliminar la nevera del hogar autenticado.
- * Solo usuarios con rol OWNER pueden ejecutar esta operación.
+ * Solo usuarios con rol OWNER pueden ejecutar esta operaciAn.
  */
 public class DeleteMyFridgeUseCase {
 

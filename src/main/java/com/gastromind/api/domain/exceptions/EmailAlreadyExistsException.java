@@ -1,7 +1,7 @@
 package com.gastromind.api.domain.exceptions;
 
 /**
- * Excepción de dominio cuando el email ya está registrado.
+ * ExcepciAn de dominio cuando el email ya estA registrado.
  */
 public class EmailAlreadyExistsException extends RuntimeException {
     /**

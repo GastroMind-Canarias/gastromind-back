@@ -197,7 +197,7 @@ class TicketServiceImplTest {
         when(unitRepository.findFirstByNameIgnoreCase("Unidades")).thenReturn(Optional.of(defaultUd));
 
         TicketItem line = new TicketItem();
-        line.setLineProductName("Yogur sin catálogo");
+        line.setLineProductName("Yogur sin catalogo");
         line.setQuantity(BigDecimal.ONE);
         line.setUnit(null);
 
@@ -208,7 +208,7 @@ class TicketServiceImplTest {
 
         Ticket saved = service.create(t);
 
-        assertEquals("Yogur sin catálogo", line.getLineProductName());
+        assertEquals("Yogur sin catalogo", line.getLineProductName());
         assertEquals(defaultUd, line.getUnit());
         verify(usualPurchaseTicketSyncService).syncAfterTicketCreated(saved);
     }

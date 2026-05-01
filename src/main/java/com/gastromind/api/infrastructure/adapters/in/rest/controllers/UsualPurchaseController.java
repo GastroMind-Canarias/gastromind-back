@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/usual-purchases")
-@Tag(name = "Producto mAAaAaAaaAAaAAasAAs comprado", description = "GestiAAaAaAaaAAaAAasAAn de los registros de producto mAAaAaAaaAAaAAasAAs comprado de un usuario.")
+@Tag(name = "Producto mas comprado", description = "Gestion de los registros de producto mas comprado de un usuario.")
 /**
  * Controlador REST para operaciones de usual purchase.
  */
@@ -72,8 +72,8 @@ public class UsualPurchaseController {
     }
 
     @Operation(summary = "Sugerencias inteligentes (hogar)", description = """
-            Productos comprados repetidamente segAAaAaAaaAAaAAasAAn tickets de todos los miembros del hogar; \
-            compara con stock en nevera. target puede venir de compra manual o de la mediana histAAaAaAaaAAaAAasAArica.\
+            Productos comprados repetidamente segun tickets de todos los miembros del hogar; \
+            compara con stock en nevera. target puede venir de compra manual o de la mediana historica.\
             """)
     /**
      * Realiza list suggestions.

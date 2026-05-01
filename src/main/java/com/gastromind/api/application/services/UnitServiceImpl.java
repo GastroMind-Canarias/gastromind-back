@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 /**
- * Servicio de aplicación para gestionar unidades de medida.
+ * Servicio de aplicacion para gestionar unidades de medida.
  */
 public class UnitServiceImpl implements IUnitService {
 

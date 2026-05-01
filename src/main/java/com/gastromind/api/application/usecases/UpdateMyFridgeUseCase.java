@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 /**
  * Caso de uso para actualizar los datos de la nevera del hogar autenticado.
- * Solo permite la operación a usuarios con rol OWNER.
+ * Solo permite la operaciAn a usuarios con rol OWNER.
  */
 public class UpdateMyFridgeUseCase {
 

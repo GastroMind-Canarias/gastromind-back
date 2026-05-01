@@ -18,11 +18,11 @@ public class UpdateMyFridgeItemUseCase {
     private final FridgeItemRepository fridgeItemRepository;
     private final FridgeItemServiceImpl fridgeItemService;
     /**
-     * Constructor con dependencias de validación y actualización de items.
+     * Constructor con dependencias de validaciAn y actualizaciAn de items.
      *
      * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
      * @param fridgeItemRepository repositorio de items de nevera
-     * @param fridgeItemService servicio de actualización de items
+     * @param fridgeItemService servicio de actualizaciAn de items
      */
 
     public UpdateMyFridgeItemUseCase(

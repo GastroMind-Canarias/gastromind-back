@@ -17,7 +17,7 @@ import java.util.List;
 
 @Service
 /**
- * Servicio de aplicación para gestionar los productos almacenados en nevera.
+ * Servicio de aplicacion para gestionar los productos almacenados en nevera.
  */
 public class FridgeItemServiceImpl implements IFridgeItemService {
 
@@ -26,7 +26,7 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
     private final FridgeRepository fridgeRepository;
     /**
      * Crea el servicio con sus repositorios de inventario, producto y nevera.
-     * @param repository repositorio de ítems de nevera
+     * @param repository repositorio de items de nevera
      * @param productRepository repositorio de productos
      * @param fridgeRepository repositorio de neveras
      */
@@ -38,8 +38,8 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
         this.fridgeRepository = fridgeRepository;
     }
     /**
-     * Devuelve todos los ítems de nevera registrados.
-     * @return listado completo de ítems
+     * Devuelve todos los items de nevera registrados.
+     * @return listado completo de items
      */
 
     @Override
@@ -47,10 +47,10 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
         return repository.findAll();
     }
     /**
-     * Busca un ítem de nevera por su identificador.
-     * @param id identificador del ítem
-     * @return ítem encontrado
-     * @throws NotFoundException si el ítem no existe
+     * Busca un item de nevera por su identificador.
+     * @param id identificador del item
+     * @return item encontrado
+     * @throws NotFoundException si el item no existe
      */
 
     @Override
@@ -59,9 +59,9 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
                 .orElseThrow(() -> new NotFoundException("Item de nevera no encontrado"));
     }
     /**
-     * Lista los ítems asociados a una nevera concreta.
+     * Lista los items asociados a una nevera concreta.
      * @param fridgeId identificador de la nevera
-     * @return ítems de la nevera indicada
+     * @return items de la nevera indicada
      */
 
     @Override
@@ -69,9 +69,9 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
         return repository.findByFridgeId(fridgeId);
     }
     /**
-     * Registra un nuevo ítem de nevera.
-     * @param fridgeItem datos del ítem a registrar
-     * @return ítem persistido
+     * Registra un nuevo item de nevera.
+     * @param fridgeItem datos del item a registrar
+     * @return item persistido
      */
 
     @Override
@@ -80,13 +80,13 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
         return repository.save(fridgeItem);
     }
     /**
-     * Añade a la nevera un ítem vinculado a un producto del catálogo.
+     * Anade a la nevera un item vinculado a un producto del catalogo.
      * @param fridgeId identificador de la nevera
-     * @param productId identificador del producto de catálogo
+     * @param productId identificador del producto de catalogo
      * @param quantity cantidad del producto
      * @param expirationDate fecha de caducidad, si se conoce
-     * @param initialStatus estado inicial del ítem
-     * @return ítem creado en inventario
+     * @param initialStatus estado inicial del item
+     * @return item creado en inventario
      * @throws NotFoundException si la nevera o el producto no existen
      */
 
@@ -108,13 +108,13 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
         return repository.save(newItem);
     }
     /**
-     * Añade a la nevera un ítem libre identificado solo por etiqueta.
+     * Anade a la nevera un item libre identificado solo por etiqueta.
      * @param fridgeId identificador de la nevera
      * @param productLabel etiqueta del producto introducida por el usuario
      * @param quantity cantidad del producto
      * @param expirationDate fecha de caducidad, si se conoce
-     * @param initialStatus estado inicial del ítem
-     * @return ítem creado en inventario
+     * @param initialStatus estado inicial del item
+     * @return item creado en inventario
      */
 
     @Override
@@ -137,10 +137,10 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
         return repository.save(newItem);
     }
     /**
-     * Descuenta parcialmente la cantidad de un ítem de nevera.
-     * @param itemId identificador del ítem
+     * Descuenta parcialmente la cantidad de un item de nevera.
+     * @param itemId identificador del item
      * @param quantityToConsume cantidad a consumir
-     * @return ítem actualizado o marcado como consumido cuando llega a cero
+     * @return item actualizado o marcado como consumido cuando llega a cero
      */
 
     @Override
@@ -159,8 +159,8 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
         return repository.save(item);
     }
     /**
-     * Marca un ítem como consumido eliminándolo del inventario activo.
-     * @param itemId identificador del ítem
+     * Marca un item como consumido eliminandolo del inventario activo.
+     * @param itemId identificador del item
      */
 
     @Override
@@ -169,10 +169,10 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
         delete(itemId);
     }
     /**
-     * Recupera ítems que caducan antes del umbral indicado.
+     * Recupera items que caducan antes del umbral indicado.
      * @param fridgeId identificador de la nevera
-     * @param daysThreshold número de días de horizonte
-     * @return ítems próximos a caducar
+     * @param daysThreshold numero de dias de horizonte
+     * @return items proximos a caducar
      */
 
     @Override
@@ -181,10 +181,10 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
         return repository.findExpiringItems(fridgeId, thresholdDate);
     }
     /**
-     * Lista el inventario de una nevera filtrado por categoría.
+     * Lista el inventario de una nevera filtrado por categoria.
      * @param fridgeId identificador de la nevera
-     * @param categoryId identificador de categoría
-     * @return ítems de la categoría indicada
+     * @param categoryId identificador de categoria
+     * @return items de la categoria indicada
      */
 
     @Override
@@ -192,10 +192,10 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
         return repository.findByFridgeIdAndCategoryId(fridgeId, categoryId);
     }
     /**
-     * Define un ítem de nevera existente.
-     * @param id identificador del ítem
-     * @param fridgeItem nuevos datos del ítem
-     * @return ítem actualizado
+     * Define un item de nevera existente.
+     * @param id identificador del item
+     * @param fridgeItem nuevos datos del item
+     * @return item actualizado
      */
 
     @Override
@@ -206,8 +206,8 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
         return repository.save(fridgeItem);
     }
     /**
-     * Elimina un ítem de nevera por su identificador.
-     * @param id identificador del ítem
+     * Elimina un item de nevera por su identificador.
+     * @param id identificador del item
      */
 
     @Override

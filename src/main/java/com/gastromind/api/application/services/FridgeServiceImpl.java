@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 /**
- * Servicio de aplicación para gestionar neveras.
+ * Servicio de aplicacion para gestionar neveras.
  */
 public class FridgeServiceImpl implements IFridgeService {
 

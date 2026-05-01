@@ -11,10 +11,10 @@ public final class UsualPurchaseQuantityMath {
     private UsualPurchaseQuantityMath() {
     }
     /**
-     * Convierte una cantidad observada a la unidad canónica de cálculo.
+     * Convierte una cantidad observada a la unidad canAnica de calculo.
      * @param quantityRaw cantidad original detectada
-     * @param canonicalUnitCode código canónico de unidad
-     * @return cantidad normalizada para cálculos de compra habitual
+     * @param canonicalUnitCode cAdigo canAnico de unidad
+     * @return cantidad normalizada para calculos de compra habitual
      */
 
     public static BigDecimal toCanonicalAmount(BigDecimal quantityRaw, String canonicalUnitCode) {
@@ -29,9 +29,9 @@ public final class UsualPurchaseQuantityMath {
         };
     }
     /**
-     * Devuelve la unidad de presentación asociada a una unidad canónica.
-     * @param canonicalUnitCode código canónico de unidad
-     * @return unidad de presentación ({@code kg}, {@code l} o {@code ud})
+     * Devuelve la unidad de presentaciAn asociada a una unidad canAnica.
+     * @param canonicalUnitCode cAdigo canAnico de unidad
+     * @return unidad de presentaciAn ({@code kg}, {@code l} o {@code ud})
      */
 
     public static String presentationUnit(String canonicalUnitCode) {
@@ -43,7 +43,7 @@ public final class UsualPurchaseQuantityMath {
         };
     }
     /**
-     * Calcula la mediana de una colección de cantidades.
+     * Calcula la mediana de una coleccion de cantidades.
      * @param values valores sobre los que calcular la mediana
      * @return mediana redondeada a cuatro decimales
      */

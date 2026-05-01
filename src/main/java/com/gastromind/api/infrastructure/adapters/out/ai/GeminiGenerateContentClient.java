@@ -54,7 +54,9 @@ public class GeminiGenerateContentClient {
             } catch (RestClientException e) {
                 boolean hasAnotherModel = i < models.size() - 1;
                 if (hasAnotherModel && GeminiRetryPolicy.shouldTryNextModel(e)) {
-                    log.warn("Gemini model '{}' failed ({}), trying fallback model", model, e.getMessage());
+                    String nextModel = models.get(i + 1);
+                    log.warn("Gemini model '{}' failed ({}), trying fallback model '{}'",
+                            model, e.getMessage(), nextModel);
                     lastRetryable = e;
                     continue;
                 }

@@ -101,11 +101,11 @@ class FridgeItemServiceImplTest {
             return i;
         });
 
-        FridgeItem out = service.addLabeledItemToFridge("fr-1", "  Yogur sin catálogo  ", BigDecimal.ONE, null,
+        FridgeItem out = service.addLabeledItemToFridge("fr-1", "  Yogur sin catalogo  ", BigDecimal.ONE, null,
                 ItemStatus.GOOD);
 
         assertEquals("fr-1", out.getFridgeId());
-        assertEquals("Yogur sin catálogo", out.getProductLabel());
+        assertEquals("Yogur sin catalogo", out.getProductLabel());
         assertEquals(ItemStatus.GOOD, out.getStatus());
     }
 

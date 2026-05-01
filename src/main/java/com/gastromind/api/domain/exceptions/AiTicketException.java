@@ -1,7 +1,7 @@
 package com.gastromind.api.domain.exceptions;
 
 /**
- * Excepción de dominio en extracción de tickets con IA.
+ * ExcepciAn de dominio en extracciAn de tickets con IA.
  */
 public class AiTicketException extends RuntimeException {
     /**

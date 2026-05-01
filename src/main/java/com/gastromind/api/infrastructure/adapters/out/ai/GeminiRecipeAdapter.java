@@ -85,7 +85,7 @@ public class GeminiRecipeAdapter implements RecipeAiPort {
             gen.put("responseMimeType", "application/json");
             return objectMapper.writeValueAsString(root);
         } catch (Exception e) {
-            throw new AiRecipeException("Error construyendo peticiAAaAaAaaAAaAAasAAn a Gemini", e);
+            throw new AiRecipeException("Error construyendo peticion a Gemini", e);
         }
     }
 
@@ -100,11 +100,11 @@ public class GeminiRecipeAdapter implements RecipeAiPort {
                 ? "ninguno indicado"
                 : String.join(", ", ctx.allergenNamesToAvoid());
         String appliances = ctx.availableAppliances().isEmpty()
-                ? "ninguno especAAaAaAaaAAaAAasAAfico (elige el electrodomAAaAaAaaAAaAAasAAstico mAAaAaAaaAAaAAasAAs razonable)"
+                ? "ninguno especifico (elige el electrodomastico mas razonable)"
                 : ctx.availableAppliances().stream().map(Enum::name).collect(Collectors.joining(", "));
 
         return """
-                Eres un chef asistente. Debes responder SOLO con un JSON vAAaAaAaaAAaAAasAAlido (sin markdown ni texto fuera del JSON) con exactamente estas claves y tipos:
+                Eres un chef asistente. Debes responder SOLO con un JSON valido (sin markdown ni texto fuera del JSON) con exactamente estas claves y tipos:
                 {
                   "title": string,
                   "instructions": string (pasos numerados o claros),
@@ -114,22 +114,22 @@ public class GeminiRecipeAdapter implements RecipeAiPort {
                   "difficulty": string (exactamente uno de: EASY, MEDIUM, HARD),
                   "ingredients_used": array de { "product_id": string (uuid del inventario), "quantity_used": number }
                 }
-                Inventario del hogar (cantidades numAAaAaAaaAAaAAasAAricas en las mismas unidades que la nevera; NO puedes usar mAAaAaAaaAAaAAasAAs de quantity_available por product_id):
+                Inventario del hogar (cantidades numericas en las mismas unidades que la nevera; NO puedes usar mas de quantity_available por product_id):
                 %s
                 Reglas:
                 - Una sola receta.
                 - Solo puedes incluir en ingredients_used product_id que aparezcan en el inventario anterior.
-                - Para cada producto usado, quantity_used debe ser > 0 y AAaAasAAAAAAAAaAAAAasAAAAaAAasAA quantity_available del inventario.
-                - Si el inventario estAAaAaAaaAAaAAasAA vacAAaAaAaaAAaAAasAAo, ingredients_used puede ser [] y sugiere una receta muy sencilla con ingredientes habituales (sin inventario estructurado).
+                - Para cada producto usado, quantity_used debe ser > 0 y etc quantity_available del inventario.
+                - Si el inventario esta vacio, ingredients_used puede ser [] y sugiere una receta muy sencilla con ingredientes habituales (sin inventario estructurado).
                 - Raciones objetivo (comensales): %d
-                - Evita completamente alAAaAaAaaAAaAAasAArgenos o ingredientes que contengan: %s
+                - Evita completamente alergenos o ingredientes que contengan: %s
                 - Prioriza utensilios disponibles en el hogar: %s; el campo appliance_needed debe ser uno de la lista permitida y coherente con la receta.
                 """.formatted(stockBlock, ctx.servings(), allergens, appliances);
     }
 
     private String buildStockBlock(List<RecipeStockLine> stock) throws java.io.IOException {
         if (stock == null || stock.isEmpty()) {
-            return "(vacAAaAaAaaAAaAAasAAo AAaAasAAAAAAAAasAAAAasAAAAAAAAaAAAAasAA no hay lAAaAaAaaAAaAAasAAneas en nevera con cantidad disponible)";
+            return "(vacio si no hay lineas en nevera con cantidad disponible)";
         }
         ArrayNode arr = objectMapper.createArrayNode();
         for (RecipeStockLine line : stock) {

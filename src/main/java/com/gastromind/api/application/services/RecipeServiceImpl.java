@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 /**
- * Servicio de aplicación para gestionar recetas.
+ * Servicio de aplicacion para gestionar recetas.
  */
 public class RecipeServiceImpl implements IRecipeService {
 

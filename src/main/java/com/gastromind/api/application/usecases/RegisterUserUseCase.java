@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 /**
  * Caso de uso responsable de registrar un usuario y vincularlo a un hogar.
- * Permite unirse a un hogar existente mediante invitación o crear uno nuevo.
+ * Permite unirse a un hogar existente mediante invitaciAn o crear uno nuevo.
  */
 public class RegisterUserUseCase {
 
@@ -27,10 +27,10 @@ public class RegisterUserUseCase {
     /**
      * Constructor con las dependencias necesarias para el flujo de alta de usuario.
      *
-     * @param householdService servicio de gestión de hogares
-     * @param userService servicio de gestión de usuarios
-     * @param allergenService servicio de consulta de alérgenos
-     * @param passwordEncoder componente para cifrar la contraseña
+     * @param householdService servicio de gestiAn de hogares
+     * @param userService servicio de gestiAn de usuarios
+     * @param allergenService servicio de consulta de alergenos
+     * @param passwordEncoder componente para cifrar la contraseAa
      */
 
     public RegisterUserUseCase(
@@ -44,7 +44,7 @@ public class RegisterUserUseCase {
         this.passwordEncoder = passwordEncoder;
     }
     /**
-     * Registra al usuario según el modo de alta indicado en la solicitud.
+     * Registra al usuario segAn el modo de alta indicado en la solicitud.
      *
      * @param request datos de registro, incluyendo datos personales y de hogar
      * @throws IllegalArgumentException si faltan datos obligatorios o el modo de alta es inconsistente

@@ -30,7 +30,7 @@ public record TicketMeRequest(
         @PastOrPresent(message = "La fecha no puede ser futura")
         LocalDate purchaseDate,
 
-        @Schema(description = "LAAneas del ticket (opcional; vacAAo = solo cabecera)")
+        @Schema(description = "Lineas del ticket (opcional; vacio = solo cabecera)")
         List<@Valid TicketItemRequest> items
 ) {}
 

@@ -48,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        // DEBUG 1: AAaAAAasAAAAAaAAasAALlega el header?
+        // DEBUG 1: Llega el header
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -62,7 +62,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-                // AquAAaAaAaaAAaAAasAA suele fallar: si el nombre no coincide exacto con la DB
+                // Aqui suele fallar: si el nombre no coincide exacto con la DB
                 UserDetails user = userDetailsService.loadUserByUsername(username);
                 System.out.println("DEBUG: Usuario encontrado en DB -> " + user.getUsername());
                 System.out.println("DEBUG: Autoridades -> " + user.getAuthorities());
@@ -75,9 +75,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(auth);
-                    System.out.println("DEBUG: AAaAAAasAAAAAaAAasAAAutenticaciAAaAaAaaAAaAAasAAn establecida con AAaAaAaaAAaAAasAAxito!");
+                    System.out.println("DEBUG: Autenticacion establecida con exito!");
                 } else {
-                    System.out.println("DEBUG: El token no es vAAaAaAaaAAaAAasAAlido para este usuario");
+                    System.out.println("DEBUG: El token no es valido para este usuario");
                 }
             }
         } catch (Exception e) {

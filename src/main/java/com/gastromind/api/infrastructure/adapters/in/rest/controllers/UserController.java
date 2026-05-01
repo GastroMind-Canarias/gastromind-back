@@ -30,7 +30,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
-@Tag(name = "Usuario", description = "GestiAAaAaAaaAAaAAasAAn de los perfiles de usuario en el sistema.")
+@Tag(name = "Usuario", description = "Gestion de los perfiles de usuario en el sistema.")
 /**
  * Controlador REST para operaciones de user.
  */
@@ -53,7 +53,7 @@ public class UserController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Obtener mi perfil", description = "Devuelve la informaciAAaAaAaaAAaAAasAAn del usuario autenticado basAAaAaAaaAAaAAasAAndose en el token JWT.")
+    @Operation(summary = "Obtener mi perfil", description = "Devuelve la informacion del usuario autenticado basandose en el token JWT.")
     @ApiStandardDoc
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getMyProfile(Authentication authentication) {
@@ -85,7 +85,7 @@ public class UserController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Actualizar mi perfil", description = "Permite al usuario modificar su nombre, email y alAAaAaAaaAAaAAasAArgenos.")
+    @Operation(summary = "Actualizar mi perfil", description = "Permite al usuario modificar su nombre, email y alergenos.")
     @ApiStandardDoc
     @PatchMapping("/me/profile")
     public ResponseEntity<UserResponse> updateMyProfile(Authentication authentication, @Valid @RequestBody UserRequest request) {
@@ -101,7 +101,7 @@ public class UserController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Editar mis preferencias", description = "Reemplaza en una sola operaciAAaAaAaaAAaAAasAAn los alAAaAaAaaAAaAAasAArgenos del usuario y utensilios del hogar.")
+    @Operation(summary = "Editar mis preferencias", description = "Reemplaza en una sola operacion los alergenos del usuario y utensilios del hogar.")
     @ApiStandardDoc
     @PatchMapping("/me/preferences")
     public ResponseEntity<UserResponse> updateMyPreferences(
@@ -116,7 +116,7 @@ public class UserController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Listar mis alAAaAaAaaAAaAAasAArgenos")
+    @Operation(summary = "Listar mis alergenos")
     @ApiStandardDoc
     @GetMapping("/me/allergens")
     public ResponseEntity<List<AllergenResponse>> listMyAllergens(Authentication authentication) {
@@ -131,7 +131,7 @@ public class UserController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "AAAaAaAaaAAaAAasAAadir un alAAaAaAaaAAaAAasAArgeno a mi perfil")
+    @Operation(summary = "Anadir un alergeno a mi perfil")
     @ApiPostDoc
     @PostMapping("/me/allergens")
     public ResponseEntity<Void> addMyAllergen(
@@ -148,7 +148,7 @@ public class UserController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "AAAaAaAaaAAaAAasAAadir varios alAAaAaAaaAAaAAasAArgenos a mi perfil")
+    @Operation(summary = "Anadir varios alergenos a mi perfil")
     @ApiPostDoc
     @PostMapping("/me/allergens/batch")
     public ResponseEntity<Void> addMyAllergensBatch(
@@ -165,7 +165,7 @@ public class UserController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Sustituir todos mis alAAaAaAaaAAaAAasAArgenos por el listado indicado")
+    @Operation(summary = "Sustituir todos mis alergenos por el listado indicado")
     @ApiStandardDoc
     @PutMapping("/me/allergens")
     public ResponseEntity<Void> replaceMyAllergens(
@@ -182,7 +182,7 @@ public class UserController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Quitar un alAAaAaAaaAAaAAasAArgeno de mi perfil")
+    @Operation(summary = "Quitar un alergeno de mi perfil")
     @ApiStandardDoc
     @DeleteMapping("/me/allergens/{allergenId}")
     public ResponseEntity<Void> removeMyAllergen(
@@ -199,7 +199,7 @@ public class UserController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Quitar varios alAAaAaAaaAAaAAasAArgenos de mi perfil")
+    @Operation(summary = "Quitar varios alergenos de mi perfil")
     @ApiStandardDoc
     @DeleteMapping("/me/allergens/batch")
     public ResponseEntity<Void> removeMyAllergensBatch(

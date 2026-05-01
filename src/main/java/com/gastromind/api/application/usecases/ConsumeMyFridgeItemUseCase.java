@@ -21,7 +21,7 @@ public class ConsumeMyFridgeItemUseCase {
     private final FridgeItemRepository fridgeItemRepository;
     private final FridgeItemServiceImpl fridgeItemService;
     /**
-     * Constructor con dependencias para validación de pertenencia y consumo.
+     * Constructor con dependencias para validaciAn de pertenencia y consumo.
      *
      * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
      * @param fridgeItemRepository repositorio de items de nevera

@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/households")
-@Tag(name = "Recetas IA", description = "Sugerencias de receta segAAaAaAaaAAaAAasAAn nevera, alAAaAaAaaAAaAAasAArgenos y electrodomAAaAaAaaAAaAAasAAsticos del hogar.")
+@Tag(name = "Recetas IA", description = "Sugerencias de receta segun nevera, alergenos y electrodomesticos del hogar.")
 /**
  * Controlador REST para operaciones de recipe suggestion.
  */
@@ -59,9 +59,9 @@ public class RecipeSuggestionController {
     }
 
     @Operation(summary = "Sugerir una receta con IA (contexto del hogar)", description = """
-            Genera **una** receta usando Gemini con productos de la nevera, alAAaAaAaaAAaAAasAArgenos agregados de los miembros,
-            electrodomAAaAaAaaAAaAAasAAsticos del hogar y raciones: o las indicadas en el cuerpo o, si no, el nAAaAaAaaAAaAAasAAmero de miembros.
-            La sugerencia se guarda en Redis (~10 dAAaAaAaaAAaAAasAAas) hasta guardarla como favorita.""")
+            Genera **una** receta usando Gemini con productos de la nevera, alergenos agregados de los miembros,
+            electrodomesticos del hogar y raciones: o las indicadas en el cuerpo o, si no, el numero de miembros.
+            La sugerencia se guarda en Redis (~10 dias) hasta guardarla como favorita.""")
     /**
      * Realiza suggest.
      * @param authentication usuario autenticado.
@@ -85,9 +85,9 @@ public class RecipeSuggestionController {
         return ResponseEntity.ok(new SuggestRecipeResponse(result.suggestionId(), recipeResponse));
     }
 
-    @Operation(summary = "Recuperar una sugerencia guardada en cachAAaAaAaaAAaAAasAA", description = """
-            Devuelve la misma forma que POST /suggestions si la clave sigue en Redis (TTL ~10 dAAaAaAaaAAaAAasAAas)
-            y coincide hogar + usuario. AAaAaAaaAAaAAasAAtil si el front guarda solo suggestionId (p. ej. en la URL) y recarga la pAAaAaAaaAAaAAasAAgina.""")
+    @Operation(summary = "Recuperar una sugerencia guardada en cache", description = """
+            Devuelve la misma forma que POST /suggestions si la clave sigue en Redis (TTL ~10 dias)
+            y coincide hogar + usuario. Util si el front guarda solo suggestionId (p. ej. en la URL) y recarga la pagina.""")
     /**
      * Devuelve recipe suggestion por suggestion.
      * @param authentication usuario autenticado.

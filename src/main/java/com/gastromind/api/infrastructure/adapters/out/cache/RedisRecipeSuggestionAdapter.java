@@ -12,14 +12,14 @@ import java.util.UUID;
 
 @Component
 /**
- * Adaptador de caché en Redis para sugerencias de receta por usuario y hogar.
+ * Adaptador de cachA en Redis para sugerencias de receta por usuario y hogar.
  */
 public class RedisRecipeSuggestionAdapter implements RecipeSuggestionCachePort {
 
     private final StringRedisTemplate redis;
     private final ObjectMapper objectMapper;
     private final RecipeSuggestionCacheProperties properties;
-    /** Configura el acceso a Redis y la serialización de sugerencias. */
+    /** Configura el acceso a Redis y la serializaciAn de sugerencias. */
 
     public RedisRecipeSuggestionAdapter(
             StringRedisTemplate stringRedisTemplate,
@@ -29,7 +29,7 @@ public class RedisRecipeSuggestionAdapter implements RecipeSuggestionCachePort {
         this.objectMapper = objectMapper;
         this.properties = properties;
     }
-    /** Guarda una sugerencia y devuelve su identificador público. */
+    /** Guarda una sugerencia y devuelve su identificador pAblico. */
 
     @Override
     public String save(String householdId, String userId, Recipe recipe) {
@@ -41,7 +41,7 @@ public class RedisRecipeSuggestionAdapter implements RecipeSuggestionCachePort {
                     Duration.ofDays(Math.max(1, properties.getTtlDays())));
             return id;
         } catch (Exception e) {
-            throw new IllegalStateException("No se pudo guardar la sugerencia en cachAAaAaAaaAAaAAasAA", e);
+            throw new IllegalStateException("No se pudo guardar la sugerencia en cache", e);
         }
     }
     /** Recupera una sugerencia si pertenece al usuario y hogar solicitados. */

@@ -1,7 +1,7 @@
 package com.gastromind.api.domain.models;
 
 /**
- * Modelo de dominio para un producto del catálogo.
+ * Modelo de dominio para un producto del catalogo.
  */
 public class Product {
     String id;

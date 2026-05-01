@@ -23,7 +23,7 @@ public class MarkMyFridgeItemConsumedUseCase {
      *
      * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
      * @param fridgeItemRepository repositorio de items de nevera
-     * @param fridgeItemService servicio de actualización de estado de consumo
+     * @param fridgeItemService servicio de actualizaciAn de estado de consumo
      */
 
     public MarkMyFridgeItemConsumedUseCase(

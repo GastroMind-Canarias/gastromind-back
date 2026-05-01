@@ -34,7 +34,7 @@ import java.util.Set;
 
 @RestController
 @RequestMapping("/api/v1/tickets")
-@Tag(name = "Ticket", description = "GestiAAaAaAaaAAaAAasAAn de tickets de compra y registros de transacciones.")
+@Tag(name = "Ticket", description = "Gestion de tickets de compra y registros de transacciones.")
 /**
  * Controlador REST para operaciones de ticket.
  */
@@ -134,8 +134,8 @@ public class TicketController {
     }
 
     @Operation(summary = "Importar ticket desde imagen (usuario autenticado)",
-            description = "Extrae lAAaAaAaaAAaAAasAAneas e importes con Gemini y crea el ticket para el usuario actual. "
-                    + "ParAAaAaAaaAAaAAasAAmetro opcional store_id.")
+            description = "Extrae lineas e importes con Gemini y crea el ticket para el usuario actual. "
+                    + "Parametro opcional store_id.")
     /**
      * Realiza import from image.
      * @param authentication usuario autenticado.
@@ -149,7 +149,7 @@ public class TicketController {
     public ResponseEntity<TicketResponse> importFromImage(
             Authentication authentication,
             @RequestPart("file") MultipartFile file,
-            @Parameter(description = "Tienda (opcional si el ticket muestra nombre y existe en catAAaAaAaaAAaAAasAAlogo)")
+            @Parameter(description = "Tienda (opcional si el ticket muestra nombre y existe en catalogo)")
             @RequestParam(value = "store_id", required = false) String storeId) {
         User user = getCurrentUser(authentication);
         if (file == null || file.isEmpty()) {
@@ -157,7 +157,7 @@ public class TicketController {
         }
         if (file.getSize() > ticketImageProperties.getMaxImageBytes()) {
             throw new IllegalArgumentException(
-                    "La imagen supera el tamaAAaAaAaaAAaAAasAAo mAAaAaAaaAAaAAasAAximo permitido (" + ticketImageProperties.getMaxImageBytes() + " bytes)");
+                    "La imagen supera el tamano maximo permitido (" + ticketImageProperties.getMaxImageBytes() + " bytes)");
         }
         String contentType = file.getContentType();
         if (contentType == null || !ALLOWED_IMAGE_TYPES.contains(contentType.toLowerCase(Locale.ROOT))) {
@@ -178,7 +178,7 @@ public class TicketController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Crear ticket (solo ADMIN)", description = "Registra un ticket con user_id explAAaAaAaaAAaAAasAAcito en el cuerpo.")
+    @Operation(summary = "Crear ticket (solo ADMIN)", description = "Registra un ticket con user_id explicito en el cuerpo.")
     @ApiPostDoc
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")

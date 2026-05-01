@@ -17,7 +17,7 @@ public class UsualPurchaseProperties {
     private double recencyHalfLifeDays = 30.0;
 
     private double ticketSyncBlendWeight = 0.35;
-    /** Días de historial que se tienen en cuenta para el cálculo. */
+    /** Dias de historial que se tienen en cuenta para el calculo. */
 
     public int getHistoryDays() {
         return historyDays;
@@ -27,17 +27,17 @@ public class UsualPurchaseProperties {
     public void setHistoryDays(int historyDays) {
         this.historyDays = historyDays;
     }
-    /** Número mínimo de tickets distintos para generar sugerencias fiables. */
+    /** Numero minimo de tickets distintos para generar sugerencias fiables. */
 
     public int getMinDistinctTickets() {
         return minDistinctTickets;
     }
-    /** Define el umbral mínimo de tickets distintos. */
+    /** Define el umbral minimo de tickets distintos. */
 
     public void setMinDistinctTickets(int minDistinctTickets) {
         this.minDistinctTickets = minDistinctTickets;
     }
-    /** Proporción que marca cuándo un producto se considera con poco stock. */
+    /** Proporcion que marca cuando un producto se considera con poco stock. */
 
     public double getLowStockFraction() {
         return lowStockFraction;
@@ -47,7 +47,7 @@ public class UsualPurchaseProperties {
     public void setLowStockFraction(double lowStockFraction) {
         this.lowStockFraction = lowStockFraction;
     }
-    /** Semivida en días para ponderar la recencia de compras anteriores. */
+    /** Semivida en dias para ponderar la recencia de compras anteriores. */
 
     public double getRecencyHalfLifeDays() {
         return recencyHalfLifeDays;
@@ -62,7 +62,7 @@ public class UsualPurchaseProperties {
     public double getTicketSyncBlendWeight() {
         return ticketSyncBlendWeight;
     }
-    /** Define el peso de sincronización con tickets. */
+    /** Define el peso de sincronizacion con tickets. */
 
     public void setTicketSyncBlendWeight(double ticketSyncBlendWeight) {
         this.ticketSyncBlendWeight = ticketSyncBlendWeight;

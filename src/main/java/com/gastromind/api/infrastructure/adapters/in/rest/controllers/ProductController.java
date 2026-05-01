@@ -21,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/products")
-@Tag(name = "Producto", description = "Gestión del catálogo de productos disponibles.")
+@Tag(name = "Producto", description = "Gestion del catalogo de productos disponibles.")
 /**
  * Controlador REST para gestionar productos.
  */
@@ -35,7 +35,7 @@ public class ProductController {
     /**
      * Lista todos los productos.
      *
-     * @return colección de productos
+     * @return coleccion de productos
      */
 
     @Operation(summary = "Obtener todos los productos", description = "Devuelve una lista completa de todos los productos registrados.")

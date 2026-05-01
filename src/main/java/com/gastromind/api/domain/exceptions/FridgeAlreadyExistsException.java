@@ -1,7 +1,7 @@
 package com.gastromind.api.domain.exceptions;
 
 /**
- * Excepción de dominio cuando el hogar ya tiene nevera.
+ * ExcepciAn de dominio cuando el hogar ya tiene nevera.
  */
 public class FridgeAlreadyExistsException extends RuntimeException {
     /**

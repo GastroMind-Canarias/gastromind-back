@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Service
 /**
  * Caso de uso que genera sugerencias de compra habitual para un hogar.
- * Calcula cantidades objetivo a partir del histórico de tickets y del stock actual en nevera.
+ * Calcula cantidades objetivo a partir del historico de tickets y del stock actual en nevera.
  */
 public class ListUsualPurchaseSuggestionsUseCase {
 
@@ -44,11 +44,11 @@ public class ListUsualPurchaseSuggestionsUseCase {
      * Constructor con los servicios y repositorios necesarios para calcular sugerencias.
      *
      * @param resolveHouseholdContext resolvedor de contexto autenticado del hogar
-     * @param ticketHistory repositorio de líneas históricas de tickets
+     * @param ticketHistory repositorio de lAneas histAricas de tickets
      * @param fridgeRepository repositorio de neveras por hogar
      * @param fridgeItemService servicio de inventario de nevera
      * @param usualPurchaseRepository repositorio de objetivos manuales de compra habitual
-     * @param properties configuración de umbrales y ventanas de cálculo
+     * @param properties configuracion de umbrales y ventanas de calculo
      */
 
     public ListUsualPurchaseSuggestionsUseCase(
@@ -82,7 +82,7 @@ public class ListUsualPurchaseSuggestionsUseCase {
      *
      * @param principal identificador del usuario autenticado
      * @param lowStockOnly indica si se filtran solo productos con bajo stock
-     * @param historyDaysOverride días de histórico a considerar; si es nulo o inválido, se usa la configuración
+     * @param historyDaysOverride dias de historico a considerar; si es nulo o invalido, se usa la configuracion
      * @return lista de sugerencias de compra habitual
      */
 
@@ -151,7 +151,9 @@ public class ListUsualPurchaseSuggestionsUseCase {
         Map<String, BigDecimal> fridgeByProduct = aggregateFridgeStockByProduct(householdId);
 
         int minTickets = Math.max(1, properties.getMinDistinctTickets());
-        double halfLife = properties.getRecencyHalfLifeDays() > 0 ? properties.getRecencyHalfLifeDays() : 30.0;
+        double halfLife = properties.getRecencyHalfLifeDays() > 0
+                ? properties.getRecencyHalfLifeDays()
+                : 30.0;
         double lowFrac = properties.getLowStockFraction();
 
         List<UsualPurchaseSuggestion> out = new ArrayList<>();

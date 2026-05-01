@@ -10,7 +10,7 @@ import java.util.List;
 
 @Service
 /**
- * Servicio de aplicación para gestionar productos del catálogo.
+ * Servicio de aplicacion para gestionar productos del catalogo.
  */
 public class ProductServiceImpl implements IProductService {
 

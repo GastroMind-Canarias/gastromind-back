@@ -34,7 +34,7 @@ import java.util.Optional;
 @Service
 /**
  * Caso de uso que importa un ticket desde una imagen y lo persiste en el sistema.
- * Además, proyecta sus líneas al inventario de nevera del hogar cuando corresponde.
+ * Ademas, proyecta sus lineas al inventario de nevera del hogar cuando corresponde.
  */
 public class ImportTicketFromImageUseCase {
 
@@ -49,14 +49,14 @@ public class ImportTicketFromImageUseCase {
     /**
      * Constructor con las dependencias necesarias para extraer, normalizar y guardar tickets.
      *
-     * @param extraction puerto de extracción OCR/IA de tickets
-     * @param productRepository repositorio de productos del catálogo
-     * @param unitResolver resolvedor de unidades detectadas en líneas del ticket
+     * @param extraction puerto de extraccion OCR/IA de tickets
+     * @param productRepository repositorio de productos del catalogo
+     * @param unitResolver resolvedor de unidades detectadas en lineas del ticket
      * @param ticketService servicio de persistencia de tickets
      * @param userRepository repositorio de usuarios
      * @param storeRepository repositorio de tiendas
      * @param fridgeRepository repositorio de neveras
-     * @param fridgeItemService servicio para añadir líneas de ticket a nevera
+     * @param fridgeItemService servicio para anadir lineas de ticket a nevera
      */
 
     public ImportTicketFromImageUseCase(
@@ -78,15 +78,15 @@ public class ImportTicketFromImageUseCase {
         this.fridgeItemService = fridgeItemService;
     }
     /**
-     * Procesa la imagen del ticket y devuelve el ticket persistido con sus líneas.
+     * Procesa la imagen del ticket y devuelve el ticket persistido con sus lineas.
      *
      * @param imageBytes contenido binario de la imagen
      * @param mimeType tipo MIME de la imagen
      * @param userId identificador del usuario propietario del ticket
-     * @param storeIdOrNull identificador de tienda opcional; si es nulo, se intenta resolver por nombre extraído
+     * @param storeIdOrNull identificador de tienda opcional; si es nulo, se intenta resolver por nombre extraido
      * @return ticket guardado en base de datos
      * @throws NotFoundException si el usuario o la tienda indicada no existen
-     * @throws IllegalArgumentException si faltan datos mínimos para resolver productos o tienda
+     * @throws IllegalArgumentException si faltan datos minimos para resolver productos o tienda
      */
 
     @Transactional
@@ -219,11 +219,11 @@ public class ImportTicketFromImageUseCase {
         if (!name.isEmpty()) {
             return storeRepository.findFirstByNameIgnoreCase(name)
                     .orElseThrow(() -> new IllegalArgumentException(
-                            "No se indicAAaAaAaaAAaAAasAA store_id y no hay tienda en catAAaAaAaaAAaAAasAAlogo con nombre: " + name
-                                    + ". Cree la tienda o envAAaAaAaaAAaAAasAAe store_id."));
+                            "No se indico store_id y no hay tienda en catalogo con nombre: " + name
+                                    + ". Cree la tienda o enviese store_id."));
         }
         throw new IllegalArgumentException(
-                "No se indicAAaAaAaaAAaAAasAA store_id y el ticket no muestra un nombre de tienda reconocible. EnvAAaAaAaaAAaAAasAAe store_id.");
+                "No se indico store_id y el ticket no muestra un nombre de tienda reconocible. Enviese store_id.");
     }
 
     private static float sumLineTotals(List<TicketItem> items) {

@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @Service
 /**
- * Servicio de aplicación para gestionar compras habituales de usuario.
+ * Servicio de aplicacion para gestionar compras habituales de usuario.
  */
 public class UsualPurchaseServiceImpl implements IUsualPurchaseService {
 
@@ -54,7 +54,7 @@ public class UsualPurchaseServiceImpl implements IUsualPurchaseService {
 
     @Override
     public UsualPurchase findById(String id) {
-        return repository.findById(id).orElseThrow(()-> new NotFoundException("Producto mAAaAaAaaAAaAAasAAs comprado no encontrado"));
+        return repository.findById(id).orElseThrow(()-> new NotFoundException("Producto mas comprado no encontrado"));
     }
     /**
      * Busca un registro y valida que pertenezca al usuario indicado.

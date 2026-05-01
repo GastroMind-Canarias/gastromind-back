@@ -11,7 +11,7 @@ import java.util.List;
 
 @Service
 /**
- * Servicio de aplicación para gestionar recetas favoritas de usuario.
+ * Servicio de aplicacion para gestionar recetas favoritas de usuario.
  */
 public class UserFavoritesServiceImpl implements IUserFavoritesService {
 

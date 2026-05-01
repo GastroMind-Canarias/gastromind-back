@@ -20,14 +20,14 @@ import org.springframework.web.server.ResponseStatusException;
 @CrossOrigin
 @Tag(name = "Autenticacion", description = "Servicios para el acceso de usuarios, registro y gestion de tokens JWT.")
 /**
- * Controlador de autenticación para login y alta de usuarios.
+ * Controlador de autenticacion para login y alta de usuarios.
  */
 public class AuthController {
 
     private final IAuthService authService;
     private final RegisterUserUseCase registerUserUseCase;
     private final IJwtService jwtService;
-    /** Inyecta los servicios necesarios para autenticación y registro. */
+    /** Inyecta los servicios necesarios para autenticacion y registro. */
 
     public AuthController(IAuthService authService, RegisterUserUseCase registerUserUseCase, IJwtService jwtService) {
         this.authService = authService;
@@ -36,7 +36,7 @@ public class AuthController {
     }
     /** Autentica credenciales y devuelve un JWT listo para usar. */
 
-    @Operation(summary = "Iniciar sesiAAaAaAaaAAaAAasAAn", description = "Autentica a un usuario y devuelve un token JWT valido.")
+    @Operation(summary = "Iniciar sesion", description = "Autentica a un usuario y devuelve un token JWT valido.")
     @ApiPostDoc
     @PostMapping("/login")
     public ResponseEntity<TokenResponse> login(@Valid @RequestBody LoginRequest req) {
@@ -56,8 +56,8 @@ public class AuthController {
             description = """
                     Crea la cuenta y vincula el hogar de una de dos formas:
                     - **Crear hogar**: `householdMode=CREATE_NEW` (o sin token) + `householdName`; el usuario queda como OWNER. Opcional: `applianceTypes`.
-                    - **Unirse a un hogar**: `householdMode=JOIN_EXISTING` (o solo `inviteToken`) + cAAaAaAaaAAaAAasAAdigo de invitaciAAaAaAaaAAaAAasAAn; el usuario queda como MEMBER. `householdName` y `applianceTypes` no aplican.
-                    El campo `role` del cuerpo, si se envAAaAaAaaAAaAAasAAa, no determina el rol final (lo fija el servidor)."""
+                    - **Unirse a un hogar**: `householdMode=JOIN_EXISTING` (o solo `inviteToken`) + codigo de invitacion; el usuario queda como MEMBER. `householdName` y `applianceTypes` no aplican.
+                    El campo `role` del cuerpo, si se envia, no determina el rol final (lo fija el servidor)."""
     )
     /** Registra un usuario nuevo y lo vincula al hogar indicado. */
     @ApiPostDoc

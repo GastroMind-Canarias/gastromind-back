@@ -1,7 +1,7 @@
 package com.gastromind.api.domain.exceptions;
 
 /**
- * Excepción de dominio cuando no hay permisos suficientes.
+ * ExcepciAn de dominio cuando no hay permisos suficientes.
  */
 public class ForbiddenException extends RuntimeException {
      /**

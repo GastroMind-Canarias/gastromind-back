@@ -1,7 +1,7 @@
 package com.gastromind.api.domain.exceptions;
 
 /**
- * Excepción de dominio por error al procesar imágenes.
+ * ExcepciAn de dominio por error al procesar imAgenes.
  */
 public class ImageProcessingException extends RuntimeException {
     /**

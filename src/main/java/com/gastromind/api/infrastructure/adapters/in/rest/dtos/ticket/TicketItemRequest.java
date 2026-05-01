@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
 
-@Schema(description = "LAAnea de ticket asociada a un producto del catAAlogo")
+@Schema(description = "Linea de ticket asociada a un producto del catalogo")
 /**
  * Representa ticket item request dentro del dominio de la aplicacion.
  */
@@ -14,7 +14,7 @@ public record TicketItemRequest(
         @Schema(example = "550e8400-e29b-41d4-a716-446655440000")
         String product_id,
 
-        @Schema(description = "Nombre libre del producto cuando no existe en catAAlogo", example = "Pan chapata")
+        @Schema(description = "Nombre libre del producto cuando no existe en catalogo", example = "Pan chapata")
         String line_product_name,
 
         @Schema(example = "2")
@@ -33,7 +33,7 @@ public record TicketItemRequest(
         @Schema(description = "Opcional: PENDING_REVIEW | OK. Por defecto OK.", example = "OK")
         String verification_status,
 
-        @Schema(description = "Opcional: nota de incidencias en la lAAnea")
+        @Schema(description = "Opcional: nota de incidencias en la linea")
         String line_note
 ) {
 }

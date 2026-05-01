@@ -33,7 +33,7 @@ class CategoryServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        existing = new Category("cat-1", "Lácteos");
+        existing = new Category("cat-1", "LActeos");
     }
 
     @Test
@@ -72,8 +72,8 @@ class CategoryServiceImplTest {
     @Test
     void update_loadsExisting_setsIdAndSaves() {
         when(repository.findById("cat-1")).thenReturn(Optional.of(existing));
-        Category patch = new Category(null, "Lácteos actualizado");
-        Category saved = new Category("cat-1", "Lácteos actualizado");
+        Category patch = new Category(null, "LActeos actualizado");
+        Category saved = new Category("cat-1", "LActeos actualizado");
         when(repository.save(any(Category.class))).thenReturn(saved);
 
         Category result = categoryService.update("cat-1", patch);

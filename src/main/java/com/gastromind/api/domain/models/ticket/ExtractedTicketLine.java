@@ -3,7 +3,7 @@ package com.gastromind.api.domain.models.ticket;
 import java.math.BigDecimal;
 
 /**
- * Línea detectada durante la extracción automática de tickets.
+ * LAnea detectada durante la extracciAn automAtica de tickets.
  */
 public record ExtractedTicketLine(
         String productName,

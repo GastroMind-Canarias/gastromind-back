@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 /**
  * Caso de uso que persiste una receta sugerida y la guarda en favoritos del usuario.
- * Tras guardarla, elimina la sugerencia de la caché temporal.
+ * Tras guardarla, elimina la sugerencia de la cachA temporal.
  */
 public class SaveSuggestedRecipeAsFavoriteUseCase {
 
@@ -25,7 +25,7 @@ public class SaveSuggestedRecipeAsFavoriteUseCase {
     /**
      * Constructor con dependencias para materializar sugerencias en favoritos.
      *
-     * @param suggestionCache caché de sugerencias de receta
+     * @param suggestionCache cachA de sugerencias de receta
      * @param recipeService servicio de persistencia de recetas
      * @param userFavoritesService servicio de favoritos de usuario
      * @param recipeIngredientWritePort puerto de escritura de ingredientes de receta
@@ -42,12 +42,12 @@ public class SaveSuggestedRecipeAsFavoriteUseCase {
         this.recipeIngredientWritePort = recipeIngredientWritePort;
     }
     /**
-     * Guarda una sugerencia como receta definitiva y la añade a favoritos.
+     * Guarda una sugerencia como receta definitiva y la aAade a favoritos.
      *
-     * @param suggestionId identificador de la sugerencia en caché
+     * @param suggestionId identificador de la sugerencia en cachA
      * @param householdId identificador del hogar asociado
      * @param userId identificador del usuario propietario de la sugerencia
-     * @param currentUser usuario que recibirá el favorito
+     * @param currentUser usuario que recibirA el favorito
      * @return registro de favorito creado
      * @throws NotFoundException si la sugerencia no existe o ha expirado
      */

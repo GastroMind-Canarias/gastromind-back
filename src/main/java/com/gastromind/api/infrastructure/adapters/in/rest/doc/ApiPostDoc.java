@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
 @ApiSecurityAndGlobalErrors 
 @ApiResponses({
     @ApiResponse(responseCode = "201", description = "Recurso creado correctamente"),
-    @ApiResponse(responseCode = "400", description = "Solicitud inválida")
+    @ApiResponse(responseCode = "400", description = "Solicitud invAlida")
 })
 public @interface ApiPostDoc {}
 

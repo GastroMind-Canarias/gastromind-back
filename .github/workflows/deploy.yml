@@ -8,7 +8,7 @@ jobs:
   build-and-push:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout del código
+      - name: Checkout del codigo
         uses: actions/checkout@v4
 
       - name: Configurar JDK 21
@@ -18,7 +18,7 @@ jobs:
           distribution: 'temurin'
           cache: 'maven'
 
-      - name: Tests y cobertura (JaCoCo ≥ 85% en bundle completo)
+      - name: Tests y cobertura (JaCoCo >= 85% en bundle completo)
         run: mvn -B verify "-Djacoco.minimum.covered.ratio=0.85"
 
       - name: Determinar el Tag de la imagen
@@ -41,5 +41,5 @@ jobs:
         with:
           context: .
           push: true
-          # Aquí usa tu usuario de Docker Hub y el nombre del repo
+          # Aqui usa tu usuario de Docker Hub y el nombre del repo
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/gastromind-api:${{ env.TAG }}

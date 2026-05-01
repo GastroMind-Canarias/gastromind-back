@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 @Service
 /**
  * Caso de uso que solicita una receta sugerida a partir del contexto del hogar.
- * Reúne stock disponible, alérgenos y electrodomésticos antes de invocar el puerto de IA.
+ * Reune stock disponible, alergenos y electrodomesticos antes de invocar el puerto de IA.
  */
 public class SuggestRecipeFromHouseholdUseCase {
 
@@ -44,8 +44,8 @@ public class SuggestRecipeFromHouseholdUseCase {
      * @param houseHoldService servicio de hogares
      * @param fridgeRepository repositorio de neveras
      * @param fridgeItemService servicio de items de nevera
-     * @param recipeAiPort puerto de generación de recetas
-     * @param suggestionCache caché de sugerencias generadas
+     * @param recipeAiPort puerto de generaciAn de recetas
+     * @param suggestionCache cachA de sugerencias generadas
      */
 
     public SuggestRecipeFromHouseholdUseCase(
@@ -61,11 +61,11 @@ public class SuggestRecipeFromHouseholdUseCase {
         this.suggestionCache = suggestionCache;
     }
     /**
-     * Genera una sugerencia de receta para el hogar indicado y la guarda en caché.
+     * Genera una sugerencia de receta para el hogar indicado y la guarda en cachA.
      *
      * @param householdId identificador del hogar
      * @param userId identificador del usuario que solicita la sugerencia
-     * @param servings raciones deseadas; si es nulo o inválido, se ajusta al tamaño del hogar
+     * @param servings raciones deseadas; si es nulo o invalido, se ajusta al tamaAo del hogar
      * @return receta propuesta junto con su identificador de sugerencia
      */
 

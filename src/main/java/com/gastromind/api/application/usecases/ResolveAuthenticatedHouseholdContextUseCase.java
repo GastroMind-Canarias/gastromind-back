@@ -34,7 +34,7 @@ public class ResolveAuthenticatedHouseholdContextUseCase {
      *
      * @param principal nombre de usuario o correo autenticado
      * @return contexto autenticado con usuario, hogar y nevera
-     * @throws ForbiddenException si el principal no es válido o el usuario no pertenece a un hogar
+     * @throws ForbiddenException si el principal no es vAlido o el usuario no pertenece a un hogar
      * @throws NotFoundException si el hogar no tiene nevera asociada
      */
 
@@ -51,7 +51,7 @@ public class ResolveAuthenticatedHouseholdContextUseCase {
      *
      * @param principal nombre de usuario o correo autenticado
      * @return contexto autenticado con usuario y hogar, sin nevera
-     * @throws ForbiddenException si el principal no es válido o el usuario no pertenece a un hogar
+     * @throws ForbiddenException si el principal no es vAlido o el usuario no pertenece a un hogar
      */
 
     @Transactional(readOnly = true)

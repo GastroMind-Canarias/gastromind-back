@@ -24,8 +24,7 @@ public interface TicketItemJpaRepository extends JpaRepository<TicketItemEntity,
             LEFT JOIN tu.household th
             WHERE t.purchaseDate >= :since
             AND (
-              (t.household IS NOT NULL AND t.household.id = :householdId)
-              OR (t.household IS NULL AND th IS NOT NULL AND th.id = :householdId)
+              (t.household IS NOT NULL AND t.household.id = :householdId) OR (t.household IS NULL AND th IS NOT NULL AND th.id = :householdId)
             )
             """)
     List<TicketItemEntity> findForHouseholdSince(

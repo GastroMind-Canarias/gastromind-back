@@ -59,7 +59,7 @@ public class RecipeIngredientWriteAdapter implements RecipeIngredientWritePort {
         UnitEntity unit = unitJpaRepository.findByName(DEFAULT_UNIT_NAME)
                 .or(() -> unitJpaRepository.findFirstByNameOrderByIdAsc(DEFAULT_UNIT_NAME))
                 .orElseGet(() -> unitJpaRepository.findAll().stream().findFirst()
-                        .orElseThrow(() -> new IllegalStateException("No hay unidades en catAAaAaAaaAAaAAasAAlogo")));
+                        .orElseThrow(() -> new IllegalStateException("No hay unidades en catalogo")));
         RecipeEntity recipeRef = entityManager.getReference(RecipeEntity.class, recipeId);
         for (RecipeIngredientUsage u : usages) {
             if (u.getProductId() == null || u.getProductId().isBlank()) {

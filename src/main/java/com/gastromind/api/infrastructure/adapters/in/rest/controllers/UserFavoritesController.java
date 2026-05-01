@@ -60,7 +60,7 @@ public class UserFavoritesController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Listar todos los favoritos (solo ADMIN)", description = "Lista global de enlaces usuarioAAaAasAAAAAAAAasAAAAasAAAAAAAAaAAAAaAaAreceta.")
+    @Operation(summary = "Listar todos los favoritos (solo ADMIN)", description = "Lista global de enlaces usuario-receta.")
     @ApiStandardDoc
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -101,8 +101,8 @@ public class UserFavoritesController {
     }
 
     @Operation(summary = "Guardar sugerencia de IA como favorita", description = """
-            Persiste la receta generada por IA (clave temporal en Redis) en el catAAaAaAaaAAaAAasAAlogo y la asocia al usuario actual.
-            La sugerencia debe seguir vigente (TTL ~10 dAAaAaAaaAAaAAasAAas) y pertenecer al mismo usuario/hogar.""")
+            Persiste la receta generada por IA (clave temporal en Redis) en el catalogo y la asocia al usuario actual.
+            La sugerencia debe seguir vigente (TTL ~10 dias) y pertenecer al mismo usuario/hogar.""")
     /**
      * Realiza save from suggestion.
      * @param authentication usuario autenticado.
@@ -131,7 +131,7 @@ public class UserFavoritesController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "AAAaAaAaaAAaAAasAAadir receta a mis favoritos", description = "Asocia la receta al usuario autenticado.")
+    @Operation(summary = "Anadir receta a mis favoritos", description = "Asocia la receta al usuario autenticado.")
     @ApiPostDoc
     @PostMapping("/me")
     @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")

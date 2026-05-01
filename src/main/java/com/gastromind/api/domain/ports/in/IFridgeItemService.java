@@ -6,7 +6,7 @@ import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.e
 import java.util.List;
 
 /**
- * Define las operaciones de negocio para ítems de nevera.
+ * Define las operaciones de negocio para items de nevera.
  */
 public interface IFridgeItemService {
     List<FridgeItem> findAll();

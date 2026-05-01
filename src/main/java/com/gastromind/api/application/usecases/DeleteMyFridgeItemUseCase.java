@@ -11,7 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 /**
  * Caso de uso para eliminar un item de la nevera del usuario autenticado.
- * Incluye validación de pertenencia del item al hogar.
+ * Incluye validaciAn de pertenencia del item al hogar.
  */
 public class DeleteMyFridgeItemUseCase {
 
@@ -23,7 +23,7 @@ public class DeleteMyFridgeItemUseCase {
      *
      * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
      * @param fridgeItemRepository repositorio de items de nevera
-     * @param fridgeItemService servicio de eliminación de items
+     * @param fridgeItemService servicio de eliminaciAn de items
      */
 
     public DeleteMyFridgeItemUseCase(

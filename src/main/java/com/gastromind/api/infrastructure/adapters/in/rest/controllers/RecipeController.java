@@ -21,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/recipes")
-@Tag(name = "Receta", description = "Gestión del catálogo de recetas culinarias.")
+@Tag(name = "Receta", description = "Gestion del catalogo de recetas culinarias.")
 /**
  * Controlador REST para gestionar recetas.
  */
@@ -35,7 +35,7 @@ public class RecipeController {
     /**
      * Lista todas las recetas.
      *
-     * @return colección de recetas
+     * @return coleccion de recetas
      */
 
     @Operation(summary = "Obtener todas las recetas", description = "Devuelve una lista completa de todas las recetas registradas.")

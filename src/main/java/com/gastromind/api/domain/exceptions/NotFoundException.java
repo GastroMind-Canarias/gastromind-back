@@ -1,7 +1,7 @@
 package com.gastromind.api.domain.exceptions;
 
 /**
- * Excepción de dominio cuando un recurso no existe.
+ * ExcepciAn de dominio cuando un recurso no existe.
  */
 public class NotFoundException extends RuntimeException {
     /**

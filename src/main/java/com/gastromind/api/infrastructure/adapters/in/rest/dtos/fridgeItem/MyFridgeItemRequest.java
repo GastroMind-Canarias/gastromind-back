@@ -9,7 +9,7 @@ import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Schema(description = "Alta o ediciAAn de AAtem en la nevera del usuario (sin fridgeId)")
+@Schema(description = "Alta o edicion de item en la nevera del usuario (sin fridgeId)")
 /**
  * Representa my fridge item request dentro del dominio de la aplicacion.
  */
@@ -26,7 +26,7 @@ public record MyFridgeItemRequest(
         @Schema(description = "Fecha de caducidad estimada (opcional si el producto no caduca)", example = "2026-12-31")
         LocalDate expirationDate,
 
-        @Schema(description = "Estado del AAtem en nevera", example = "GOOD")
+        @Schema(description = "Estado del item en nevera", example = "GOOD")
         @NotNull(message = "El estado es obligatorio")
         ItemStatus status
 ) {

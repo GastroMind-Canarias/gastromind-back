@@ -1,7 +1,7 @@
 package com.gastromind.api.domain.models;
 
 /**
- * Modelo de dominio para un alérgeno alimentario.
+ * Modelo de dominio para un alergeno alimentario.
  */
 public class Allergen {
     String id;

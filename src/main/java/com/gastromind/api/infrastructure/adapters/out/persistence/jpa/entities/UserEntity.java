@@ -53,7 +53,7 @@ public class UserEntity {
     @ManyToMany
     @JoinTable(name = "user_favorites", joinColumns = @JoinColumn(name = "user_id"), inverseJoinColumns = @JoinColumn(name = "recipe_id"))
     private Set<RecipeEntity> favoriteRecipes;
-    /** Constructor vacío requerido por JPA. */
+    /** Constructor vacio requerido por JPA. */
 
     public UserEntity() {
     }

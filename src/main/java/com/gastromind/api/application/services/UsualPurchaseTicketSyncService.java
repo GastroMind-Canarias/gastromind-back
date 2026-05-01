@@ -22,9 +22,9 @@ public class UsualPurchaseTicketSyncService {
     private final UsualPurchaseRepository usualPurchaseRepository;
     private final UsualPurchaseProperties properties;
     /**
-     * Crea el servicio con sus dependencias de persistencia y configuración.
+     * Crea el servicio con sus dependencias de persistencia y configuracion.
      * @param usualPurchaseRepository repositorio de compras habituales
-     * @param properties propiedades de ajuste del algoritmo de sincronización
+     * @param properties propiedades de ajuste del algoritmo de sincronizaciAn
      */
 
     public UsualPurchaseTicketSyncService(
@@ -34,8 +34,8 @@ public class UsualPurchaseTicketSyncService {
         this.properties = properties;
     }
     /**
-     * Define sugerencias de compra habitual a partir de un ticket recién creado.
-     * @param ticket ticket sobre el que se calculará la sincronización
+     * Define sugerencias de compra habitual a partir de un ticket reciAn creado.
+     * @param ticket ticket sobre el que se calcularA la sincronizaciAn
      */
 
     public void syncAfterTicketCreated(Ticket ticket) {

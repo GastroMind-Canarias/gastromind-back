@@ -8,7 +8,7 @@ import java.util.Set;
 @Entity
 @Table(name = "product")
 /**
- * Entidad JPA para persistir productos del catálogo.
+ * Entidad JPA para persistir productos del catalogo.
  */
 public class ProductEntity {
 
@@ -50,7 +50,7 @@ public class ProductEntity {
 
     @OneToMany(mappedBy = "product")
     private List<RecipeIngredientEntity> recipeIngredients;
-    /** Constructor vacío requerido por JPA. */
+    /** Constructor vacio requerido por JPA. */
 
     public ProductEntity() {
     }

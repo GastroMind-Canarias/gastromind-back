@@ -15,14 +15,14 @@ import java.util.Date;
 
 @Service
 /**
- * Servicio de utilidades JWT para emisión y validación de tokens.
+ * Servicio de utilidades JWT para emisiAn y validaciAn de tokens.
  */
 public class JwtService implements IJwtService {
 
     private final SecretKey key;
     private final long expirationMinutes;
     /**
-     * Inicializa la firma criptográfica y la expiración configurada para los tokens.
+     * Inicializa la firma criptogrAfica y la expiraciAn configurada para los tokens.
      */
 
     public JwtService(
@@ -52,7 +52,7 @@ public class JwtService implements IJwtService {
     public String extractUsername(String token) {
         return parseClaims(token).getSubject();
     }
-    /** Valida que el token corresponda al usuario y no esté expirado. */
+    /** Valida que el token corresponda al usuario y no estA expirado. */
 
     @Override
     public boolean isTokenValid(String token, UserDetails userDetails) {
@@ -66,7 +66,7 @@ public class JwtService implements IJwtService {
             return false;
         }
     }
-    /** Comprueba si el token es estructuralmente válido y vigente. */
+    /** Comprueba si el token es estructuralmente vAlido y vigente. */
 
     @Override
     public boolean isValid(String token) {

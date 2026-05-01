@@ -8,7 +8,7 @@ import java.util.Locale;
 
 @Service
 /**
- * Traduce unidades detectadas por IA a unidades canónicas del sistema.
+ * Traduce unidades detectadas por IA a unidades canAnicas del sistema.
  */
 public class TicketQuantityUnitResolver {
 
@@ -22,8 +22,8 @@ public class TicketQuantityUnitResolver {
         this.unitRepository = unitRepository;
     }
     /**
-     * Resuelve un código de unidad devuelto por IA a una unidad persistida.
-     * @param rawCode código de unidad recibido (por ejemplo, g, kg, ud)
+     * Resuelve un cAdigo de unidad devuelto por IA a una unidad persistida.
+     * @param rawCode cAdigo de unidad recibido (por ejemplo, g, kg, ud)
      * @return unidad de medida equivalente en base de datos
      * @throws IllegalStateException si no existe la unidad semilla {@code Unidades}
      */
@@ -47,9 +47,9 @@ public class TicketQuantityUnitResolver {
                                 "No hay unidad semilla 'Unidades' en la tabla unit. Ejecute data.sql o cree unidades.")));
     }
     /**
-     * Convierte una unidad de base de datos a su código canónico corto.
+     * Convierte una unidad de base de datos a su cAdigo canAnico corto.
      * @param unit unidad de medida
-     * @return código canónico ({@code g}, {@code kg}, {@code ml}, {@code l} o {@code ud})
+     * @return cAdigo canAnico ({@code g}, {@code kg}, {@code ml}, {@code l} o {@code ud})
      */
 
     public static String canonicalCode(Unit unit) {
@@ -75,9 +75,9 @@ public class TicketQuantityUnitResolver {
         return "ud";
     }
     /**
-     * Convierte el nombre de una unidad de base de datos a código canónico.
+     * Convierte el nombre de una unidad de base de datos a cAdigo canAnico.
      * @param unitName nombre de unidad almacenado en base de datos
-     * @return código canónico ({@code g}, {@code kg}, {@code ml}, {@code l} o {@code ud})
+     * @return cAdigo canAnico ({@code g}, {@code kg}, {@code ml}, {@code l} o {@code ud})
      */
 
     public static String canonicalCodeFromDbUnitName(String unitName) {

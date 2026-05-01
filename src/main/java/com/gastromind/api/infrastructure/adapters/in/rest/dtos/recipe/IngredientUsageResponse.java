@@ -9,7 +9,7 @@ import java.math.BigDecimal;
  * Representa ingredient usage response dentro del dominio de la aplicacion.
  */
 public record IngredientUsageResponse(
-        @Schema(description = "Id del producto en catAAlogo")
+        @Schema(description = "Id del producto en catalogo")
         String productId,
         @Schema(description = "Nombre del producto")
         String productName,

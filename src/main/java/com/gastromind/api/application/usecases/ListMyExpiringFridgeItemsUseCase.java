@@ -9,7 +9,7 @@ import java.util.List;
 
 @Service
 /**
- * Caso de uso para listar items próximos a caducar en la nevera del usuario.
+ * Caso de uso para listar items proximos a caducar en la nevera del usuario.
  */
 public class ListMyExpiringFridgeItemsUseCase {
 
@@ -30,11 +30,11 @@ public class ListMyExpiringFridgeItemsUseCase {
         this.fridgeItemService = fridgeItemService;
     }
     /**
-     * Devuelve los items cuya caducidad está dentro del umbral indicado.
+     * Devuelve los items cuya caducidad estA dentro del umbral indicado.
      *
      * @param principal identificador del usuario autenticado
-     * @param days número de días de anticipación para considerar la caducidad
-     * @return lista de items próximos a caducar
+     * @param days nAmero de dias de anticipaciAn para considerar la caducidad
+     * @return lista de items proximos a caducar
      */
 
     @Transactional(readOnly = true)

@@ -18,10 +18,10 @@ public class CreateMyFridgeItemUseCase {
     private final ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase;
     private final FridgeItemServiceImpl fridgeItemService;
     /**
-     * Constructor con dependencias de contexto y gestión de items de nevera.
+     * Constructor con dependencias de contexto y gestion de items de nevera.
      *
      * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
-     * @param fridgeItemService servicio de creación de items de nevera
+     * @param fridgeItemService servicio de creacion de items de nevera
      */
 
     public CreateMyFridgeItemUseCase(
@@ -32,10 +32,10 @@ public class CreateMyFridgeItemUseCase {
         this.fridgeItemService = fridgeItemService;
     }
     /**
-     * Añade un producto al inventario de la nevera del usuario autenticado.
+     * Anade un producto al inventario de la nevera del usuario autenticado.
      *
      * @param principal identificador del usuario autenticado
-     * @param productId identificador del producto a añadir
+     * @param productId identificador del producto a anadir
      * @param quantity cantidad inicial del item
      * @param expirationDate fecha de caducidad opcional
      * @param status estado inicial del item

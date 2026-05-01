@@ -17,7 +17,7 @@ public record UsualPurchaseSuggestionResponse(
         @Schema(example = "Leche entera")
         String product_name,
 
-        @Schema(description = "Cantidad objetivo (kg, l o ud segAAn quantity_unit)")
+        @Schema(description = "Cantidad objetivo (kg, l o ud segun quantity_unit)")
         BigDecimal target_quantity,
 
         @Schema(example = "kg", allowableValues = {"kg", "l", "ud"})
@@ -26,16 +26,16 @@ public record UsualPurchaseSuggestionResponse(
         @Schema(description = "Cantidad agregada actual en la nevera del hogar")
         BigDecimal current_fridge_quantity,
 
-        @Schema(description = "PuntuaciAAn (frecuencia Aa decaimiento por antigAAedad)")
+        @Schema(description = "Puntuacion (frecuencia Aa decaimiento por antiguedad)")
         double score,
 
-        @Schema(description = "NAAmero de tickets distintos con este producto en el periodo")
+        @Schema(description = "Numero de tickets distintos con este producto en el periodo")
         int distinct_ticket_count,
 
-        @Schema(description = "Fecha/hora de la AAltima compra registrada en un ticket")
+        @Schema(description = "Fecha/hora de la Ultima compra registrada en un ticket")
         LocalDateTime last_purchased_at,
 
-        @Schema(description = "True si el stock estAA por debajo del umbral configurado respecto al target")
+        @Schema(description = "True si el stock esta por debajo del umbral configurado respecto al target")
         boolean low_stock
 ) {}
 

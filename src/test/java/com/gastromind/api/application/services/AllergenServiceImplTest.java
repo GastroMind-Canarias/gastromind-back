@@ -53,7 +53,7 @@ class AllergenServiceImplTest {
     void findById_throwsWhenMissing() {
         when(repository.findById("missing")).thenReturn(Optional.empty());
         NotFoundException ex = assertThrows(NotFoundException.class, () -> service.findById("missing"));
-        assertEquals("Alérgeno no encontrado", ex.getMessage());
+        assertEquals("AlArgeno no encontrado", ex.getMessage());
     }
 
     @Test

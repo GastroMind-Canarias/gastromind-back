@@ -10,7 +10,7 @@ import java.util.List;
  * Representa appliance id list request dentro del dominio de la aplicacion.
  */
 public record ApplianceIdListRequest(
-        @NotEmpty @Schema(description = "UUIDs de registros de electrodomAAstico del hogar")
+        @NotEmpty @Schema(description = "UUIDs de registros de electrodomestico del hogar")
         List<String> ids
 ) {
 }

@@ -110,7 +110,7 @@ public class HouseHoldController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "AAAaAaAaaAAaAAasAAadir dispositivo (Solo Admin)")
+    @Operation(summary = "Anadir dispositivo (Solo Admin)")
     @ApiPostDoc
     @PostMapping("/{id}/appliances")
     @PreAuthorize("hasRole('ADMIN')")
@@ -139,7 +139,7 @@ public class HouseHoldController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Generar token de invitaciAAaAaAaaAAaAAasAAn (Solo Admin)")
+    @Operation(summary = "Generar token de invitacion (Solo Admin)")
     @ApiStandardDoc
     @PostMapping("/{id}/invite")
     @PreAuthorize("hasRole('ADMIN')")
@@ -254,7 +254,7 @@ public class HouseHoldController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Generar token de invitaciAAaAaAaaAAaAAasAAn de mi hogar (ADMIN u OWNER del hogar)")
+    @Operation(summary = "Generar token de invitacion de mi hogar (ADMIN u OWNER del hogar)")
     @ApiStandardDoc
     @PostMapping("/me/invite")
     @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
@@ -268,7 +268,7 @@ public class HouseHoldController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Listar electrodomAAaAaAaaAAaAAasAAsticos de mi hogar")
+    @Operation(summary = "Listar electrodomesticos de mi hogar")
     @ApiStandardDoc
     @GetMapping("/me/appliances")
     @PreAuthorize("isAuthenticated()")
@@ -283,7 +283,7 @@ public class HouseHoldController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "AAAaAaAaaAAaAAasAAadir un electrodomAAaAaAaaAAaAAasAAstico a mi hogar (solo OWNER)")
+    @Operation(summary = "Anadir un electrodomestico a mi hogar (solo OWNER)")
     @ApiPostDoc
     @PostMapping("/me/appliances")
     @PreAuthorize("isAuthenticated()")
@@ -303,7 +303,7 @@ public class HouseHoldController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "AAAaAaAaaAAaAAasAAadir varios electrodomAAaAaAaaAAaAAasAAsticos a mi hogar (solo OWNER; ignora tipos ya existentes)")
+    @Operation(summary = "Anadir varios electrodomesticos a mi hogar (solo OWNER; ignora tipos ya existentes)")
     @ApiPostDoc
     @PostMapping("/me/appliances/batch")
     @PreAuthorize("isAuthenticated()")
@@ -325,7 +325,7 @@ public class HouseHoldController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Cambiar el tipo de un electrodomAAaAaAaaAAaAAasAAstico de mi hogar (solo OWNER)")
+    @Operation(summary = "Cambiar el tipo de un electrodomestico de mi hogar (solo OWNER)")
     @ApiStandardDoc
     @PatchMapping("/me/appliances/{applianceRecordId}")
     @PreAuthorize("isAuthenticated()")
@@ -346,7 +346,7 @@ public class HouseHoldController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Eliminar un electrodomAAaAaAaaAAaAAasAAstico de mi hogar por id de fila (solo OWNER)")
+    @Operation(summary = "Eliminar un electrodomestico de mi hogar por id de fila (solo OWNER)")
     @ApiStandardDoc
     @DeleteMapping("/me/appliances/{applianceRecordId}")
     @PreAuthorize("isAuthenticated()")
@@ -366,7 +366,7 @@ public class HouseHoldController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Eliminar varios electrodomAAaAaAaaAAaAAasAAsticos por ids de fila (solo OWNER)")
+    @Operation(summary = "Eliminar varios electrodomesticos por ids de fila (solo OWNER)")
     @ApiStandardDoc
     @DeleteMapping("/me/appliances/batch")
     @PreAuthorize("isAuthenticated()")
@@ -418,7 +418,7 @@ public class HouseHoldController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Unirme a un hogar con cAAaAaAaaAAaAAasAAdigo de invitaciAAaAaAaaAAaAAasAAn")
+    @Operation(summary = "Unirme a un hogar con codigo de invitacion")
     @ApiPostDoc
     @PostMapping("/me/join")
     @PreAuthorize("isAuthenticated()")

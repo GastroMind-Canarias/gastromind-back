@@ -14,7 +14,7 @@ import java.util.List;
 @Service
 /**
  * Caso de uso para actualizar preferencias del usuario autenticado y su hogar.
- * Permite reemplazar alérgenos del usuario y electrodomésticos del hogar.
+ * Permite reemplazar alergenos del usuario y electrodomesticos del hogar.
  */
 public class UpdateMyPreferencesUseCase {
 
@@ -23,8 +23,8 @@ public class UpdateMyPreferencesUseCase {
     /**
      * Constructor con servicios de usuario y hogar.
      *
-     * @param userServiceImpl servicio de gestión de usuarios
-     * @param houseHoldServiceImpl servicio de gestión de hogares
+     * @param userServiceImpl servicio de gestiAn de usuarios
+     * @param houseHoldServiceImpl servicio de gestiAn de hogares
      */
 
     public UpdateMyPreferencesUseCase(UserServiceImpl userServiceImpl, HouseHoldServiceImpl houseHoldServiceImpl) {
@@ -35,10 +35,10 @@ public class UpdateMyPreferencesUseCase {
      * Define las preferencias del usuario autenticado.
      *
      * @param principal identificador del usuario autenticado
-     * @param allergenIds identificadores de alérgenos seleccionados
-     * @param appliances lista de electrodomésticos del hogar
+     * @param allergenIds identificadores de alergenos seleccionados
+     * @param appliances lista de electrodomesticos del hogar
      * @return usuario actualizado tras aplicar cambios
-     * @throws ForbiddenException si el usuario no está autenticado, no pertenece a un hogar o no es OWNER
+     * @throws ForbiddenException si el usuario no estA autenticado, no pertenece a un hogar o no es OWNER
      */
 
     @Transactional

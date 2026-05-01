@@ -20,9 +20,9 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/allergens")
-@Tag(name = "Alérgeno", description = "Gestión del catálogo de alérgenos e intolerancias alimentarias.")
+@Tag(name = "Alergeno", description = "Gestion del catalogo de alergenos e intolerancias alimentarias.")
 /**
- * Controlador REST para consultar y mantener el catálogo de alérgenos.
+ * Controlador REST para consultar y mantener el catalogo de alergenos.
  */
 public class AllergenController {
 
@@ -32,12 +32,12 @@ public class AllergenController {
     @Autowired
     private AllergenRestMapper allergenMapper;
     /**
-     * Lista todos los alérgenos registrados.
+     * Lista todos los alergenos registrados.
      *
-     * @return colección de alérgenos
+     * @return coleccion de alergenos
      */
 
-    @Operation(summary = "Obtener todos los alérgenos", description = "Devuelve la lista completa de alérgenos registrados en el sistema.")
+    @Operation(summary = "Obtener todos los alergenos", description = "Devuelve la lista completa de alergenos registrados en el sistema.")
     @GetMapping
     @ApiStandardDoc
     public ResponseEntity<List<AllergenResponse>> getAll() {
@@ -45,28 +45,28 @@ public class AllergenController {
         return ResponseEntity.ok(allergenMapper.toResponseList(allergens));
     }
     /**
-     * Recupera un alérgeno por su identificador.
+     * Recupera un alergeno por su identificador.
      *
-     * @param id identificador del alérgeno
-     * @return alérgeno encontrado
+     * @param id identificador del alergeno
+     * @return alergeno encontrado
      */
 
-    @Operation(summary = "Buscar alérgeno por ID", description = "Devuelve un alérgeno concreto a partir de su identificador.")
+    @Operation(summary = "Buscar alergeno por ID", description = "Devuelve un alergeno concreto a partir de su identificador.")
     @ApiStandardDoc
     @GetMapping("/{id}")
     public ResponseEntity<AllergenResponse> getById(
-            @Parameter(description = "ID del alérgeno a buscar", example = "1") @PathVariable String id) {
+            @Parameter(description = "ID del alergeno a buscar", example = "1") @PathVariable String id) {
         Allergen allergen = allergenServiceImpl.findById(id);
         return ResponseEntity.ok(allergenMapper.toResponse(allergen));
     }
     /**
-     * Registra un nuevo alérgeno.
+     * Registra un nuevo alergeno.
      *
-     * @param request datos de alta del alérgeno
-     * @return alérgeno creado
+     * @param request datos de alta del alergeno
+     * @return alergeno creado
      */
 
-    @Operation(summary = "Crear nuevo alérgeno", description = "Registra un nuevo alérgeno en el sistema.")
+    @Operation(summary = "Crear nuevo alergeno", description = "Registra un nuevo alergeno en el sistema.")
     @ApiPostDoc
     @PostMapping
     public ResponseEntity<AllergenResponse> create(@Valid @RequestBody AllergenRequest request) {
@@ -75,14 +75,14 @@ public class AllergenController {
         return ResponseEntity.status(HttpStatus.CREATED).body(allergenMapper.toResponse(savedAllergen));
     }
     /**
-     * Define un alérgeno existente.
+     * Define un alergeno existente.
      *
-     * @param id identificador del alérgeno
+     * @param id identificador del alergeno
      * @param request datos actualizados
-     * @return alérgeno actualizado
+     * @return alergeno actualizado
      */
 
-    @Operation(summary = "Actualizar alérgeno", description = "Modifica los datos de un alérgeno existente.")
+    @Operation(summary = "Actualizar alergeno", description = "Modifica los datos de un alergeno existente.")
     @PutMapping("/{id}")
     @ApiStandardDoc
     public ResponseEntity<AllergenResponse> update(@PathVariable String id, @Valid @RequestBody AllergenRequest request) {
@@ -91,13 +91,13 @@ public class AllergenController {
         return ResponseEntity.ok(allergenMapper.toResponse(updatedAllergen));
     }
     /**
-     * Elimina un alérgeno.
+     * Elimina un alergeno.
      *
-     * @param id identificador del alérgeno
+     * @param id identificador del alergeno
      * @return respuesta sin contenido
      */
 
-    @Operation(summary = "Eliminar alérgeno", description = "Elimina un alérgeno de forma permanente.")
+    @Operation(summary = "Eliminar alergeno", description = "Elimina un alergeno de forma permanente.")
     @DeleteMapping("/{id}")
     @ApiStandardDoc
     public ResponseEntity<Void> delete(@PathVariable String id) {

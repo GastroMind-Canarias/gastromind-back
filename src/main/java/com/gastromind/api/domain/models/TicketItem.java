@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.util.Objects;
 
 /**
- * Modelo de dominio para una línea de ticket.
+ * Modelo de dominio para una linea de ticket.
  */
 public class TicketItem {
 

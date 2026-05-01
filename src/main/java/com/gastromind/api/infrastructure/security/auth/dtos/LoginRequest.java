@@ -14,9 +14,9 @@ public record LoginRequest(
         @NotBlank(message = "El nombre de usuario no puede estar vacio")
         String username,
 
-        @Schema(example = "Secret123!", description = "ContraseAAa de acceso")
-        @NotBlank(message = "La contraseAAa es obligatoria")
-        @Size(min = 6, message = "La contraseAAa debe tener al menos 6 caracteres")
+        @Schema(example = "Secret123!", description = "Contrasena de acceso")
+        @NotBlank(message = "La contrasena es obligatoria")
+        @Size(min = 6, message = "La contrasena debe tener al menos 6 caracteres")
         String password
 ) {}
 

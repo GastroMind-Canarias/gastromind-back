@@ -21,7 +21,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/stores")
-@Tag(name = "Tienda", description = "Gestión del catálogo de tiendas y establecimientos.")
+@Tag(name = "Tienda", description = "Gestion del catalogo de tiendas y establecimientos.")
 /**
  * Controlador REST para gestionar tiendas.
  */
@@ -35,7 +35,7 @@ public class StoreController {
     /**
      * Lista todas las tiendas.
      *
-     * @return colección de tiendas
+     * @return coleccion de tiendas
      */
 
     @Operation(summary = "Obtener todas las tiendas", description = "Devuelve una lista completa de todas las tiendas registradas.")

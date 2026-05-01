@@ -79,7 +79,7 @@ public class GeminiTicketExtractionAdapter implements TicketExtractionPort {
     private String buildPrompt() {
         return """
                 Eres un extractor especializado en tickets de SUPERMERCADO para una app de cocina y despensa.
-                Analiza la imagen y responde SOLO con un JSON vAAaAaAaaAAaAAasAAlido (sin markdown ni texto fuera del JSON) con exactamente esta forma:
+                Analiza la imagen y responde SOLO con un JSON valido (sin markdown ni texto fuera del JSON) con exactamente esta forma:
                 {
                   "store_name": string o null,
                   "purchase_date": string o null (YYYY-MM-DD),
@@ -97,33 +97,33 @@ public class GeminiTicketExtractionAdapter implements TicketExtractionPort {
                   ]
                 }
 
-                INCLUSIAAaAaAaaAAAAAAaAAAAaAaAN DE LAAaAaAaaAAaAAasAANEAS (solo alimentaciAAaAaAaaAAaAAasAAn y hogar relacionado con cocina):
-                - Incluye: alimentos, bebidas comestibles, frescos, ultramarinos, congelados, panaderAAaAaAaaAAaAAasAAa, lAAaAaAaaAAaAAasAActeos, aceites COMESTIBLES, etc.
-                - NO incluyas: motor/coche (aceites de motor, limpiacristales coche, parachoquesAAaAasAAAAAAAAasAAAAasAAAAaAAasAA), ferreterAAaAaAaaAAaAAasAAa no alimentaria, bolsas de plAAaAaAaaAAaAAasAAstico de compra solas, pilas, revistas, medicamentos si no es relevante, productos de limpieza no alimentarios salvo que sean claramente para cocina (p. ej. lavavajillas podrAAaAaAaaAAaAAasAAa excluirse si la app es solo comida AAaAasAAAAAAAAasAAAAasAAAAAAAAaAAAAasAA en caso de duda, excluye lo que no sea comestible o ingrediente de cocina).
-                - Si una lAAaAaAaaAAaAAasAAnea no es claramente producto de alimentaciAAaAaAaaAAaAAasAAn/cocina, no la incluyas.
+                INCLUSION DE LINEAS (solo alimentacion y hogar relacionado con cocina):
+                - Incluye: alimentos, bebidas comestibles, frescos, ultramarinos, congelados, panaderia, lacteos, aceites COMESTIBLES, etc.
+                - NO incluyas: motor/coche (aceites de motor, limpiacristales coche, parachoques, etc.), ferreteria no alimentaria, bolsas de plastico de compra solas, pilas, revistas, medicamentos si no es relevante, productos de limpieza no alimentarios salvo que sean claramente para cocina (p. ej. lavavajillas podria excluirse si la app es solo comida si en caso de duda, excluye lo que no sea comestible o ingrediente de cocina).
+                - Si una linea no es claramente producto de alimentacion/cocina, no la incluyas.
 
                 NOMBRES:
-                - Escribe product_name en espaAAaAaAaaAAaAAasAAol correcto, SIN abreviaturas de ticket: expande (ej. "S/GRA" AAaAasAAAAAAAAaAAAAasAAAAAAAAaAAAAAAaAAA "sin grasa", "ATAAaAaAaaAAaAAasAAN" puede quedarse, "PAVO" AAaAasAAAAAAAAaAAAAasAAAAAAAAaAAAAAAaAAA "pavo").
-                - CapitalizaciAAaAaAaaAAaAAasAAn natural (no todo en mayAAaAaAaaAAaAAasAAsculas salvo marcas conocidas).
+                - Escribe product_name en espanol correcto, SIN abreviaturas de ticket: expande (ej. "S/GRA" -> "sin grasa", "ATUN" puede quedarse, "PAVO" -> "pavo").
+                - Capitalizacion natural (no todo en mayusculas salvo marcas conocidas).
 
                 CANTIDAD Y UNIDAD:
                 - quantity_amount y quantity_unit deben reflejar lo COMPRADO, no el precio por peso:
                   - Si el ticket dice 450 g de pechuga, quantity_amount=450 y quantity_unit="g" (no uses 1 ud para peso vendido a granel/precio/kg).
-                  - Si son 2 bricks de leche de 1 L, quantity_amount=2 y quantity_unit="ud" (o si el ticket muestra 2 L total, puedes usar quantity_amount=2 y quantity_unit="l" si es mAAaAaAaaAAaAAasAAs fiel al ticket).
-                  - Para packs "x6" zumos: si es un pack de 6 unidades, quantity_amount=1 y quantity_unit="ud" si se cobra el pack entero, o refleja botellas si el ticket separa lAAaAaAaaAAaAAasAAneas.
+                  - Si son 2 bricks de leche de 1 L, quantity_amount=2 y quantity_unit="ud" (o si el ticket muestra 2 L total, puedes usar quantity_amount=2 y quantity_unit="l" si es mas fiel al ticket).
+                  - Para packs "x6" zumos: si es un pack de 6 unidades, quantity_amount=1 y quantity_unit="ud" si se cobra el pack entero, o refleja botellas si el ticket separa lineas.
                 - quantity_unit solo puede ser: g, kg, ml, l, ud.
 
                 PRECIOS:
-                - unit_price: precio unitario que permita entender la lAAaAaAaaAAaAAasAAnea (tAAaAaAaaAAaAAasAApicamente AAaAasAAAAAAAAaAAAAaAAAAaAAasAA/kg si venden a peso, AAaAasAAAAAAAAaAAAAaAAAAaAAasAA/ud si es unidad). Si no es legible, null.
-                - line_total: importe de la lAAaAaAaaAAaAAasAAnea si aparece.
+                - unit_price: precio unitario que permita entender la linea (tipicamente EUR/kg si venden a peso, EUR/ud si es unidad). Si no es legible, null.
+                - line_total: importe de la linea si aparece.
 
-                REVISIAAaAaAaaAAAAAAaAAAAaAaAN DE LAAaAaAaaAAaAAasAANEA (para la app):
-                - line_needs_verification: true si hay dudas reales: peso/volumen no legible o ambiguo, cantidad incierta, precio ilegible, o solo ves precio/unidad pero no cuAAaAaAaaAAaAAasAAnto se comprAAaAaAaaAAaAAasAA en gramos/ml.
-                - line_quality_note: en espaAAaAaAaaAAaAAasAAol, breve (ej. "No se distingue el peso en gramos; se asume 1 ud."). Si no hay incidencias, null y line_needs_verification false.
+                REVISION DE LINEA (para la app):
+                - line_needs_verification: true si hay dudas reales: peso/volumen no legible o ambiguo, cantidad incierta, precio ilegible, o solo ves precio/unidad pero no cuanto se compro en gramos/ml.
+                - line_quality_note: en espanol, breve (ej. "No se distingue el peso en gramos; se asume 1 ud."). Si no hay incidencias, null y line_needs_verification false.
 
                 OTROS:
-                - Agrupa lAAaAaAaaAAaAAasAAneas duplicadas del mismo producto sumando quantity_amount (misma unidad).
-                - Omite cabeceras, totales duplicados y lAAaAaAaaAAaAAasAAneas de IVA sin detalle.
+                - Agrupa lineas duplicadas del mismo producto sumando quantity_amount (misma unidad).
+                - Omite cabeceras, totales duplicados y lineas de IVA sin detalle.
                 - total_amount: total del ticket si se ve; si no, 0.
                 """;
     }
@@ -144,7 +144,7 @@ public class GeminiTicketExtractionAdapter implements TicketExtractionPort {
             gen.put("responseMimeType", "application/json");
             return objectMapper.writeValueAsString(root);
         } catch (Exception e) {
-            throw new AiTicketException("Error construyendo peticiAAaAaAaaAAaAAasAAn multimodal a Gemini", e);
+            throw new AiTicketException("Error construyendo peticion multimodal a Gemini", e);
         }
     }
 

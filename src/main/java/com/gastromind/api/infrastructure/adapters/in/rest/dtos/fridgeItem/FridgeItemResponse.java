@@ -5,7 +5,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-@Schema(description = "Respuesta detallada de un producto en la nevera (el id de nevera no se repite: en /me es implAAcito; en rutas admin puede inferirse del path)")
+@Schema(description = "Respuesta detallada de un producto en la nevera (el id de nevera no se repite: en /me es implicito; en rutas admin puede inferirse del path)")
 /**
  * Representa fridge item response dentro del dominio de la aplicacion.
  */

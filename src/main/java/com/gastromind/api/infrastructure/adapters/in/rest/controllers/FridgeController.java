@@ -26,7 +26,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/fridges")
-@Tag(name = "Nevera", description = "Gestión del inventario de neveras.")
+@Tag(name = "Nevera", description = "Gestion del inventario de neveras.")
 /**
  * Controlador REST para operaciones sobre neveras.
  */
@@ -48,7 +48,7 @@ public class FridgeController {
     /**
      * Lista todas las neveras.
      *
-     * @return colección de neveras
+     * @return coleccion de neveras
      */
 
     @Operation(summary = "Obtener todas las neveras (Solo Admin)", description = "Devuelve una lista completa de todas las neveras registradas.")
@@ -78,7 +78,7 @@ public class FridgeController {
     /**
      * Devuelve la nevera asociada al usuario autenticado.
      *
-     * @param authentication contexto de autenticación actual
+     * @param authentication contexto de autenticacion actual
      * @return nevera del hogar del usuario
      */
 
@@ -109,7 +109,7 @@ public class FridgeController {
     /**
      * Crea la nevera de mi hogar.
      *
-     * @param authentication contexto de autenticación actual
+     * @param authentication contexto de autenticacion actual
      * @param request datos de la nevera
      * @return nevera creada
      */
@@ -143,7 +143,7 @@ public class FridgeController {
     /**
      * Define la nevera de mi hogar.
      *
-     * @param authentication contexto de autenticación actual
+     * @param authentication contexto de autenticacion actual
      * @param request datos actualizados
      * @return nevera actualizada
      */
@@ -175,7 +175,7 @@ public class FridgeController {
     /**
      * Elimina la nevera de mi hogar.
      *
-     * @param authentication contexto de autenticación actual
+     * @param authentication contexto de autenticacion actual
      * @return respuesta sin contenido
      */
 

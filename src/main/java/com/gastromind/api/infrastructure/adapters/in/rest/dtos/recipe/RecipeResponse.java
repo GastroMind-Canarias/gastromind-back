@@ -15,7 +15,7 @@ public record RecipeResponse(
         String id,
         @Schema(example = "Huevos a la estampida")
         String title,
-        @Schema(example = "1AA - Cortar las papas para posteriormente aAAadirles sal al gusto y freirlas...")
+        @Schema(example = "1 - Cortar las papas para posteriormente anadirles sal al gusto y freirlas...")
         String instructions,
         @Schema(example = "4", description = "Cantidad de raciones de la receta")
         int servings,

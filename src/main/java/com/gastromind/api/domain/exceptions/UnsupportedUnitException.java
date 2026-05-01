@@ -1,7 +1,7 @@
 package com.gastromind.api.domain.exceptions;
 
 /**
- * Excepción de dominio para unidades de medida no soportadas.
+ * ExcepciAn de dominio para unidades de medida no soportadas.
  */
 public class UnsupportedUnitException extends RuntimeException {
     /**

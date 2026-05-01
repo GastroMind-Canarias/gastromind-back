@@ -20,7 +20,7 @@ import java.util.List;
 
 @Service
 /**
- * Servicio de aplicación para gestionar tickets de compra.
+ * Servicio de aplicacion para gestionar tickets de compra.
  */
 public class TicketServiceImpl implements ITicketService {
 
@@ -30,12 +30,12 @@ public class TicketServiceImpl implements ITicketService {
     private final UserRepository userRepository;
     private final UsualPurchaseTicketSyncService usualPurchaseTicketSyncService;
     /**
-     * Crea el servicio con sus dependencias de persistencia y sincronización.
+     * Crea el servicio con sus dependencias de persistencia y sincronizaciAn.
      * @param repository repositorio de tickets
      * @param productRepository repositorio de productos
      * @param unitRepository repositorio de unidades
      * @param userRepository repositorio de usuarios
-     * @param usualPurchaseTicketSyncService servicio de sincronización de compras habituales
+     * @param usualPurchaseTicketSyncService servicio de sincronizaciAn de compras habituales
      */
 
     public TicketServiceImpl(
@@ -149,7 +149,7 @@ public class TicketServiceImpl implements ITicketService {
         }
     }
     /**
-     * Crea un ticket nuevo resolviendo referencias de líneas y hogar.
+     * Crea un ticket nuevo resolviendo referencias de lAneas y hogar.
      * @param ticket ticket a crear
      * @return ticket persistido
      */
@@ -181,13 +181,13 @@ public class TicketServiceImpl implements ITicketService {
         }
         Unit defaultUd = unitRepository.findFirstByNameIgnoreCase("Unidades")
                 .orElseThrow(() -> new NotFoundException(
-                        "Unidad 'Unidades' no encontrada en catAAaAaAaaAAaAAasAAlogo. Revise la tabla unit / data.sql."));
+                        "Unidad 'Unidades' no encontrada en catalogo. Revise la tabla unit / data.sql."));
         for (TicketItem item : ticket.getItems()) {
             boolean hasProductId = item.getProduct() != null && item.getProduct().getId() != null;
             boolean hasLineName = item.getLineProductName() != null && !item.getLineProductName().isBlank();
             if (!hasProductId && !hasLineName) {
                 throw new IllegalArgumentException(
-                        "Cada lAAaAaAaaAAaAAasAAnea del ticket debe tener un producto con id o un nombre de lAAaAaAaaAAaAAasAAnea (sin catAAaAaAaaAAaAAasAAlogo)");
+                        "Cada linea del ticket debe tener un producto con id o un nombre de linea (sin catalogo)");
             }
             if (hasProductId) {
                 Product fullProduct = productRepository.findById(item.getProduct().getId())

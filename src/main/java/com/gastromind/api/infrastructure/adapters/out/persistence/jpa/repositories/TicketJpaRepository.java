@@ -18,8 +18,7 @@ public interface TicketJpaRepository extends JpaRepository<TicketEntity, String>
 
     @Query("""
             SELECT t FROM TicketEntity t JOIN t.user u LEFT JOIN u.household h
-            WHERE (t.household IS NOT NULL AND t.household.id = :hid)
-               OR (t.household IS NULL AND h IS NOT NULL AND h.id = :hid)
+            WHERE (t.household IS NOT NULL AND t.household.id = :hid) OR (t.household IS NULL AND h IS NOT NULL AND h.id = :hid)
             ORDER BY t.purchaseDate DESC
             """)
     List<TicketEntity> findVisibleForHousehold(@Param("hid") String householdId);

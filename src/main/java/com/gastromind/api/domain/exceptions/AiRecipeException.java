@@ -1,7 +1,7 @@
 package com.gastromind.api.domain.exceptions;
 
 /**
- * Excepción de dominio en generación de recetas con IA.
+ * ExcepciAn de dominio en generaciAn de recetas con IA.
  */
 public class AiRecipeException extends RuntimeException {
     /**

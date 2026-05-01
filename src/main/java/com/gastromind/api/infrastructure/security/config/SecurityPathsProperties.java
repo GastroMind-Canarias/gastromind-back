@@ -6,16 +6,16 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "gastromind.security")
 /**
- * Propiedades con rutas públicas excluidas de autenticación.
+ * Propiedades con rutas publicas excluidas de autenticacion.
  */
 public class SecurityPathsProperties {
     private String[] publicUrls;
-    /** Devuelve el listado de URLs públicas configuradas. */
+    /** Devuelve el listado de URLs publicas configuradas. */
 
     public String[] getPublicUrls() {
         return publicUrls;
     }
-    /** Sustituye el listado de URLs públicas permitidas. */
+    /** Sustituye el listado de URLs publicas permitidas. */
 
     public void setPublicUrls(String[] publicUrls) {
         this.publicUrls = publicUrls;

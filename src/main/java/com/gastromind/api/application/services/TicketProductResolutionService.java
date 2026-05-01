@@ -9,7 +9,7 @@ import java.util.regex.Pattern;
 
 @Service
 /**
- * Resuelve productos de catálogo a partir de nombres detectados en tickets.
+ * Resuelve productos de catalogo a partir de nombres detectados en tickets.
  */
 public class TicketProductResolutionService {
 
@@ -18,17 +18,17 @@ public class TicketProductResolutionService {
     private final ProductRepository productRepository;
     /**
      * Crea el servicio con acceso al repositorio de productos.
-     * @param productRepository repositorio de productos de catálogo
+     * @param productRepository repositorio de productos de catalogo
      */
 
     public TicketProductResolutionService(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
     /**
-     * Busca un producto del catálogo a partir del nombre de una línea de ticket.
-     * @param rawName nombre detectado en la línea del ticket
+     * Busca un producto del catalogo a partir del nombre de una lAnea de ticket.
+     * @param rawName nombre detectado en la lAnea del ticket
      * @return producto encontrado, si existe coincidencia
-     * @throws IllegalArgumentException si el nombre queda vacío tras normalizarlo
+     * @throws IllegalArgumentException si el nombre queda vacio tras normalizarlo
      */
 
     public Optional<Product> findCatalogProductByName(String rawName) {
@@ -41,7 +41,7 @@ public class TicketProductResolutionService {
     /**
      * Normaliza un nombre de producto eliminando espacios redundantes.
      * @param raw texto original
-     * @return nombre normalizado o cadena vacía si la entrada es nula
+     * @return nombre normalizado o cadena vacAa si la entrada es nula
      */
 
     public static String normalizeName(String raw) {

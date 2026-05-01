@@ -1,7 +1,7 @@
 package com.gastromind.api.domain.exceptions;
 
 /**
- * Excepción de dominio por fallo en servicios externos.
+ * ExcepciAn de dominio por fallo en servicios externos.
  */
 public class ExternalServiceException extends RuntimeException {
     /**

@@ -1,15 +1,15 @@
-# ETAPA 1: Compilación (Se hace en el PC o en GitHub Actions)
+# ETAPA 1: Compilacion (Se hace en el PC o en GitHub Actions)
 FROM maven:3.9.6-eclipse-temurin-21 AS build
 WORKDIR /app
-# Copiamos solo el pom.xml primero para aprovechar la caché de Docker de las dependencias
+# Copiamos solo el pom.xml primero para aprovechar la cache de Docker de las dependencias
 COPY pom.xml .
 RUN mvn dependency:go-offline
 
-# Copiamos el código fuente y compilamos
+# Copiamos el codigo fuente y compilamos
 COPY src ./src
 RUN mvn clean package -DskipTests
 
-# ETAPA 2: Ejecución (Esto es lo que realmente correrá en tu NUC)
+# ETAPA 2: Ejecucion (Esto es lo que realmente correra en tu NUC)
 FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 # Copiamos solo el .jar generado en la etapa anterior

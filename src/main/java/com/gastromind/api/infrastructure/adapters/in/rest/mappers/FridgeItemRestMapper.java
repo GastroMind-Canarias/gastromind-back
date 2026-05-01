@@ -17,7 +17,7 @@ public interface FridgeItemRestMapper {
 
     @Mapping(target = "product.id", source = "productId")
     @Mapping(target = "fridgeId", source = "fridgeId")
-    @Mapping(target = "id", ignore = true) // El ID suele ser gestionado por la base de datos en la creaciAAn
+    @Mapping(target = "id", ignore = true) // El ID suele ser gestionado por la base de datos en la creacion
     FridgeItem toDomain(FridgeItemRequest request);
 
     @Mapping(target = "product.id", source = "productId")

@@ -6,7 +6,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
-@Schema(description = "InformaciAAn pAAblica del usuario")
+@Schema(description = "Informacion publica del usuario")
 /**
  * Representa user response dentro del dominio de la aplicacion.
  */
@@ -15,7 +15,7 @@ public record UserResponse(
         @Schema(example = "usr-00123")
         String id,
 
-        @Schema(example = "Juan PAArez")
+        @Schema(example = "Juan Perez")
         String name,
 
         @Schema(example = "juan@gastromind.com")
@@ -27,7 +27,7 @@ public record UserResponse(
         @Schema(example = "ROLE_MEMBER")
         Role role,
 
-        @Schema(description = "Lista de alAArgenos asociados al usuario")
+        @Schema(description = "Lista de alergenos asociados al usuario")
         List<AllergenResponse> allergens
 ) {}
 

@@ -10,15 +10,15 @@ import java.util.List;
 
 @Service
 /**
- * Servicio de aplicación para gestionar el catálogo de categorías.
+ * Servicio de aplicacion para gestionar el catalogo de categorias.
  */
 public class CategoryServiceImpl implements ICategoryService {
     
 
     private final CategoryRepository repository;
     /**
-     * Crea el servicio con el repositorio de categorías.
-     * @param repository repositorio de persistencia de categorías
+     * Crea el servicio con el repositorio de categorias.
+     * @param repository repositorio de persistencia de categorias
      */
 
 
@@ -26,8 +26,8 @@ public class CategoryServiceImpl implements ICategoryService {
         this.repository = repository;
     }
     /**
-     * Devuelve todas las categorías registradas.
-     * @return listado completo de categorías
+     * Devuelve todas las categorias registradas.
+     * @return listado completo de categorias
      */
 
     @Override
@@ -35,10 +35,10 @@ public class CategoryServiceImpl implements ICategoryService {
         return repository.findAll();
     }
     /**
-     * Busca una categoría por su identificador.
-     * @param id identificador de la categoría
-     * @return categoría encontrada
-     * @throws NotFoundException si no existe una categoría con ese id
+     * Busca una categoria por su identificador.
+     * @param id identificador de la categoria
+     * @return categoria encontrada
+     * @throws NotFoundException si no existe una categoria con ese id
      */
 
     @Override
@@ -46,9 +46,9 @@ public class CategoryServiceImpl implements ICategoryService {
         return repository.findById(id).orElseThrow(() -> new NotFoundException("Categoria no encontrada"));
     }
     /**
-     * Crea una nueva categoría.
-     * @param category datos de la categoría a crear
-     * @return categoría persistida
+     * Crea una nueva categoria.
+     * @param category datos de la categoria a crear
+     * @return categoria persistida
      */
 
     @Override
@@ -56,11 +56,11 @@ public class CategoryServiceImpl implements ICategoryService {
         return repository.save(category);
     }
     /**
-     * Define una categoría existente.
-     * @param id identificador de la categoría a actualizar
-     * @param category nuevos datos de la categoría
-     * @return categoría actualizada
-     * @throws NotFoundException si no existe una categoría con ese id
+     * Define una categoria existente.
+     * @param id identificador de la categoria a actualizar
+     * @param category nuevos datos de la categoria
+     * @return categoria actualizada
+     * @throws NotFoundException si no existe una categoria con ese id
      */
 
     @Override
@@ -70,9 +70,9 @@ public class CategoryServiceImpl implements ICategoryService {
         return repository.save(category);
     }
     /**
-     * Elimina una categoría por su identificador.
-     * @param id identificador de la categoría a eliminar
-     * @throws NotFoundException si no existe una categoría con ese id
+     * Elimina una categoria por su identificador.
+     * @param id identificador de la categoria a eliminar
+     * @throws NotFoundException si no existe una categoria con ese id
      */
 
     @Override
