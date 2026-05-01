@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.security.auth.services.impl;
+package com.gastromind.api.infrastructure.security.auth.services.impl;
 
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.repositories.UserJpaRepository;
 import com.gastromind.api.infrastructure.security.auth.services.IAuthService;

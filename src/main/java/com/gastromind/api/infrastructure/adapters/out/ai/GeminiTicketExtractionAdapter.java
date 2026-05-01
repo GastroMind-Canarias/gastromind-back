@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.adapters.out.ai;
+package com.gastromind.api.infrastructure.adapters.out.ai;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

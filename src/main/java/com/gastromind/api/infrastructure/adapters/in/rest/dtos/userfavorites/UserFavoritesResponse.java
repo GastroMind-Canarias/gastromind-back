@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.adapters.in.rest.dtos.userfavorites;
+package com.gastromind.api.infrastructure.adapters.in.rest.dtos.userfavorites;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

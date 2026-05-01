@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.application.services;
+package com.gastromind.api.application.services;
 
 import com.gastromind.api.domain.models.Product;
 import com.gastromind.api.domain.models.Ticket;

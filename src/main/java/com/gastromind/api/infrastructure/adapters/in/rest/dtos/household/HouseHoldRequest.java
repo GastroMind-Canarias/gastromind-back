@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.adapters.in.rest.dtos.household;
+package com.gastromind.api.infrastructure.adapters.in.rest.dtos.household;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;

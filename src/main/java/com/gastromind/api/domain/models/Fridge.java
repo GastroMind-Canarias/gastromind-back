@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.domain.models;
+package com.gastromind.api.domain.models;
 
 /**
  * Modelo de dominio para una nevera de hogar.

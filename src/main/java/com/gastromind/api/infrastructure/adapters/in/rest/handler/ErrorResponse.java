@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.adapters.in.rest.handler;
+package com.gastromind.api.infrastructure.adapters.in.rest.handler;
 
 import java.time.LocalDateTime;
 

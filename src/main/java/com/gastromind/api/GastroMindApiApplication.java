@@ -1,4 +1,4 @@
-﻿package com.gastromind.api;
+package com.gastromind.api;
 
 import com.gastromind.api.infrastructure.adapters.out.ai.GeminiProperties;
 import com.gastromind.api.infrastructure.adapters.out.ai.TicketImageProperties;

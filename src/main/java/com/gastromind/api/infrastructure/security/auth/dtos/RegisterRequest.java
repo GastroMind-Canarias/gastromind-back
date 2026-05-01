@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.security.auth.dtos;
+package com.gastromind.api.infrastructure.security.auth.dtos;
 
 import com.gastromind.api.domain.models.enums.Appliance;
 import com.gastromind.api.domain.models.enums.Role;

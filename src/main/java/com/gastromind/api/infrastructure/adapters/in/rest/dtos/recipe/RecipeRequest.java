@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.adapters.in.rest.dtos.recipe;
+package com.gastromind.api.infrastructure.adapters.in.rest.dtos.recipe;
 
 import com.gastromind.api.domain.models.enums.Appliance;
 import io.swagger.v3.oas.annotations.media.Schema;

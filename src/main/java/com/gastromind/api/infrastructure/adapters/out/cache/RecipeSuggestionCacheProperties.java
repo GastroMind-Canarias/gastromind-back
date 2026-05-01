@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.adapters.out.cache;
+package com.gastromind.api.infrastructure.adapters.out.cache;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

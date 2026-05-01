@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.adapters.in.rest.handler;
+package com.gastromind.api.infrastructure.adapters.in.rest.handler;
 
 import com.gastromind.api.domain.exceptions.AiRecipeException;
 import com.gastromind.api.domain.exceptions.AiTicketException;

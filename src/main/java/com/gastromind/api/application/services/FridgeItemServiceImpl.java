@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.application.services;
+package com.gastromind.api.application.services;
 
 import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.models.FridgeItem;

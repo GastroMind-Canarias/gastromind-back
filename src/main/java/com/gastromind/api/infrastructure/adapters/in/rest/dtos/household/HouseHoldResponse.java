@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.adapters.in.rest.dtos.household;
+package com.gastromind.api.infrastructure.adapters.in.rest.dtos.household;
 
 import com.gastromind.api.domain.models.enums.Appliance;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.user.UserResponse;

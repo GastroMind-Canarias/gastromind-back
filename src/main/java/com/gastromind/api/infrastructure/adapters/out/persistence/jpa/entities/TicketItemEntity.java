@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities;
+package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities;
 
 import com.gastromind.api.domain.models.enums.TicketLineVerificationStatus;
 import jakarta.persistence.*;

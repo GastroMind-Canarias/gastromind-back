@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities;
+package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities;
 
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ApplianceType;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.DifficultyLevel;

@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.application.usecases;
+package com.gastromind.api.application.usecases;
 
 import com.gastromind.api.application.services.FridgeItemServiceImpl;
 import com.gastromind.api.domain.exceptions.ForbiddenException;

@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.config;
+package com.gastromind.api.infrastructure.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 

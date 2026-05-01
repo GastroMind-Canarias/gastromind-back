@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.adapters.in.rest.dtos.allergen;
+package com.gastromind.api.infrastructure.adapters.in.rest.dtos.allergen;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

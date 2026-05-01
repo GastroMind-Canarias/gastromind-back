@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.openapi;
+package com.gastromind.api.infrastructure.openapi;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

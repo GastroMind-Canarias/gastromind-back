@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.security.filter;
+package com.gastromind.api.infrastructure.security.filter;
 
 import com.gastromind.api.infrastructure.security.auth.services.IJwtService;
 import jakarta.servlet.FilterChain;

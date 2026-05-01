@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.security.config;
+package com.gastromind.api.infrastructure.security.config;
 
 import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.UserEntity;

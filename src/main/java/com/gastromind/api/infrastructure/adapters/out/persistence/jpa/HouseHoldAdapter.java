@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.adapters.out.persistence.jpa;
+package com.gastromind.api.infrastructure.adapters.out.persistence.jpa;
 
 import com.gastromind.api.domain.models.HouseHold;
 import com.gastromind.api.domain.ports.out.HouseHoldRepository;

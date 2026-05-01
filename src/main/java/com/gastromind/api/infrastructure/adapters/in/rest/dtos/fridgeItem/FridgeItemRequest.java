@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem;
+package com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem;
 
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
 import io.swagger.v3.oas.annotations.media.Schema;

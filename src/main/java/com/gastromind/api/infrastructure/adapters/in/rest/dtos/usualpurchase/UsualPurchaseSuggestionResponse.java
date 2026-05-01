@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.adapters.in.rest.dtos.usualpurchase;
+package com.gastromind.api.infrastructure.adapters.in.rest.dtos.usualpurchase;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

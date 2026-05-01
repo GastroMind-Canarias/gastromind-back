@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.domain.models;
+package com.gastromind.api.domain.models;
 
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
 

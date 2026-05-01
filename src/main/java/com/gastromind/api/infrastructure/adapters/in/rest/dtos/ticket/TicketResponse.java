@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket;
+package com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 

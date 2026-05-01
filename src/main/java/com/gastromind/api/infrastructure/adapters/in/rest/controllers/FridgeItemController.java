@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
+package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
 import com.gastromind.api.application.services.FridgeItemServiceImpl;
 import com.gastromind.api.application.usecases.ConsumeMyFridgeItemUseCase;

@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.domain.exceptions;
+package com.gastromind.api.domain.exceptions;
 
 /**
  * Excepción de dominio en generación de recetas con IA.

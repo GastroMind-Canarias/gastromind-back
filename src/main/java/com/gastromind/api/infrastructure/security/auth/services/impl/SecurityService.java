@@ -1,4 +1,4 @@
-﻿package com.gastromind.api.infrastructure.security.auth.services.impl;
+package com.gastromind.api.infrastructure.security.auth.services.impl;
 
 import com.gastromind.api.domain.exceptions.ForbiddenException;
 import com.gastromind.api.domain.models.User;
