@@ -27,7 +27,7 @@ class GeminiRecipeAdapterTest {
         GeminiRecipeAdapter adapter = new GeminiRecipeAdapter(props, mock(GeminiGenerateContentClient.class), new ObjectMapper());
 
         AiRecipeException ex = assertThrows(AiRecipeException.class, () -> adapter.generateOneRecipe(context()));
-        assertEquals("Generación de recetas por IA no configurada (falta app.ai.gemini.api-key)", ex.getMessage());
+        assertEquals("Generacion de recetas por IA no configurada (falta app.ai.gemini.api-key)", ex.getMessage());
     }
 
     @Test

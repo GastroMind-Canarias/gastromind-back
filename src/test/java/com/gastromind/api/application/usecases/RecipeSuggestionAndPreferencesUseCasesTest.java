@@ -109,7 +109,7 @@ class RecipeSuggestionAndPreferencesUseCasesTest {
 
         ForbiddenException notOwner = assertThrows(ForbiddenException.class,
                 () -> useCase.execute("member", List.of(), List.of()));
-        assertEquals("Solo el OWNER del hogar puede gestionar los electrodomésticos", notOwner.getMessage());
+        assertEquals("Solo el OWNER del hogar puede gestionar los electrodomesticos", notOwner.getMessage());
         verify(userService, never()).replaceAllergens(any(), any());
     }
 

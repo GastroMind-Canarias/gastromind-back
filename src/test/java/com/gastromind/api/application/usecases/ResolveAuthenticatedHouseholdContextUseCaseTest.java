@@ -82,7 +82,7 @@ class ResolveAuthenticatedHouseholdContextUseCaseTest {
 
         ForbiddenException ex = assertThrows(ForbiddenException.class, () -> useCase.execute("owner1"));
 
-        assertEquals("El usuario no pertenece a ningún hogar", ex.getMessage());
+        assertEquals("El usuario no pertenece a ningun hogar", ex.getMessage());
     }
 
     @Test

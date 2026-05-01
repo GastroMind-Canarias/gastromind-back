@@ -56,7 +56,7 @@ class CategoryServiceImplTest {
         when(repository.findById("missing")).thenReturn(Optional.empty());
 
         NotFoundException ex = assertThrows(NotFoundException.class, () -> categoryService.findById("missing"));
-        assertEquals("Categoría no encontrada", ex.getMessage());
+        assertEquals("Categoria no encontrada", ex.getMessage());
     }
 
     @Test

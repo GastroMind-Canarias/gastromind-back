@@ -182,6 +182,6 @@ class HouseHoldControllerTest {
 
         ForbiddenException ex = assertThrows(ForbiddenException.class,
                 () -> controller.addMyAppliance(authentication, Appliance.HORNO));
-        assertEquals("Solo el OWNER del hogar puede gestionar los electrodomésticos", ex.getMessage());
+        assertEquals("Solo el OWNER del hogar puede gestionar los electrodomesticos", ex.getMessage());
     }
 }

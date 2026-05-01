@@ -123,7 +123,7 @@ class RegisterUserUseCaseTest {
                 List.of(), List.of());
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> useCase.exec(request));
-        assertEquals("No envíe inviteToken si el modo es crear hogar nuevo (CREATE_NEW)", ex.getMessage());
+        assertEquals("No envie inviteToken si el modo es crear hogar nuevo (CREATE_NEW)", ex.getMessage());
     }
 
     @Test
@@ -140,6 +140,6 @@ class RegisterUserUseCaseTest {
                 List.of(), List.of());
 
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> useCase.exec(request));
-        assertEquals("Indique solo una opción: inviteToken para unirse o householdName para crear un hogar nuevo", ex.getMessage());
+        assertEquals("Indique solo una opcion: inviteToken para unirse o householdName para crear un hogar nuevo", ex.getMessage());
     }
 }

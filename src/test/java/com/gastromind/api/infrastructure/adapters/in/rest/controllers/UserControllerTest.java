@@ -82,12 +82,12 @@ class UserControllerTest {
         UpdateMyPreferencesRequest request = new UpdateMyPreferencesRequest(List.of(), List.of());
         when(authentication.getName()).thenReturn("owner");
         when(updateMyPreferencesUseCase.execute("owner", request.allergenIds(), request.appliances()))
-                .thenThrow(new ForbiddenException("El usuario no pertenece a ningún hogar"));
+                .thenThrow(new ForbiddenException("El usuario no pertenece a ningun hogar"));
 
         ForbiddenException ex = assertThrows(ForbiddenException.class,
                 () -> controller.updateMyPreferences(authentication, request));
 
-        assertTrue(ex.getMessage().contains("ningún hogar"));
+        assertTrue(ex.getMessage().contains("ningun hogar"));
     }
 
     @Test

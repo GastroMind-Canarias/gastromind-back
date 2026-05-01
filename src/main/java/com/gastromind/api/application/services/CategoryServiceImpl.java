@@ -43,7 +43,7 @@ public class CategoryServiceImpl implements ICategoryService {
 
     @Override
     public Category findById(String id) {
-        return repository.findById(id).orElseThrow(()-> new NotFoundException("CategorAAaAaAaaAAaAAasAAa no encontrada"));
+        return repository.findById(id).orElseThrow(() -> new NotFoundException("Categoria no encontrada"));
     }
     /**
      * Crea una nueva categoría.

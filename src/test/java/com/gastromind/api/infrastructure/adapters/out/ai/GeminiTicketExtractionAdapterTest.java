@@ -24,12 +24,12 @@ class GeminiTicketExtractionAdapterTest {
 
         AiTicketException ex1 = assertThrows(AiTicketException.class,
                 () -> adapter.extractFromImage(new byte[]{1}, "image/png"));
-        assertEquals("Extracción de tickets por IA no configurada (falta app.ai.gemini.api-key)", ex1.getMessage());
+        assertEquals("Extraccion de tickets por IA no configurada (falta app.ai.gemini.api-key)", ex1.getMessage());
 
         props.setApiKey("k");
         AiTicketException ex2 = assertThrows(AiTicketException.class,
                 () -> adapter.extractFromImage(new byte[]{}, "image/png"));
-        assertEquals("La imagen del ticket está vacía", ex2.getMessage());
+        assertEquals("La imagen del ticket esta vacia", ex2.getMessage());
     }
 
     @Test
@@ -79,7 +79,7 @@ class GeminiTicketExtractionAdapterTest {
 
         AiTicketException ex = assertThrows(AiTicketException.class,
                 () -> adapter.extractFromImage(new byte[]{1}, "image/png"));
-        assertEquals("No se detectaron líneas de producto de alimentación en el ticket", ex.getMessage());
+        assertEquals("No se detectaron lineas de producto de alimentacion en el ticket", ex.getMessage());
     }
 
     @Test

@@ -94,7 +94,7 @@ class UserFavoritesControllerTest {
         when(userService.findByUsername("owner")).thenReturn(user);
 
         ForbiddenException ex = assertThrows(ForbiddenException.class, () -> c.saveFromSuggestion(auth, "s-1"));
-        assertEquals("El usuario no pertenece a ningún hogar", ex.getMessage());
+        assertEquals("El usuario no pertenece a ningun hogar", ex.getMessage());
     }
 
     private static UserFavoritesController buildController(

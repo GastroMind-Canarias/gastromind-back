@@ -167,7 +167,7 @@ class ImportTicketFromImageUseCaseTest {
                 List.of(new ExtractedTicketLine("   ", BigDecimal.ONE, "ud", BigDecimal.ONE, BigDecimal.ONE, false, null))));
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
                 () -> useCase.execute(new byte[]{1}, "image/png", "user-1", "store-1"));
-        assertEquals("Nombre de producto vacío en una línea del ticket", ex.getMessage());
+        assertEquals("Nombre de producto vacio en una linea del ticket", ex.getMessage());
     }
 
     @Test
