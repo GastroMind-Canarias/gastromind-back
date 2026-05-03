@@ -38,6 +38,9 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/households")
 @Tag(name = "Unidad Familiar")
+/**
+ * Controlador REST para operaciones de house hold.
+ */
 public class HouseHoldController {
 
     @Autowired
@@ -64,17 +67,20 @@ public class HouseHoldController {
     private String getCurrentHouseholdId(Authentication authentication) {
         User currentUser = getCurrentUser(authentication);
         if (currentUser.getHouseHold_id() == null || currentUser.getHouseHold_id().getId() == null) {
-            throw new ForbiddenException("El usuario no pertenece a ningún hogar");
+            throw new ForbiddenException("El usuario no pertenece a ningun hogar");
         }
         return currentUser.getHouseHold_id().getId();
     }
 
-    /** Solo el dueño del hogar (rol {@link Role#ROLE_OWNER}) puede mutar electrodomésticos en rutas {@code /me/appliances/**}. */
     private void requireHouseholdOwner(User user) {
         if (user.getRole() != Role.ROLE_OWNER) {
-            throw new ForbiddenException("Solo el OWNER del hogar puede gestionar los electrodomésticos");
+            throw new ForbiddenException("Solo el OWNER del hogar puede gestionar los electrodomesticos");
         }
     }
+    /**
+     * Lista todos los house hold.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Listar todos los hogares (Solo ADMIN)")
     @ApiStandardDoc
@@ -83,6 +89,11 @@ public class HouseHoldController {
     public ResponseEntity<List<HouseHoldResponse>> getAll() {
         return ResponseEntity.ok(houseHoldMapper.toResponseList(holdServiceImpl.findAll()));
     }
+    /**
+     * Elimina un house hold.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Eliminar unidad familiar (Solo Admin)")
     @ApiStandardDoc
@@ -92,8 +103,14 @@ public class HouseHoldController {
         holdServiceImpl.delete(id);
         return ResponseEntity.noContent().build();
     }
+    /**
+     * Realiza add appliance.
+     * @param id el identificador del recurso
+     * @param appliance valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Añadir dispositivo (Solo Admin)")
+    @Operation(summary = "Anadir dispositivo (Solo Admin)")
     @ApiPostDoc
     @PostMapping("/{id}/appliances")
     @PreAuthorize("hasRole('ADMIN')")
@@ -101,6 +118,12 @@ public class HouseHoldController {
         HouseholdAppliance saved = holdServiceImpl.addAppliance(id, appliance);
         return ResponseEntity.status(HttpStatus.CREATED).body(applianceRestMapper.toResponse(saved));
     }
+    /**
+     * Realiza remove member.
+     * @param id el identificador del recurso
+     * @param memberUserId valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Expulsar miembro (Solo Admin)")
     @ApiStandardDoc
@@ -110,14 +133,25 @@ public class HouseHoldController {
         holdServiceImpl.removeMember(id, memberUserId);
         return ResponseEntity.noContent().build();
     }
+    /**
+     * Realiza invite.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Generar token de invitación (Solo Admin)")
+    @Operation(summary = "Generar token de invitacion (Solo Admin)")
     @ApiStandardDoc
     @PostMapping("/{id}/invite")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<String> invite(@PathVariable String id) {
         return ResponseEntity.ok(holdServiceImpl.generateInviteToken(id));
     }
+    /**
+     * Realiza promote to owner.
+     * @param id el identificador del recurso
+     * @param userId el identificador del usuario
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Ascender a OWNER (Solo Admin)")
     @ApiStandardDoc
@@ -127,6 +161,11 @@ public class HouseHoldController {
         User promoted = holdServiceImpl.promoteToOwner(id, userId);
         return ResponseEntity.ok(userRestMapper.toResponse(promoted));
     }
+    /**
+     * Devuelve house hold por id.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Ver detalle del hogar (Solo Admin)")
     @ApiStandardDoc
@@ -136,6 +175,11 @@ public class HouseHoldController {
         HouseHold houseHold = holdServiceImpl.findById(id);
         return ResponseEntity.ok(houseHoldMapper.toResponse(houseHold));
     }
+    /**
+     * Realiza list members.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Listar miembros del hogar (Solo Admin)")
     @ApiStandardDoc
@@ -145,6 +189,11 @@ public class HouseHoldController {
         List<User> members = holdServiceImpl.listMembers(id);
         return ResponseEntity.ok(userRestMapper.toResponseList(members));
     }
+    /**
+     * Registra un nuevo house hold.
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Crear nuevo hogar")
     @ApiPostDoc
@@ -154,6 +203,11 @@ public class HouseHoldController {
         HouseHold saved = holdServiceImpl.create(houseHoldMapper.toDomain(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(houseHoldMapper.toResponse(saved));
     }
+    /**
+     * Realiza leave.
+     * @param authentication usuario autenticado.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Abandonar el hogar actual")
     @ApiPostDoc
@@ -164,6 +218,11 @@ public class HouseHoldController {
         holdServiceImpl.leaveHousehold(currentUser.getId());
         return ResponseEntity.noContent().build();
     }
+    /**
+     * Devuelve house hold por my household.
+     * @param authentication usuario autenticado.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Ver detalle de mi hogar")
     @ApiStandardDoc
@@ -174,6 +233,11 @@ public class HouseHoldController {
         HouseHold houseHold = holdServiceImpl.findById(householdId);
         return ResponseEntity.ok(houseHoldMapper.toResponse(houseHold));
     }
+    /**
+     * Realiza list my members.
+     * @param authentication usuario autenticado.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Listar miembros de mi hogar")
     @ApiStandardDoc
@@ -184,8 +248,13 @@ public class HouseHoldController {
         List<User> members = holdServiceImpl.listMembers(householdId);
         return ResponseEntity.ok(userRestMapper.toResponseList(members));
     }
+    /**
+     * Realiza invite my household.
+     * @param authentication usuario autenticado.
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Generar token de invitación de mi hogar (ADMIN u OWNER del hogar)")
+    @Operation(summary = "Generar token de invitacion de mi hogar (ADMIN u OWNER del hogar)")
     @ApiStandardDoc
     @PostMapping("/me/invite")
     @PreAuthorize("hasRole('ADMIN') or hasRole('OWNER')")
@@ -193,8 +262,13 @@ public class HouseHoldController {
         String householdId = getCurrentHouseholdId(authentication);
         return ResponseEntity.ok(holdServiceImpl.generateInviteToken(householdId));
     }
+    /**
+     * Realiza list my appliances.
+     * @param authentication usuario autenticado.
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Listar electrodomésticos de mi hogar")
+    @Operation(summary = "Listar electrodomesticos de mi hogar")
     @ApiStandardDoc
     @GetMapping("/me/appliances")
     @PreAuthorize("isAuthenticated()")
@@ -202,8 +276,14 @@ public class HouseHoldController {
         String householdId = getCurrentHouseholdId(authentication);
         return ResponseEntity.ok(applianceRestMapper.toResponseList(holdServiceImpl.listAppliances(householdId)));
     }
+    /**
+     * Realiza add my appliance.
+     * @param authentication usuario autenticado.
+     * @param appliance valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Añadir un electrodoméstico a mi hogar (solo OWNER)")
+    @Operation(summary = "Anadir un electrodomestico a mi hogar (solo OWNER)")
     @ApiPostDoc
     @PostMapping("/me/appliances")
     @PreAuthorize("isAuthenticated()")
@@ -216,8 +296,14 @@ public class HouseHoldController {
         HouseholdAppliance saved = holdServiceImpl.addAppliance(householdId, appliance);
         return ResponseEntity.status(HttpStatus.CREATED).body(applianceRestMapper.toResponse(saved));
     }
+    /**
+     * Realiza add my appliances batch.
+     * @param authentication usuario autenticado.
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Añadir varios electrodomésticos a mi hogar (solo OWNER; ignora tipos ya existentes)")
+    @Operation(summary = "Anadir varios electrodomesticos a mi hogar (solo OWNER; ignora tipos ya existentes)")
     @ApiPostDoc
     @PostMapping("/me/appliances/batch")
     @PreAuthorize("isAuthenticated()")
@@ -231,8 +317,15 @@ public class HouseHoldController {
                 request.appliances() != null ? request.appliances() : List.of());
         return ResponseEntity.status(HttpStatus.CREATED).body(applianceRestMapper.toResponseList(list));
     }
+    /**
+     * Realiza update my appliance.
+     * @param authentication usuario autenticado.
+     * @param applianceRecordId valor a utilizar.
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Cambiar el tipo de un electrodoméstico de mi hogar (solo OWNER)")
+    @Operation(summary = "Cambiar el tipo de un electrodomestico de mi hogar (solo OWNER)")
     @ApiStandardDoc
     @PatchMapping("/me/appliances/{applianceRecordId}")
     @PreAuthorize("isAuthenticated()")
@@ -246,8 +339,14 @@ public class HouseHoldController {
         HouseholdAppliance saved = holdServiceImpl.updateAppliance(householdId, applianceRecordId, request.appliance());
         return ResponseEntity.ok(applianceRestMapper.toResponse(saved));
     }
+    /**
+     * Realiza delete my appliance.
+     * @param authentication usuario autenticado.
+     * @param applianceRecordId valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Eliminar un electrodoméstico de mi hogar por id de fila (solo OWNER)")
+    @Operation(summary = "Eliminar un electrodomestico de mi hogar por id de fila (solo OWNER)")
     @ApiStandardDoc
     @DeleteMapping("/me/appliances/{applianceRecordId}")
     @PreAuthorize("isAuthenticated()")
@@ -260,8 +359,14 @@ public class HouseHoldController {
         holdServiceImpl.removeApplianceFromHousehold(householdId, applianceRecordId);
         return ResponseEntity.noContent().build();
     }
+    /**
+     * Realiza delete my appliances batch.
+     * @param authentication usuario autenticado.
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Eliminar varios electrodomésticos por ids de fila (solo OWNER)")
+    @Operation(summary = "Eliminar varios electrodomesticos por ids de fila (solo OWNER)")
     @ApiStandardDoc
     @DeleteMapping("/me/appliances/batch")
     @PreAuthorize("isAuthenticated()")
@@ -274,6 +379,12 @@ public class HouseHoldController {
         holdServiceImpl.removeAppliancesBulk(householdId, request.ids());
         return ResponseEntity.noContent().build();
     }
+    /**
+     * Realiza remove my member.
+     * @param authentication usuario autenticado.
+     * @param memberUserId valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Expulsar miembro de mi hogar (ADMIN u OWNER del hogar)")
     @ApiStandardDoc
@@ -284,6 +395,12 @@ public class HouseHoldController {
         holdServiceImpl.removeMember(householdId, memberUserId);
         return ResponseEntity.noContent().build();
     }
+    /**
+     * Realiza promote my member to owner.
+     * @param authentication usuario autenticado.
+     * @param userId el identificador del usuario
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Ascender miembro de mi hogar a OWNER (ADMIN u OWNER del hogar)")
     @ApiStandardDoc
@@ -294,8 +411,14 @@ public class HouseHoldController {
         User promoted = holdServiceImpl.promoteToOwner(householdId, userId);
         return ResponseEntity.ok(userRestMapper.toResponse(promoted));
     }
+    /**
+     * Realiza join my user with invite.
+     * @param authentication usuario autenticado.
+     * @param token el token
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Unirme a un hogar con código de invitación")
+    @Operation(summary = "Unirme a un hogar con codigo de invitacion")
     @ApiPostDoc
     @PostMapping("/me/join")
     @PreAuthorize("isAuthenticated()")
@@ -307,3 +430,7 @@ public class HouseHoldController {
         return ResponseEntity.ok(userRestMapper.toResponse(updated));
     }
 }
+
+
+
+

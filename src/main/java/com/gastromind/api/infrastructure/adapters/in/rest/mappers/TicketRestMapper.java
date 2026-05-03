@@ -2,12 +2,15 @@ package com.gastromind.api.infrastructure.adapters.in.rest.mappers;
 
 import com.gastromind.api.application.services.TicketQuantityUnitResolver;
 import com.gastromind.api.domain.models.Product;
+import com.gastromind.api.domain.models.Store;
 import com.gastromind.api.domain.models.Ticket;
 import com.gastromind.api.domain.models.TicketItem;
 import com.gastromind.api.domain.models.Unit;
+import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.enums.TicketLineVerificationStatus;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketItemRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketItemResponse;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketMeRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketResponse;
 import org.mapstruct.AfterMapping;
@@ -19,21 +22,36 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de ticket rest.
+ */
 public interface TicketRestMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "total_amount", source = "total_mount")
     @Mapping(target = "user_id.id", source = "user_id")
     @Mapping(target = "store_id.id", source = "store_id")
-    @Mapping(target = "items", expression = "java(mapRequestItems(request))")
+    @Mapping(target = "items", expression = "java(mapTicketItemRequests(request.items()))")
     Ticket toDomain(TicketRequest request);
 
+    @Mapping(target = "household_id", source = "houseHold_id.id")
+    @Mapping(target = "uploaded_by_user_id", source = "user_id.id")
     @Mapping(target = "user_id", source = "user_id.id")
     @Mapping(target = "store_id", source = "store_id.id")
     @Mapping(target = "items", source = "items")
     TicketResponse toResponse(Ticket domain);
 
     List<TicketResponse> toResponseList(List<Ticket> tickets);
+
+    default Ticket toDomainForMe(TicketMeRequest request, String userId) {
+        Ticket t = new Ticket();
+        t.setUser_id(new User(userId));
+        t.setStore_id(new Store(request.store_id()));
+        t.setTotal_amount(request.total_mount());
+        t.setPurchaseDate(request.purchaseDate());
+        t.setItems(mapTicketItemRequests(request.items()));
+        return t;
+    }
 
     List<TicketItemResponse> toItemResponseList(List<TicketItem> items);
 
@@ -50,10 +68,11 @@ public interface TicketRestMapper {
                 : TicketLineVerificationStatus.OK.name();
         boolean productNeedsReview = item.getProduct() != null && item.getProduct().isNeedsReview();
         String productReviewNote = item.getProduct() != null ? item.getProduct().getReviewNote() : null;
+        String productName = item.getProduct() != null ? item.getProduct().getName() : item.getLineProductName();
         return new TicketItemResponse(
                 item.getId(),
                 item.getProduct() != null ? item.getProduct().getId() : null,
-                item.getProduct() != null ? item.getProduct().getName() : null,
+                productName,
                 productNeedsReview,
                 productReviewNote,
                 item.getQuantity(),
@@ -72,31 +91,49 @@ public interface TicketRestMapper {
         }
     }
 
-    default List<TicketItem> mapRequestItems(TicketRequest request) {
-        if (request.items() == null || request.items().isEmpty()) {
+    default List<TicketItem> mapTicketItemRequests(List<TicketItemRequest> lines) {
+        if (lines == null || lines.isEmpty()) {
             return new ArrayList<>();
         }
         List<TicketItem> out = new ArrayList<>();
-        for (TicketItemRequest line : request.items()) {
+        for (TicketItemRequest line : lines) {
             TicketItem ti = new TicketItem();
-            Product p = new Product(line.product_id());
-            ti.setProduct(p);
+            if (hasText(line.product_id())) {
+                Product p = new Product(line.product_id().trim());
+                ti.setProduct(p);
+            } else {
+                ti.setProduct(null);
+            }
+            if (hasText(line.line_product_name())) {
+                ti.setLineProductName(line.line_product_name().trim());
+            }
             ti.setQuantity(line.quantity());
             ti.setPriceUnit(line.price_unit());
-            if (line.unit_id() != null && !line.unit_id().isBlank()) {
-                ti.setUnit(new Unit(line.unit_id()));
+            if (hasText(line.unit_id())) {
+                ti.setUnit(new Unit(line.unit_id().trim()));
             }
-            if (line.verification_status() != null && !line.verification_status().isBlank()) {
+            if (hasText(line.verification_status())) {
                 try {
-                    ti.setVerificationStatus(TicketLineVerificationStatus.valueOf(line.verification_status().trim()));
+                    ti.setVerificationStatus(
+                            TicketLineVerificationStatus.valueOf(line.verification_status().trim().toUpperCase()));
                 } catch (IllegalArgumentException ignored) {
                 }
             }
-            if (line.line_note() != null && !line.line_note().isBlank()) {
+            if (hasText(line.line_note())) {
                 ti.setLineNote(line.line_note().trim());
             }
             out.add(ti);
         }
         return out;
     }
+
+    private static boolean hasText(String value) {
+        return value != null && !value.isBlank();
+    }
 }
+
+
+
+
+
+

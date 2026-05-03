@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
+/**
+ * Define el contrato de user jpa.
+ */
 public interface UserJpaRepository extends JpaRepository<UserEntity, String> {
 
     @EntityGraph(attributePaths = {"household", "household.members"})
@@ -22,3 +25,9 @@ public interface UserJpaRepository extends JpaRepository<UserEntity, String> {
     @EntityGraph(attributePaths = {"allergens", "household"})
     List<UserEntity> findByHouseholdId(String householdId);
 }
+
+
+
+
+
+

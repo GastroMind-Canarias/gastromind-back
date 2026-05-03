@@ -10,19 +10,22 @@ import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
-@Schema(description = "Datos de entrada para la gestión de usuarios")
+@Schema(description = "Datos de entrada para la gestion de usuarios")
+/**
+ * Representa user request dentro del dominio de la aplicacion.
+ */
 public record UserRequest(
 
-        @Schema(example = "Juan Pérez")
+        @Schema(example = "Juan Perez")
         @NotBlank(message = "El name es obligatorio")
         String name,
 
         @Schema(example = "juan@gastromind.com")
         @NotBlank(message = "El email es obligatorio")
-        @Email(message = "El formato del email no es válido")
+        @Email(message = "El formato del email no es valido")
         String email,
 
-        @Schema(example = "Secret123!", description = "Mínimo 8 caracteres")
+        @Schema(example = "Secret123!", description = "Minimo 8 caracteres")
         @Size(min = 8, message = "La password debe tener al menos 8 caracteres")
         String password,
 
@@ -34,6 +37,12 @@ public record UserRequest(
         @NotNull(message = "El role es obligatorio")
         Role role,
 
-        @Schema(description = "Lista de alérgenos asociados al usuario")
+        @Schema(description = "Lista de alergenos asociados al usuario")
         List<AllergenResponse> allergens
 ) {}
+
+
+
+
+
+

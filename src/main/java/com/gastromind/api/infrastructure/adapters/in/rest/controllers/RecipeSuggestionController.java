@@ -26,7 +26,10 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/v1/households")
-@Tag(name = "Recetas IA", description = "Sugerencias de receta según nevera, alérgenos y electrodomésticos del hogar.")
+@Tag(name = "Recetas IA", description = "Sugerencias de receta segun nevera, alergenos y electrodomesticos del hogar.")
+/**
+ * Controlador REST para operaciones de recipe suggestion.
+ */
 public class RecipeSuggestionController {
 
     @Autowired
@@ -50,15 +53,21 @@ public class RecipeSuggestionController {
 
     private String requireHouseholdId(User user) {
         if (user.getHouseHold_id() == null || user.getHouseHold_id().getId() == null) {
-            throw new ForbiddenException("El usuario no pertenece a ningún hogar");
+            throw new ForbiddenException("El usuario no pertenece a ningun hogar");
         }
         return user.getHouseHold_id().getId();
     }
 
     @Operation(summary = "Sugerir una receta con IA (contexto del hogar)", description = """
-            Genera **una** receta usando Gemini con productos de la nevera, alérgenos agregados de los miembros,
-            electrodomésticos del hogar y raciones: o las indicadas en el cuerpo o, si no, el número de miembros.
-            La sugerencia se guarda en Redis (~10 días) hasta guardarla como favorita.""")
+            Genera **una** receta usando Gemini con productos de la nevera, alergenos agregados de los miembros,
+            electrodomesticos del hogar y raciones: o las indicadas en el cuerpo o, si no, el numero de miembros.
+            La sugerencia se guarda en Redis (~10 dias) hasta guardarla como favorita.""")
+    /**
+     * Realiza suggest.
+     * @param authentication usuario autenticado.
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
     @ApiPostDoc
     @PostMapping("/me/recipes/suggestions")
     @PreAuthorize("isAuthenticated()")
@@ -76,9 +85,15 @@ public class RecipeSuggestionController {
         return ResponseEntity.ok(new SuggestRecipeResponse(result.suggestionId(), recipeResponse));
     }
 
-    @Operation(summary = "Recuperar una sugerencia guardada en caché", description = """
-            Devuelve la misma forma que POST /suggestions si la clave sigue en Redis (TTL ~10 días)
-            y coincide hogar + usuario. Útil si el front guarda solo suggestionId (p. ej. en la URL) y recarga la página.""")
+    @Operation(summary = "Recuperar una sugerencia guardada en cache", description = """
+            Devuelve la misma forma que POST /suggestions si la clave sigue en Redis (TTL ~10 dias)
+            y coincide hogar + usuario. Util si el front guarda solo suggestionId (p. ej. en la URL) y recarga la pagina.""")
+    /**
+     * Devuelve recipe suggestion por suggestion.
+     * @param authentication usuario autenticado.
+     * @param suggestionId valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
     @ApiStandardDoc
     @GetMapping("/me/recipes/suggestions/{suggestionId}")
     @PreAuthorize("isAuthenticated()")
@@ -93,3 +108,7 @@ public class RecipeSuggestionController {
         return ResponseEntity.ok(new SuggestRecipeResponse(suggestionId, recipeRestMapper.toResponse(recipe)));
     }
 }
+
+
+
+

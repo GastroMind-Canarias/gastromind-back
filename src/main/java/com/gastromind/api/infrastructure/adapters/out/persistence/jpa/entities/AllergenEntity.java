@@ -6,6 +6,9 @@ import java.util.Set;
 
 @Entity
 @Table(name = "allergen")
+/**
+ * Representa allergen dentro del dominio de la aplicacion.
+ */
 public class AllergenEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
@@ -19,13 +22,27 @@ public class AllergenEntity {
 
     @ManyToMany(mappedBy = "allergens")
     private Set<ProductEntity> products;
+    /**
+     * Constructor de allergen.
+     */
 
     public AllergenEntity() {
     }
+    /**
+     * Constructor de allergen.
+     * @param id el identificador del recurso
+     */
 
     public AllergenEntity(String id) {
         this.id = id;
     }
+    /**
+     * Constructor de allergen.
+     * @param id el identificador del recurso
+     * @param name el nombre
+     * @param users valor a utilizar.
+     * @param products los productos
+     */
 
     public AllergenEntity(String id, String name, Set<UserEntity> users, Set<ProductEntity> products) {
         this.id = id;
@@ -33,38 +50,74 @@ public class AllergenEntity {
         this.users = users;
         this.products = products;
     }
+    /**
+     * Devuelve id.
+     * @return valor actual.
+     */
 
     public String getId() {
         return id;
     }
+    /**
+     * Define id.
+     * @param id el identificador del recurso
+     */
 
     public void setId(String id) {
         this.id = id;
     }
+    /**
+     * Devuelve name.
+     * @return valor actual.
+     */
 
     public String getName() {
         return name;
     }
+    /**
+     * Define name.
+     * @param name el nombre
+     */
 
     public void setName(String name) {
         this.name = name;
     }
+    /**
+     * Devuelve users.
+     * @return resultado de la operacion solicitada.
+     */
 
     public Set<UserEntity> getUsers() {
         return users;
     }
+    /**
+     * Define users.
+     * @param users valor a utilizar.
+     */
 
     public void setUsers(Set<UserEntity> users) {
         this.users = users;
     }
+    /**
+     * Devuelve products.
+     * @return resultado de la operacion solicitada.
+     */
 
     public Set<ProductEntity> getProducts() {
         return products;
     }
+    /**
+     * Define products.
+     * @param products los productos
+     */
 
     public void setProducts(Set<ProductEntity> products) {
         this.products = products;
     }
+    /**
+     * Calcula el hash de la instancia.
+     * @return valor configurado.
+     */
 
     @Override
     public int hashCode() {
@@ -73,6 +126,11 @@ public class AllergenEntity {
         result = prime * result + ((id == null) ? 0 : id.hashCode());
         return result;
     }
+    /**
+     * Compara esta instancia con otro objeto.
+     * @param obj valor a utilizar.
+     * @return true si cumple la condicion; false en caso contrario.
+     */
 
     @Override
     public boolean equals(Object obj) {
@@ -92,3 +150,7 @@ public class AllergenEntity {
     }
 
 }
+
+
+
+

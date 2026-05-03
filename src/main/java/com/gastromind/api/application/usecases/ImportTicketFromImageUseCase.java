@@ -2,6 +2,7 @@ package com.gastromind.api.application.usecases;
 
 import com.gastromind.api.application.services.TicketProductResolutionService;
 import com.gastromind.api.application.services.TicketQuantityUnitResolver;
+import com.gastromind.api.domain.models.Fridge;
 import com.gastromind.api.domain.models.Product;
 import com.gastromind.api.domain.models.Store;
 import com.gastromind.api.domain.models.Ticket;
@@ -12,10 +13,14 @@ import com.gastromind.api.domain.models.enums.TicketLineVerificationStatus;
 import com.gastromind.api.domain.models.ticket.ExtractedTicketLine;
 import com.gastromind.api.domain.models.ticket.ExtractedTicketReceipt;
 import com.gastromind.api.domain.exceptions.NotFoundException;
+import com.gastromind.api.domain.ports.in.IFridgeItemService;
 import com.gastromind.api.domain.ports.in.ITicketService;
+import com.gastromind.api.domain.ports.out.FridgeRepository;
+import com.gastromind.api.domain.ports.out.ProductRepository;
 import com.gastromind.api.domain.ports.out.StoreRepository;
 import com.gastromind.api.domain.ports.out.TicketExtractionPort;
 import com.gastromind.api.domain.ports.out.UserRepository;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,31 +29,65 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
+/**
+ * Caso de uso que importa un ticket desde una imagen y lo persiste en el sistema.
+ * Ademas, proyecta sus lineas al inventario de nevera del hogar cuando corresponde.
+ */
 public class ImportTicketFromImageUseCase {
 
     private final TicketExtractionPort extraction;
-    private final TicketProductResolutionService productResolution;
+    private final ProductRepository productRepository;
     private final TicketQuantityUnitResolver unitResolver;
     private final ITicketService ticketService;
     private final UserRepository userRepository;
     private final StoreRepository storeRepository;
+    private final FridgeRepository fridgeRepository;
+    private final IFridgeItemService fridgeItemService;
+    /**
+     * Constructor con las dependencias necesarias para extraer, normalizar y guardar tickets.
+     *
+     * @param extraction puerto de extraccion OCR/IA de tickets
+     * @param productRepository repositorio de productos del catalogo
+     * @param unitResolver resolvedor de unidades detectadas en lineas del ticket
+     * @param ticketService servicio de persistencia de tickets
+     * @param userRepository repositorio de usuarios
+     * @param storeRepository repositorio de tiendas
+     * @param fridgeRepository repositorio de neveras
+     * @param fridgeItemService servicio para anadir lineas de ticket a nevera
+     */
 
     public ImportTicketFromImageUseCase(
             TicketExtractionPort extraction,
-            TicketProductResolutionService productResolution,
+            ProductRepository productRepository,
             TicketQuantityUnitResolver unitResolver,
             ITicketService ticketService,
             UserRepository userRepository,
-            StoreRepository storeRepository) {
+            StoreRepository storeRepository,
+            FridgeRepository fridgeRepository,
+            IFridgeItemService fridgeItemService) {
         this.extraction = extraction;
-        this.productResolution = productResolution;
+        this.productRepository = productRepository;
         this.unitResolver = unitResolver;
         this.ticketService = ticketService;
         this.userRepository = userRepository;
         this.storeRepository = storeRepository;
+        this.fridgeRepository = fridgeRepository;
+        this.fridgeItemService = fridgeItemService;
     }
+    /**
+     * Procesa la imagen del ticket y devuelve el ticket persistido con sus lineas.
+     *
+     * @param imageBytes contenido binario de la imagen
+     * @param mimeType tipo MIME de la imagen
+     * @param userId identificador del usuario propietario del ticket
+     * @param storeIdOrNull identificador de tienda opcional; si es nulo, se intenta resolver por nombre extraido
+     * @return ticket guardado en base de datos
+     * @throws NotFoundException si el usuario o la tienda indicada no existen
+     * @throws IllegalArgumentException si faltan datos minimos para resolver productos o tienda
+     */
 
     @Transactional
     public Ticket execute(byte[] imageBytes, String mimeType, String userId, String storeIdOrNull) {
@@ -60,7 +99,12 @@ public class ImportTicketFromImageUseCase {
 
         List<TicketItem> items = new ArrayList<>();
         for (ExtractedTicketLine line : extracted.lines()) {
-            Product product = productResolution.resolveOrCreate(line.productName());
+            String normalized = TicketProductResolutionService.normalizeName(line.productName());
+            if (normalized.isEmpty()) {
+                throw new IllegalArgumentException("Nombre de producto vacio en una linea del ticket");
+            }
+            Optional<Product> catalog = productRepository.findFirstByNameIgnoreCase(normalized);
+
             BigDecimal qtyAmt = line.quantityAmount().max(BigDecimal.ZERO);
             if (qtyAmt.compareTo(BigDecimal.ZERO) <= 0) {
                 qtyAmt = BigDecimal.ONE;
@@ -70,7 +114,7 @@ public class ImportTicketFromImageUseCase {
             BigDecimal unitPrice = inferUnitPrice(line, qtyAmt, unit);
 
             TicketItem ti = new TicketItem();
-            ti.setProduct(product);
+            catalog.ifPresentOrElse(ti::setProduct, () -> ti.setLineProductName(normalized));
             ti.setQuantity(qtyAmt);
             ti.setUnit(unit);
             ti.setPriceUnit(unitPrice);
@@ -98,12 +142,35 @@ public class ImportTicketFromImageUseCase {
         ticket.setPurchaseDate(purchaseDate);
         ticket.setItems(items);
 
-        return ticketService.create(ticket);
+        Ticket saved = ticketService.create(ticket);
+        pushTicketLinesToFridge(saved);
+        return saved;
     }
 
-    /**
-     * Precio referido a la unidad de medida: €/kg (g o kg), €/l (ml o l), €/unidad (ud).
-     */
+    private void pushTicketLinesToFridge(Ticket ticket) {
+        if (ticket.getHouseHold_id() == null || ticket.getHouseHold_id().getId() == null
+                || ticket.getItems() == null || ticket.getItems().isEmpty()) {
+            return;
+        }
+        Fridge fridge = fridgeRepository.findFirstByHouseholdId(ticket.getHouseHold_id().getId()).orElse(null);
+        if (fridge == null || fridge.getId() == null) {
+            return;
+        }
+        String fridgeId = fridge.getId();
+        for (TicketItem item : ticket.getItems()) {
+            if (item.getQuantity() == null || item.getQuantity().compareTo(BigDecimal.ZERO) <= 0) {
+                continue;
+            }
+            if (item.getProduct() != null && item.getProduct().getId() != null) {
+                fridgeItemService.addProductToFridge(fridgeId, item.getProduct().getId(), item.getQuantity(), null,
+                        ItemStatus.GOOD);
+            } else if (item.getLineProductName() != null && !item.getLineProductName().isBlank()) {
+                fridgeItemService.addLabeledItemToFridge(fridgeId, item.getLineProductName().trim(),
+                        item.getQuantity(), null, ItemStatus.GOOD);
+            }
+        }
+    }
+
     private static BigDecimal inferUnitPrice(ExtractedTicketLine line, BigDecimal qtyAmt, Unit unit) {
         if (line.unitPrice() != null && line.unitPrice().compareTo(BigDecimal.ZERO) > 0) {
             return line.unitPrice().setScale(4, RoundingMode.HALF_UP);
@@ -152,11 +219,11 @@ public class ImportTicketFromImageUseCase {
         if (!name.isEmpty()) {
             return storeRepository.findFirstByNameIgnoreCase(name)
                     .orElseThrow(() -> new IllegalArgumentException(
-                            "No se indicó store_id y no hay tienda en catálogo con nombre: " + name
-                                    + ". Cree la tienda o envíe store_id."));
+                            "No se indico store_id y no hay tienda en catalogo con nombre: " + name
+                                    + ". Cree la tienda o enviese store_id."));
         }
         throw new IllegalArgumentException(
-                "No se indicó store_id y el ticket no muestra un nombre de tienda reconocible. Envíe store_id.");
+                "No se indico store_id y el ticket no muestra un nombre de tienda reconocible. Enviese store_id.");
     }
 
     private static float sumLineTotals(List<TicketItem> items) {
@@ -179,3 +246,7 @@ public class ImportTicketFromImageUseCase {
         };
     }
 }
+
+
+
+

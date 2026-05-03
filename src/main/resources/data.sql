@@ -1,8 +1,8 @@
--- Habilitar extensión para UUIDs si no existe
+-- Habilitar extensiAn para UUIDs si no existe
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
--- Semilla idempotente (WHERE NOT EXISTS). Los UNIQUE en entidades JPA evitan duplicados lógicos en runtime.
--- Si Hibernate acaba de crear la tabla, ON CONFLICT(name) puede fallar hasta que exista el índice único.
+-- Semilla idempotente (WHERE NOT EXISTS). Los UNIQUE en entidades JPA evitan duplicados logicos en runtime.
+-- Si Hibernate acaba de crear la tabla, ON CONFLICT(name) puede fallar hasta que exista el Andice Anico.
 
 -- 1. HOUSEHOLD (una sola fila demo por nombre)
 INSERT INTO household (id, name)
@@ -13,7 +13,7 @@ WHERE NOT EXISTS (SELECT 1 FROM household h WHERE h.name = 'Familia GastroMind' 
 INSERT INTO category (id, name)
 SELECT gen_random_uuid(), v.name
 FROM (VALUES
-    ('Lácteos y Huevos'),
+    ('LActeos y Huevos'),
     ('Carnes y Aves'),
     ('Frutas y Verduras'),
     ('Despensa'),
@@ -27,15 +27,15 @@ SELECT gen_random_uuid(), v.name
 FROM (VALUES
     ('Gluten'),
     ('Lactosa'),
-    ('Crustáceos'),
+    ('CrustAceos'),
     ('Huevos'),
     ('Pescado'),
     ('Cacahuetes'),
     ('Soja'),
-    ('Frutos de cáscara'),
+    ('Frutos de cAscara'),
     ('Apio'),
     ('Mostaza'),
-    ('Sésamo'),
+    ('SAsamo'),
     ('Sulfitos'),
     ('Altramuces'),
     ('Moluscos')
@@ -68,7 +68,7 @@ WHERE NOT EXISTS (SELECT 1 FROM users u WHERE u.email = 'gastromind@gmail.com' L
 -- 6. PRODUCTS
 INSERT INTO product (id, name, is_essential, category_id)
 SELECT gen_random_uuid(), 'Leche Entera', true,
-       (SELECT id FROM category WHERE name = 'Lácteos y Huevos' LIMIT 1)
+       (SELECT id FROM category WHERE name = 'LActeos y Huevos' LIMIT 1)
 WHERE NOT EXISTS (SELECT 1 FROM product p WHERE p.name = 'Leche Entera');
 
 INSERT INTO product (id, name, is_essential, category_id)

@@ -5,6 +5,9 @@ import com.gastromind.api.domain.models.Fridge;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Define el contrato de persistencia o integracion para fridge.
+ */
 public interface FridgeRepository {
     Fridge save(Fridge fridge);
 
@@ -15,4 +18,6 @@ public interface FridgeRepository {
     List<Fridge> findAll();
 
     List<Fridge> findByHouseholdId(String householdId);
+
+    Optional<Fridge> findFirstByHouseholdId(String householdId);
 }

@@ -27,6 +27,10 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
+/**
+ * Caso de uso que solicita una receta sugerida a partir del contexto del hogar.
+ * Reune stock disponible, alergenos y electrodomesticos antes de invocar el puerto de IA.
+ */
 public class SuggestRecipeFromHouseholdUseCase {
 
     private final IHouseHoldService houseHoldService;
@@ -34,6 +38,15 @@ public class SuggestRecipeFromHouseholdUseCase {
     private final IFridgeItemService fridgeItemService;
     private final RecipeAiPort recipeAiPort;
     private final RecipeSuggestionCachePort suggestionCache;
+    /**
+     * Constructor con las dependencias para construir el contexto de sugerencia.
+     *
+     * @param houseHoldService servicio de hogares
+     * @param fridgeRepository repositorio de neveras
+     * @param fridgeItemService servicio de items de nevera
+     * @param recipeAiPort puerto de generaciAn de recetas
+     * @param suggestionCache cachA de sugerencias generadas
+     */
 
     public SuggestRecipeFromHouseholdUseCase(
             IHouseHoldService houseHoldService,
@@ -47,12 +60,15 @@ public class SuggestRecipeFromHouseholdUseCase {
         this.recipeAiPort = recipeAiPort;
         this.suggestionCache = suggestionCache;
     }
-
     /**
-     * @param householdId hogar del usuario autenticado
-     * @param userId      id del usuario autenticado
-     * @param servings    si viene null o &lt;= 0, se usa el número de miembros del hogar (mínimo 1)
+     * Genera una sugerencia de receta para el hogar indicado y la guarda en cachA.
+     *
+     * @param householdId identificador del hogar
+     * @param userId identificador del usuario que solicita la sugerencia
+     * @param servings raciones deseadas; si es nulo o invalido, se ajusta al tamaAo del hogar
+     * @return receta propuesta junto con su identificador de sugerencia
      */
+
     @Transactional(readOnly = true)
     public SuggestRecipeResult execute(String householdId, String userId, Integer servings) {
         List<User> members = houseHoldService.listMembers(householdId);
@@ -78,9 +94,6 @@ public class SuggestRecipeFromHouseholdUseCase {
         return new SuggestRecipeResult(recipe, suggestionId);
     }
 
-    /**
-     * Suma cantidades por {@code product_id} en la nevera (excluye consumido / caducado).
-     */
     private List<RecipeStockLine> collectAvailableStock(String householdId) {
         Map<String, StockAgg> byProduct = new LinkedHashMap<>();
         fridgeRepository.findByHouseholdId(householdId).forEach(fridge -> {
@@ -139,3 +152,7 @@ public class SuggestRecipeFromHouseholdUseCase {
 
     public record SuggestRecipeResult(Recipe recipe, String suggestionId) {}
 }
+
+
+
+

@@ -10,11 +10,14 @@ import jakarta.validation.constraints.Positive;
 import java.time.LocalDate;
 
 @Schema(description = "Objeto para registrar una nueva receta")
+/**
+ * Representa recipe request dentro del dominio de la aplicacion.
+ */
 public record RecipeRequest(
         @Schema(example = "Huevos a la estampida")
         @NotBlank(message = "El nombre de la receta es obligatorio")
         String title,
-        @Schema(example = "1º - Cortar las papas para posteriormente añadirles sal al gusto y freirlas...")
+        @Schema(example = "1 - Cortar las papas para posteriormente anadirles sal al gusto y freirlas...")
         @NotBlank(message = "Las instrucciones para realizar la receta son obligatorias")
         String instructions,
         @Schema(example = "4", description = "Cantidad de raciones de la receta")
@@ -36,3 +39,9 @@ public record RecipeRequest(
         LocalDate created_at
 ) {
 }
+
+
+
+
+
+

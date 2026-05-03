@@ -1,6 +1,9 @@
 package com.gastromind.api.infrastructure.adapters.in.rest.mappers;
 
+import com.gastromind.api.domain.models.Product;
 import com.gastromind.api.domain.models.UsualPurchase;
+import com.gastromind.api.domain.models.User;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.usualpurchase.UsualPurchaseMeRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.usualpurchase.UsualPurchaseRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.usualpurchase.UsualPurchaseResponse;
 import org.mapstruct.Mapper;
@@ -9,6 +12,9 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de usual purchase rest.
+ */
 public interface UsualPurchaseRestMapper {
 
     @Mapping(target = "id", ignore = true)
@@ -21,4 +27,18 @@ public interface UsualPurchaseRestMapper {
     UsualPurchaseResponse toResponse(UsualPurchase domain);
 
     List<UsualPurchaseResponse> toResponseList(List<UsualPurchase> usualPurchases);
+
+    default UsualPurchase toDomainForMe(UsualPurchaseMeRequest request, String userId) {
+        UsualPurchase u = new UsualPurchase();
+        u.setUser_id(new User(userId));
+        u.setProduct_id(new Product(request.product_id()));
+        u.setTarget_quantity(request.target_quantity().floatValue());
+        return u;
+    }
 }
+
+
+
+
+
+

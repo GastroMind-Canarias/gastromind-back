@@ -8,9 +8,16 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+/**
+ * Representa open api config dentro del dominio de la aplicacion.
+ */
 public class OpenApiConfig {
 
     public static final String SECURITY_SCHEME = "bearerAuth";
+    /**
+     * Realiza open api.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Bean
     public OpenAPI openAPI() {
@@ -26,3 +33,7 @@ public class OpenApiConfig {
                 );
     }
 }
+
+
+
+

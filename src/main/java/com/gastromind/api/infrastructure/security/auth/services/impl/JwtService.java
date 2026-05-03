@@ -14,10 +14,16 @@ import java.time.Instant;
 import java.util.Date;
 
 @Service
+/**
+ * Servicio de utilidades JWT para emisiAn y validaciAn de tokens.
+ */
 public class JwtService implements IJwtService {
 
     private final SecretKey key;
     private final long expirationMinutes;
+    /**
+     * Inicializa la firma criptogrAfica y la expiraciAn configurada para los tokens.
+     */
 
     public JwtService(
             @Value("${app.jwt.secret}") String secret,
@@ -26,6 +32,7 @@ public class JwtService implements IJwtService {
         this.key = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));
         this.expirationMinutes = expirationMinutes;
     }
+    /** Genera un token firmado para el usuario indicado. */
 
     @Override
     public String generateToken(String username) {
@@ -39,17 +46,27 @@ public class JwtService implements IJwtService {
                 .signWith(key)
                 .compact();
     }
+    /** Extrae el nombre de usuario contenido en el token. */
 
     @Override
     public String extractUsername(String token) {
         return parseClaims(token).getSubject();
     }
+    /** Valida que el token corresponda al usuario y no estA expirado. */
 
     @Override
     public boolean isTokenValid(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+        try {
+            Claims claims = parseClaims(token);
+            if (!claims.getSubject().equals(userDetails.getUsername())) {
+                return false;
+            }
+            return !claims.getExpiration().before(new Date());
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
+    /** Comprueba si el token es estructuralmente vAlido y vigente. */
 
     @Override
     public boolean isValid(String token) {
@@ -61,10 +78,6 @@ public class JwtService implements IJwtService {
         }
     }
 
-    private boolean isTokenExpired(String token) {
-        return parseClaims(token).getExpiration().before(new Date());
-    }
-
     private Claims parseClaims(String token) {
         return Jwts.parser()
                 .verifyWith(key)
@@ -73,3 +86,7 @@ public class JwtService implements IJwtService {
                 .getPayload();
     }
 }
+
+
+
+

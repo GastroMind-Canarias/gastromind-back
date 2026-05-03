@@ -7,6 +7,9 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de unit.
+ */
 public interface UnitMapper {
 
     UnitEntity toEntity(Unit domain);
@@ -16,3 +19,9 @@ public interface UnitMapper {
     List<UnitEntity> toEntityList(List<Unit> domainList);
     List<Unit> toDomainList(List<UnitEntity> entityList);
 }
+
+
+
+
+
+

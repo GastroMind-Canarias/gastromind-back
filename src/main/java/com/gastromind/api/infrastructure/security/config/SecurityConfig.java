@@ -19,12 +19,26 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+/**
+ * Representa security config dentro del dominio de la aplicacion.
+ */
 public class SecurityConfig {
     private final SecurityPathsProperties paths;
+    /**
+     * Constructor de security config.
+     * @param paths valor a utilizar.
+     */
 
     public SecurityConfig(SecurityPathsProperties paths) {
         this.paths = paths;
     }
+    /**
+     * Realiza security filter chain.
+     * @param http valor a utilizar.
+     * @param jwtFilter valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     * @throws Exception si ocurre una condicion de error en la operacion
+     */
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http, JwtAuthenticationFilter jwtFilter) throws Exception {
@@ -40,6 +54,11 @@ public class SecurityConfig {
         http.addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
+    /**
+     * Realiza user details service.
+     * @param userRepository valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Bean
     public UserDetailsService userDetailsService(UserJpaRepository userRepository) {
@@ -56,9 +75,17 @@ public class SecurityConfig {
                     .build();
         };
     }
+    /**
+     * Realiza password encoder.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }
+
+
+
+

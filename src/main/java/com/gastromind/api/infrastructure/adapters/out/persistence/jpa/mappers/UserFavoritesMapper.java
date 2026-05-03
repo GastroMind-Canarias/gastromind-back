@@ -8,6 +8,9 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring", uses = { UserMapper.class, RecipeMapper.class })
+/**
+ * Define el contrato de user favorites.
+ */
 public interface UserFavoritesMapper {
 
     @Mapping(source = "user_id", target = "user")
@@ -22,3 +25,9 @@ public interface UserFavoritesMapper {
 
     List<UserFavorites> toDomainList(List<UserFavoritesEntity> entityList);
 }
+
+
+
+
+
+

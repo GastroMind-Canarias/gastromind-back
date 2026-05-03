@@ -5,9 +5,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.List;
 
-@Schema(description = "Lista de tipos de electrodoméstico")
+@Schema(description = "Lista de tipos de electrodomestico")
+/**
+ * Representa appliance type list request dentro del dominio de la aplicacion.
+ */
 public record ApplianceTypeListRequest(
-        @Schema(description = "Tipos a añadir o a fijar como conjunto completo (PUT)")
+        @Schema(description = "Tipos a anadir o a fijar como conjunto completo (PUT)")
         List<Appliance> appliances
 ) {
 }
+
+
+
+
+
+

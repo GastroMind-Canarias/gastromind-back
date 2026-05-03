@@ -17,6 +17,9 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Component
+/**
+ * Representa recipe ingredient write dentro del dominio de la aplicacion.
+ */
 public class RecipeIngredientWriteAdapter implements RecipeIngredientWritePort {
 
     private static final String DEFAULT_UNIT_NAME = "Unidades";
@@ -27,6 +30,12 @@ public class RecipeIngredientWriteAdapter implements RecipeIngredientWritePort {
 
     @PersistenceContext
     private EntityManager entityManager;
+    /**
+     * Constructor de recipe ingredient write.
+     * @param recipeIngredientJpaRepository valor a utilizar.
+     * @param unitJpaRepository valor a utilizar.
+     * @param productJpaRepository valor a utilizar.
+     */
 
     public RecipeIngredientWriteAdapter(
             RecipeIngredientJpaRepository recipeIngredientJpaRepository,
@@ -36,6 +45,11 @@ public class RecipeIngredientWriteAdapter implements RecipeIngredientWritePort {
         this.unitJpaRepository = unitJpaRepository;
         this.productJpaRepository = productJpaRepository;
     }
+    /**
+     * Realiza save for recipe.
+     * @param recipeId valor a utilizar.
+     * @param usages valor a utilizar.
+     */
 
     @Override
     public void saveForRecipe(String recipeId, List<RecipeIngredientUsage> usages) {
@@ -45,7 +59,7 @@ public class RecipeIngredientWriteAdapter implements RecipeIngredientWritePort {
         UnitEntity unit = unitJpaRepository.findByName(DEFAULT_UNIT_NAME)
                 .or(() -> unitJpaRepository.findFirstByNameOrderByIdAsc(DEFAULT_UNIT_NAME))
                 .orElseGet(() -> unitJpaRepository.findAll().stream().findFirst()
-                        .orElseThrow(() -> new IllegalStateException("No hay unidades en catálogo")));
+                        .orElseThrow(() -> new IllegalStateException("No hay unidades en catalogo")));
         RecipeEntity recipeRef = entityManager.getReference(RecipeEntity.class, recipeId);
         for (RecipeIngredientUsage u : usages) {
             if (u.getProductId() == null || u.getProductId().isBlank()) {
@@ -64,3 +78,7 @@ public class RecipeIngredientWriteAdapter implements RecipeIngredientWritePort {
         }
     }
 }
+
+
+
+

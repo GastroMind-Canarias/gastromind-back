@@ -11,6 +11,9 @@ import java.time.LocalDate;
 import java.util.List;
 
 @Schema(description = "Datos necesarios para registrar un ticket")
+/**
+ * Representa ticket request dentro del dominio de la aplicacion.
+ */
 public record TicketRequest(
 
         @Schema(example = "user-123-abc", description = "ID del usuario que sube el ticket")
@@ -31,6 +34,12 @@ public record TicketRequest(
         @PastOrPresent(message = "La fecha no puede ser futura")
         LocalDate purchaseDate,
 
-        @Schema(description = "Líneas del ticket (opcional; vacío = solo cabecera)")
+        @Schema(description = "Lineas del ticket (opcional; vacio = solo cabecera)")
         List<@Valid TicketItemRequest> items
 ) {}
+
+
+
+
+
+

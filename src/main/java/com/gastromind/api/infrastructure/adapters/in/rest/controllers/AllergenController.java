@@ -20,7 +20,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/allergens")
-@Tag(name = "Alérgeno", description = "Gestión del catálogo de alérgenos e intolerancias alimentarias.")
+@Tag(name = "Alergeno", description = "Gestion del catalogo de alergenos e intolerancias alimentarias.")
+/**
+ * Controlador REST para consultar y mantener el catalogo de alergenos.
+ */
 public class AllergenController {
 
     @Autowired
@@ -28,25 +31,42 @@ public class AllergenController {
 
     @Autowired
     private AllergenRestMapper allergenMapper;
+    /**
+     * Lista todos los alergenos registrados.
+     *
+     * @return coleccion de alergenos
+     */
 
-    @Operation(summary = "Obtener todos los alérgenos", description = "Devuelve una lista completa de todos los alérgenos registrados en el sistema.")
+    @Operation(summary = "Obtener todos los alergenos", description = "Devuelve la lista completa de alergenos registrados en el sistema.")
     @GetMapping
     @ApiStandardDoc
     public ResponseEntity<List<AllergenResponse>> getAll() {
         List<Allergen> allergens = allergenServiceImpl.findAll();
         return ResponseEntity.ok(allergenMapper.toResponseList(allergens));
     }
+    /**
+     * Recupera un alergeno por su identificador.
+     *
+     * @param id identificador del alergeno
+     * @return alergeno encontrado
+     */
 
-    @Operation(summary = "Buscar alérgeno por ID", description = "Devuelve un único alérgeno basándose en su identificador único.")
+    @Operation(summary = "Buscar alergeno por ID", description = "Devuelve un alergeno concreto a partir de su identificador.")
     @ApiStandardDoc
     @GetMapping("/{id}")
     public ResponseEntity<AllergenResponse> getById(
-            @Parameter(description = "ID del alérgeno a buscar", example = "1") @PathVariable String id) {
+            @Parameter(description = "ID del alergeno a buscar", example = "1") @PathVariable String id) {
         Allergen allergen = allergenServiceImpl.findById(id);
         return ResponseEntity.ok(allergenMapper.toResponse(allergen));
     }
+    /**
+     * Registra un nuevo alergeno.
+     *
+     * @param request datos de alta del alergeno
+     * @return alergeno creado
+     */
 
-    @Operation(summary = "Crear nuevo alérgeno", description = "Registra un nuevo alérgeno en el sistema.")
+    @Operation(summary = "Crear nuevo alergeno", description = "Registra un nuevo alergeno en el sistema.")
     @ApiPostDoc
     @PostMapping
     public ResponseEntity<AllergenResponse> create(@Valid @RequestBody AllergenRequest request) {
@@ -54,8 +74,15 @@ public class AllergenController {
         Allergen savedAllergen = allergenServiceImpl.create(allergenDomain);
         return ResponseEntity.status(HttpStatus.CREATED).body(allergenMapper.toResponse(savedAllergen));
     }
+    /**
+     * Define un alergeno existente.
+     *
+     * @param id identificador del alergeno
+     * @param request datos actualizados
+     * @return alergeno actualizado
+     */
 
-    @Operation(summary = "Actualizar alérgeno", description = "Modifica los datos de un alérgeno existente.")
+    @Operation(summary = "Actualizar alergeno", description = "Modifica los datos de un alergeno existente.")
     @PutMapping("/{id}")
     @ApiStandardDoc
     public ResponseEntity<AllergenResponse> update(@PathVariable String id, @Valid @RequestBody AllergenRequest request) {
@@ -63,8 +90,14 @@ public class AllergenController {
         Allergen updatedAllergen = allergenServiceImpl.update(id, allergenDomain);
         return ResponseEntity.ok(allergenMapper.toResponse(updatedAllergen));
     }
+    /**
+     * Elimina un alergeno.
+     *
+     * @param id identificador del alergeno
+     * @return respuesta sin contenido
+     */
 
-    @Operation(summary = "Eliminar alérgeno", description = "Borra físicamente un alérgeno de la base de datos.")
+    @Operation(summary = "Eliminar alergeno", description = "Elimina un alergeno de forma permanente.")
     @DeleteMapping("/{id}")
     @ApiStandardDoc
     public ResponseEntity<Void> delete(@PathVariable String id) {
@@ -72,3 +105,7 @@ public class AllergenController {
         return ResponseEntity.noContent().build();
     }
 }
+
+
+
+

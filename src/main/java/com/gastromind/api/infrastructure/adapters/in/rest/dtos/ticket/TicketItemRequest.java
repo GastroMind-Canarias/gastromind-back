@@ -1,17 +1,21 @@
 package com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 
 import java.math.BigDecimal;
 
-@Schema(description = "Línea de ticket asociada a un producto del catálogo")
+@Schema(description = "Linea de ticket asociada a un producto del catalogo")
+/**
+ * Representa ticket item request dentro del dominio de la aplicacion.
+ */
 public record TicketItemRequest(
         @Schema(example = "550e8400-e29b-41d4-a716-446655440000")
-        @NotBlank(message = "El ID de producto es obligatorio en cada línea")
         String product_id,
+
+        @Schema(description = "Nombre libre del producto cuando no existe en catalogo", example = "Pan chapata")
+        String line_product_name,
 
         @Schema(example = "2")
         @NotNull(message = "La cantidad es obligatoria")
@@ -29,7 +33,13 @@ public record TicketItemRequest(
         @Schema(description = "Opcional: PENDING_REVIEW | OK. Por defecto OK.", example = "OK")
         String verification_status,
 
-        @Schema(description = "Opcional: nota de incidencias en la línea")
+        @Schema(description = "Opcional: nota de incidencias en la linea")
         String line_note
 ) {
 }
+
+
+
+
+
+

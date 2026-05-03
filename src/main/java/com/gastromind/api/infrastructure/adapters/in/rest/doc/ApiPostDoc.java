@@ -12,7 +12,8 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @ApiSecurityAndGlobalErrors 
 @ApiResponses({
-    @ApiResponse(responseCode = "201", description = "Recurso creado con éxito"),
-    @ApiResponse(responseCode = "400", description = "Solicitud incorrecta - Datos de entrada inválidos")
+    @ApiResponse(responseCode = "201", description = "Recurso creado correctamente"),
+    @ApiResponse(responseCode = "400", description = "Solicitud invAlida")
 })
 public @interface ApiPostDoc {}
+

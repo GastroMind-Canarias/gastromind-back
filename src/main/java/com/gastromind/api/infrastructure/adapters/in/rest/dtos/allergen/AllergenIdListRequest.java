@@ -5,9 +5,18 @@ import jakarta.validation.constraints.NotNull;
 
 import java.util.List;
 
-@Schema(description = "Lista de ids de alérgenos del catálogo")
+@Schema(description = "Lista de ids de alergenos del catalogo")
+/**
+ * Representa allergen id list request dentro del dominio de la aplicacion.
+ */
 public record AllergenIdListRequest(
-        @NotNull @Schema(description = "UUIDs de filas en allergen (puede estar vacío en PUT para borrar todos)")
+        @NotNull @Schema(description = "UUIDs de filas en allergen (puede estar vacio en PUT para borrar todos)")
         List<String> allergenIds
 ) {
 }
+
+
+
+
+
+

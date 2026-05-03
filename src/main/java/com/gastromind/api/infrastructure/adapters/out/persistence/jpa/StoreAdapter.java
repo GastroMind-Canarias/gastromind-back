@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 @Component
+/**
+ * Representa store dentro del dominio de la aplicacion.
+ */
 public class StoreAdapter implements StoreRepository {
 
     @Autowired
@@ -17,28 +20,51 @@ public class StoreAdapter implements StoreRepository {
 
     @Autowired 
     StoreMapper storeMapper;
+    /**
+     * Registra un nuevo store adapter.
+     * @param store la tienda
+     * @return resultado de la operacion solicitada.
+     */
 
     @Override
     public com.gastromind.api.domain.models.Store save(com.gastromind.api.domain.models.Store store) {
         StoreEntity entity = storeMapper.toEntity(store);
         return storeMapper.toDomain(storeJpaRepository.save(entity));
     }
+    /**
+     * Devuelve store adapter por id.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
     @Override
     public Optional<com.gastromind.api.domain.models.Store> findById(String id) {
         return storeJpaRepository.findById(id).map(storeMapper::toDomain);
     }
+    /**
+     * Realiza delete by id.
+     * @param id el identificador del recurso
+     */
 
     @Override
     public void deleteById(String id) {
        storeJpaRepository.deleteById(id);
     }
+    /**
+     * Lista todos los store adapter.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Override
     public List<com.gastromind.api.domain.models.Store> findAll() {
         List<StoreEntity> storeEntities = storeJpaRepository.findAll();
         return storeMapper.toDomainList(storeEntities);
     }
+    /**
+     * Realiza find first by name ignore case.
+     * @param name el nombre
+     * @return resultado de la operacion solicitada.
+     */
 
     @Override
     public Optional<com.gastromind.api.domain.models.Store> findFirstByNameIgnoreCase(String name) {
@@ -46,3 +72,7 @@ public class StoreAdapter implements StoreRepository {
     }
 
 }
+
+
+
+

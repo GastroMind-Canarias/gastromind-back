@@ -3,6 +3,9 @@ package com.gastromind.api.infrastructure.adapters.in.rest.dtos.category;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 @Schema(description = "Respuesta detallada de las categorias")
+/**
+ * Representa category response dentro del dominio de la aplicacion.
+ */
 public record CategoryResponse(
         @Schema(example = "550e8400-e29b-41d4-a716-446655440000")
         String id,
@@ -10,3 +13,9 @@ public record CategoryResponse(
         String name
 ) {
 }
+
+
+
+
+
+

@@ -1,6 +1,7 @@
 package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
 import com.gastromind.api.application.services.UserServiceImpl;
+import com.gastromind.api.application.usecases.UpdateMyPreferencesUseCase;
 import com.gastromind.api.domain.models.Allergen;
 import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.enums.Role;
@@ -10,6 +11,7 @@ import com.gastromind.api.infrastructure.adapters.in.rest.dtos.allergen.Allergen
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.allergen.AllergenResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.user.UserRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.user.UserResponse;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.user.UpdateMyPreferencesRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.AllergenRestMapper;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.UserRestMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +30,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/users")
-@Tag(name = "Usuario", description = "Gestión de los perfiles de usuario en el sistema.")
+@Tag(name = "Usuario", description = "Gestion de los perfiles de usuario en el sistema.")
+/**
+ * Controlador REST para operaciones de user.
+ */
 public class UserController {
 
     @Autowired
@@ -40,7 +45,15 @@ public class UserController {
     @Autowired
     private AllergenRestMapper allergenRestMapper;
 
-    @Operation(summary = "Obtener mi perfil", description = "Devuelve la información del usuario autenticado basándose en el token JWT.")
+    @Autowired
+    private UpdateMyPreferencesUseCase updateMyPreferencesUseCase;
+    /**
+     * Devuelve user por my profile.
+     * @param authentication usuario autenticado.
+     * @return resultado de la operacion solicitada.
+     */
+
+    @Operation(summary = "Obtener mi perfil", description = "Devuelve la informacion del usuario autenticado basandose en el token JWT.")
     @ApiStandardDoc
     @GetMapping("/me")
     public ResponseEntity<UserResponse> getMyProfile(Authentication authentication) {
@@ -51,6 +64,11 @@ public class UserController {
         User user = userServiceImpl.findByUsername(username);
         return ResponseEntity.ok(userMapper.toResponse(user));
     }
+    /**
+     * Devuelve user por id.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Buscar usuario por ID (Solo ADMIN)", description = "Permite a un administrador consultar cualquier perfil por su ID.")
     @ApiStandardDoc
@@ -60,8 +78,14 @@ public class UserController {
         User user = userServiceImpl.findById(id);
         return ResponseEntity.ok(userMapper.toResponse(user));
     }
+    /**
+     * Realiza update my profile.
+     * @param authentication usuario autenticado.
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Actualizar mi perfil", description = "Permite al usuario modificar su nombre, email y alérgenos.")
+    @Operation(summary = "Actualizar mi perfil", description = "Permite al usuario modificar su nombre, email y alergenos.")
     @ApiStandardDoc
     @PatchMapping("/me/profile")
     public ResponseEntity<UserResponse> updateMyProfile(Authentication authentication, @Valid @RequestBody UserRequest request) {
@@ -70,8 +94,29 @@ public class UserController {
         User updatedUser = userServiceImpl.updateProfile(existingUser.getId(), userChanges);
         return ResponseEntity.ok(userMapper.toResponse(updatedUser));
     }
+    /**
+     * Realiza update my preferences.
+     * @param authentication usuario autenticado.
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Listar mis alérgenos")
+    @Operation(summary = "Editar mis preferencias", description = "Reemplaza en una sola operacion los alergenos del usuario y utensilios del hogar.")
+    @ApiStandardDoc
+    @PatchMapping("/me/preferences")
+    public ResponseEntity<UserResponse> updateMyPreferences(
+            Authentication authentication,
+            @Valid @RequestBody UpdateMyPreferencesRequest request) {
+        User updatedUser = updateMyPreferencesUseCase.execute(authentication.getName(), request.allergenIds(), request.appliances());
+        return ResponseEntity.ok(userMapper.toResponse(updatedUser));
+    }
+    /**
+     * Realiza list my allergens.
+     * @param authentication usuario autenticado.
+     * @return resultado de la operacion solicitada.
+     */
+
+    @Operation(summary = "Listar mis alergenos")
     @ApiStandardDoc
     @GetMapping("/me/allergens")
     public ResponseEntity<List<AllergenResponse>> listMyAllergens(Authentication authentication) {
@@ -79,8 +124,14 @@ public class UserController {
         List<Allergen> list = userServiceImpl.listAllergens(user.getId());
         return ResponseEntity.ok(allergenRestMapper.toResponseList(list));
     }
+    /**
+     * Realiza add my allergen.
+     * @param authentication usuario autenticado.
+     * @param allergenId valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Añadir un alérgeno a mi perfil")
+    @Operation(summary = "Anadir un alergeno a mi perfil")
     @ApiPostDoc
     @PostMapping("/me/allergens")
     public ResponseEntity<Void> addMyAllergen(
@@ -90,8 +141,14 @@ public class UserController {
         userServiceImpl.addAllergen(user.getId(), allergenId);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+    /**
+     * Realiza add my allergens batch.
+     * @param authentication usuario autenticado.
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Añadir varios alérgenos a mi perfil")
+    @Operation(summary = "Anadir varios alergenos a mi perfil")
     @ApiPostDoc
     @PostMapping("/me/allergens/batch")
     public ResponseEntity<Void> addMyAllergensBatch(
@@ -101,8 +158,14 @@ public class UserController {
         userServiceImpl.addAllergensBulk(user.getId(), request.allergenIds());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
+    /**
+     * Realiza replace my allergens.
+     * @param authentication usuario autenticado.
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Sustituir todos mis alérgenos por el listado indicado")
+    @Operation(summary = "Sustituir todos mis alergenos por el listado indicado")
     @ApiStandardDoc
     @PutMapping("/me/allergens")
     public ResponseEntity<Void> replaceMyAllergens(
@@ -112,8 +175,14 @@ public class UserController {
         userServiceImpl.replaceAllergens(user.getId(), request.allergenIds());
         return ResponseEntity.noContent().build();
     }
+    /**
+     * Realiza remove my allergen.
+     * @param authentication usuario autenticado.
+     * @param allergenId valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Quitar un alérgeno de mi perfil")
+    @Operation(summary = "Quitar un alergeno de mi perfil")
     @ApiStandardDoc
     @DeleteMapping("/me/allergens/{allergenId}")
     public ResponseEntity<Void> removeMyAllergen(
@@ -123,8 +192,14 @@ public class UserController {
         userServiceImpl.removeAllergen(user.getId(), allergenId);
         return ResponseEntity.noContent().build();
     }
+    /**
+     * Realiza remove my allergens batch.
+     * @param authentication usuario autenticado.
+     * @param request los datos de la solicitud
+     * @return resultado de la operacion solicitada.
+     */
 
-    @Operation(summary = "Quitar varios alérgenos de mi perfil")
+    @Operation(summary = "Quitar varios alergenos de mi perfil")
     @ApiStandardDoc
     @DeleteMapping("/me/allergens/batch")
     public ResponseEntity<Void> removeMyAllergensBatch(
@@ -134,6 +209,10 @@ public class UserController {
         userServiceImpl.removeAllergensBulk(user.getId(), request.allergenIds());
         return ResponseEntity.noContent().build();
     }
+    /**
+     * Lista todos los user.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Obtener todos los usuarios (Solo ADMIN)")
     @ApiStandardDoc
@@ -143,6 +222,11 @@ public class UserController {
         List<User> users = userServiceImpl.findAll();
         return ResponseEntity.ok(userMapper.toResponseList(users));
     }
+    /**
+     * Elimina un user.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Eliminar usuario (Solo ADMIN)")
     @ApiStandardDoc
@@ -152,6 +236,12 @@ public class UserController {
         userServiceImpl.delete(id);
         return ResponseEntity.noContent().build();
     }
+    /**
+     * Realiza change user role.
+     * @param id el identificador del recurso
+     * @param newRole valor a utilizar.
+     * @return resultado de la operacion solicitada.
+     */
 
     @Operation(summary = "Cambiar rol de usuario (Solo ADMIN)")
     @PatchMapping("/{id}/role")
@@ -164,3 +254,7 @@ public class UserController {
         return ResponseEntity.ok(userMapper.toResponse(user));
     }
 }
+
+
+
+

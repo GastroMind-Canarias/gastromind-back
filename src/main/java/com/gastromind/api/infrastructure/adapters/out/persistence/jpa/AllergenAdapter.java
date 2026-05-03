@@ -11,6 +11,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 @Component
+/**
+ * Representa allergen dentro del dominio de la aplicacion.
+ */
 public class AllergenAdapter implements AllergenRepository {
 
     @Autowired
@@ -18,6 +21,11 @@ public class AllergenAdapter implements AllergenRepository {
 
     @Autowired
     AllergenMapper allergenMapper;
+    /**
+     * Registra un nuevo allergen.
+     * @param allergen el alergeno
+     * @return resultado de la operacion solicitada.
+     */
 
     @Override
     public Allergen save(Allergen allergen) {
@@ -25,17 +33,30 @@ public class AllergenAdapter implements AllergenRepository {
         return allergenMapper.toDomain(allergenJpaRepository.save(entity));
 
     }
+    /**
+     * Devuelve allergen por id.
+     * @param id el identificador del recurso
+     * @return resultado de la operacion solicitada.
+     */
 
     @Override
     public Optional<Allergen> findById(String id) {
         return allergenJpaRepository.findById(id).map(allergenMapper::toDomain);
 
     }
+    /**
+     * Realiza delete by id.
+     * @param id el identificador del recurso
+     */
 
     @Override
     public void deleteById(String id) {
         allergenJpaRepository.deleteById(id);
     }
+    /**
+     * Lista todos los allergen.
+     * @return lista actual.
+     */
 
     @Override
     public List<Allergen> findAll() {
@@ -44,3 +65,7 @@ public class AllergenAdapter implements AllergenRepository {
     }
 
 }
+
+
+
+

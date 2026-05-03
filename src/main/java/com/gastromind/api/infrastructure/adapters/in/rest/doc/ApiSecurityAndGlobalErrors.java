@@ -11,8 +11,9 @@ import java.lang.annotation.Target;
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponses({
-    @ApiResponse(responseCode = "401", description = "No autorizado - Token JWT inexistente o inválido"),
-    @ApiResponse(responseCode = "403", description = "Prohibido - No tienes los permisos necesarios"),
-    @ApiResponse(responseCode = "500", description = "Error interno - Fallo no controlado en el servidor")
+    @ApiResponse(responseCode = "401", description = "No autenticado o token invalido"),
+    @ApiResponse(responseCode = "403", description = "No tienes permisos para esta operacion"),
+    @ApiResponse(responseCode = "500", description = "Error interno del servidor")
 })
 public @interface ApiSecurityAndGlobalErrors {}
+

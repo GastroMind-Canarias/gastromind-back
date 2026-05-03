@@ -7,6 +7,9 @@ import org.mapstruct.Mapper;
 import java.util.List;
 
 @Mapper(componentModel = "spring")
+/**
+ * Define el contrato de category.
+ */
 public interface CategoryMapper {
 
     CategoryEntity toEntity(Category domain);
@@ -17,3 +20,9 @@ public interface CategoryMapper {
 
     List<Category> toDomainList(List<CategoryEntity> entityList);
 }
+
+
+
+
+
+

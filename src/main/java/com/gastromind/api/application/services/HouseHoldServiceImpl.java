@@ -22,11 +22,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ThreadLocalRandom;
 
-/**
- * Electrodomésticos: catálogo = enum; {@code household_appliances} solo enlaza hogar ↔ tipo.
- * Los borrados quitan esa relación, no una entidad de catálogo.
- */
 @Service
+/**
+ * Servicio de aplicacion para gestionar hogares, miembros y electrodomesticos.
+ */
 public class HouseHoldServiceImpl implements IHouseHoldService {
     private static final String INVITE_TOKEN_PREFIX = "invite_";
     private static final String INVITE_TOKEN_SEPARATOR = "_";
@@ -35,6 +34,13 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
     private final UserRepository userRepository;
     private final HouseholdApplianceRepository applianceRepository;
     private final FridgeRepository fridgeRepository;
+    /**
+     * Crea el servicio con los repositorios necesarios del contexto de hogar.
+     * @param repository repositorio de hogares
+     * @param userRepository repositorio de usuarios
+     * @param applianceRepository repositorio de electrodomesticos del hogar
+     * @param fridgeRepository repositorio de neveras
+     */
 
     public HouseHoldServiceImpl(HouseHoldRepository repository, UserRepository userRepository,
             HouseholdApplianceRepository applianceRepository, FridgeRepository fridgeRepository) {
@@ -43,11 +49,21 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
         this.applianceRepository = applianceRepository;
         this.fridgeRepository = fridgeRepository;
     }
+    /**
+     * Devuelve todos los hogares registrados.
+     * @return listado completo de hogares
+     */
 
     @Override
     public List<HouseHold> findAll() {
         return repository.findAll();
     }
+    /**
+     * Busca un hogar por su identificador.
+     * @param id identificador del hogar
+     * @return hogar encontrado
+     * @throws NotFoundException si no existe el hogar
+     */
 
     @Override
     public HouseHold findById(String id) {
@@ -59,6 +75,11 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
             throw new NotFoundException("Unidad Familiar no encontrada");
         }
     }
+    /**
+     * Crea un hogar y su nevera inicial.
+     * @param houseHold datos del hogar a crear
+     * @return hogar persistido
+     */
 
     @Override
     public HouseHold create(HouseHold houseHold) {
@@ -72,6 +93,10 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
         fridge.setHouseHold_id(houseHold);
         fridgeRepository.save(fridge);
     }
+    /**
+     * Elimina un hogar y desvincula a sus miembros.
+     * @param id identificador del hogar
+     */
 
     @Override
     public void delete(String id) {
@@ -84,6 +109,11 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
         });
         deleteHouseholdAndRelatedData(id);
     }
+    /**
+     * Quita a un miembro de un hogar.
+     * @param householdId identificador del hogar
+     * @param memberUserId identificador del miembro a eliminar
+     */
 
     @Override
     public void removeMember(String householdId, String memberUserId) {
@@ -98,6 +128,12 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
         member.setRole(Role.ROLE_MEMBER);
         userRepository.save(member);
     }
+    /**
+     * Promueve a propietario a un usuario del hogar.
+     * @param householdId identificador del hogar
+     * @param userId identificador del usuario a promover
+     * @return usuario actualizado
+     */
 
     @Override
     public User promoteToOwner(String householdId, String userId) {
@@ -111,40 +147,58 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
         user.setRole(Role.ROLE_OWNER);
         return userRepository.save(user);
     }
+    /**
+     * Anade un usuario a un hogar a partir de un token de invitacion.
+     * @param token token de invitacion
+     * @param userId identificador del usuario que se une
+     * @return usuario anadido al hogar
+     */
 
     @Override
     public User addMemberByToken(String token, String userId) {
         if (token == null || token.isBlank()) {
-            throw new IllegalArgumentException("El token de invitación es obligatorio");
+            throw new IllegalArgumentException("El token de invitacion es obligatorio");
         }
         if (!token.startsWith(INVITE_TOKEN_PREFIX)) {
-            throw new IllegalArgumentException("El token de invitación no tiene un formato válido");
+            throw new IllegalArgumentException("El token de invitacion no tiene un formato valido");
         }
 
         int separatorIndex = token.lastIndexOf(INVITE_TOKEN_SEPARATOR);
         if (separatorIndex < 0 || separatorIndex == token.length() - 1) {
-            throw new IllegalArgumentException("El token de invitación no contiene un hogar válido");
+            throw new IllegalArgumentException("El token de invitacion no contiene un hogar valido");
         }
 
         String householdId = token.substring(separatorIndex + 1);
         if (householdId.isBlank()) {
-            throw new IllegalArgumentException("El token de invitación no contiene un hogar válido");
+            throw new IllegalArgumentException("El token de invitacion no contiene un hogar valido");
         }
 
         return addMember(householdId, userId);
     }
+    /**
+     * Anade un electrodomestico a un hogar.
+     * @param householdId identificador del hogar
+     * @param appliance tipo de electrodomestico
+     * @return registro de electrodomestico creado
+     */
 
     @Override
     public HouseholdAppliance addAppliance(String householdId, Appliance appliance) {
         ensureHouseholdExists(householdId);
         if (applianceTypeExistsInHousehold(householdId, appliance, null)) {
-            throw new IllegalArgumentException("Ese tipo de electrodoméstico ya está en el hogar");
+            throw new IllegalArgumentException("Ese tipo de electrodomestico ya esta en el hogar");
         }
         HouseholdAppliance newAppliance = new HouseholdAppliance();
         newAppliance.setAppliance(appliance);
         newAppliance.setHouseholdId(householdId);
         return applianceRepository.save(newAppliance);
     }
+    /**
+     * Anade varios electrodomesticos evitando duplicados por tipo.
+     * @param householdId identificador del hogar
+     * @param appliances tipos de electrodomestico a anadir
+     * @return listado actualizado de electrodomesticos del hogar
+     */
 
     @Override
     @Transactional
@@ -163,6 +217,11 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
         }
         return listAppliances(householdId);
     }
+    /**
+     * Elimina varios electrodomesticos de un hogar por identificador de registro.
+     * @param householdId identificador del hogar
+     * @param applianceRecordIds identificadores de registros de electrodomestico
+     */
 
     @Override
     @Transactional
@@ -176,13 +235,19 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
                 continue;
             }
             HouseholdAppliance ha = applianceRepository.findById(rid)
-                    .orElseThrow(() -> new NotFoundException("Electrodoméstico no encontrado"));
+                    .orElseThrow(() -> new NotFoundException("Electrodomastico no encontrado"));
             if (!ha.getHouseholdId().equals(householdId)) {
-                throw new ForbiddenException("El electrodoméstico no pertenece a este hogar");
+                throw new ForbiddenException("El electrodomestico no pertenece a este hogar");
             }
             applianceRepository.deleteById(rid);
         }
     }
+    /**
+     * Reemplaza la coleccion completa de electrodomesticos de un hogar.
+     * @param householdId identificador del hogar
+     * @param appliances nueva lista de tipos de electrodomestico
+     * @return electrodomesticos guardados tras el reemplazo
+     */
 
     @Override
     @Transactional
@@ -201,18 +266,25 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
         }
         return saved;
     }
+    /**
+     * Define el tipo de un electrodomestico del hogar.
+     * @param householdId identificador del hogar
+     * @param applianceRecordId identificador del registro de electrodomestico
+     * @param appliance nuevo tipo de electrodomestico
+     * @return registro actualizado
+     */
 
     @Override
     @Transactional
     public HouseholdAppliance updateAppliance(String householdId, String applianceRecordId, Appliance appliance) {
         ensureHouseholdExists(householdId);
         HouseholdAppliance ha = applianceRepository.findById(applianceRecordId)
-                .orElseThrow(() -> new NotFoundException("Electrodoméstico no encontrado"));
+                .orElseThrow(() -> new NotFoundException("Electrodomastico no encontrado"));
         if (!ha.getHouseholdId().equals(householdId)) {
-            throw new ForbiddenException("El electrodoméstico no pertenece a este hogar");
+            throw new ForbiddenException("El electrodomestico no pertenece a este hogar");
         }
         if (applianceTypeExistsInHousehold(householdId, appliance, applianceRecordId)) {
-            throw new IllegalArgumentException("Ese tipo de electrodoméstico ya está en el hogar");
+            throw new IllegalArgumentException("Ese tipo de electrodomestico ya esta en el hogar");
         }
         ha.setAppliance(appliance);
         return applianceRepository.save(ha);
@@ -223,34 +295,60 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
                 .anyMatch(a -> a.getAppliance() == type
                         && (excludeRecordId == null || !excludeRecordId.equals(a.getId())));
     }
+    /**
+     * Elimina un electrodomestico concreto de un hogar.
+     * @param householdId identificador del hogar
+     * @param applianceRecordId identificador del registro de electrodomestico
+     */
 
     @Override
     @Transactional
     public void removeApplianceFromHousehold(String householdId, String applianceRecordId) {
         ensureHouseholdExists(householdId);
         HouseholdAppliance ha = applianceRepository.findById(applianceRecordId)
-                .orElseThrow(() -> new NotFoundException("Electrodoméstico no encontrado"));
+                .orElseThrow(() -> new NotFoundException("Electrodomastico no encontrado"));
         if (!ha.getHouseholdId().equals(householdId)) {
-            throw new ForbiddenException("El electrodoméstico no pertenece a este hogar");
+            throw new ForbiddenException("El electrodomestico no pertenece a este hogar");
         }
         applianceRepository.deleteById(applianceRecordId);
     }
+    /**
+     * Lista los electrodomesticos asociados a un hogar.
+     * @param householdId identificador del hogar
+     * @return lista de electrodomesticos del hogar
+     */
 
     @Override
     public List<HouseholdAppliance> listAppliances(String householdId) {
         return applianceRepository.findByHouseholdId(householdId);
     }
+    /**
+     * Lista los miembros de un hogar.
+     * @param householdId identificador del hogar
+     * @return usuarios pertenecientes al hogar
+     */
 
     @Override
     public List<User> listMembers(String householdId) {
         return userRepository.findByHouseholdId(householdId);
     }
+    /**
+     * Genera un token de invitacion para un hogar.
+     * @param householdId identificador del hogar
+     * @return token de invitacion generado
+     */
 
     @Override
     public String generateInviteToken(String householdId) {
         ensureHouseholdExists(householdId);
         return INVITE_TOKEN_PREFIX + UUID.randomUUID() + INVITE_TOKEN_SEPARATOR + householdId;
     }
+    /**
+     * Anade un usuario como miembro de un hogar.
+     * @param householdId identificador del hogar
+     * @param userId identificador del usuario
+     * @return usuario actualizado
+     */
 
     @Override
     public User addMember(String householdId, String userId) {
@@ -262,6 +360,10 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
         user.setRole(Role.ROLE_MEMBER);
         return userRepository.save(user);
     }
+    /**
+     * Gestiona la salida de un usuario de su hogar actual.
+     * @param userId identificador del usuario que abandona el hogar
+     */
 
     @Override
     @Transactional
@@ -270,7 +372,7 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
                 .orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
         if (user.getHouseHold_id() == null || user.getHouseHold_id().getId() == null) {
-            throw new ForbiddenException("El usuario no pertenece a ningún hogar");
+            throw new ForbiddenException("El usuario no pertenece a ningun hogar");
         }
 
         String householdId = user.getHouseHold_id().getId();
@@ -293,13 +395,13 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
         }
     }
 
-    /**
-     * Elimina neveras (e ítems en cascada), electrodomésticos del hogar y el registro del hogar.
-     * No debe quedar ningún usuario referenciando este hogar.
-     */
     private void deleteHouseholdAndRelatedData(String householdId) {
         applianceRepository.deleteAllByHouseholdId(householdId);
         fridgeRepository.findByHouseholdId(householdId).forEach(f -> fridgeRepository.deleteById(f.getId()));
         repository.deleteById(householdId);
     }
 }
+
+
+
+

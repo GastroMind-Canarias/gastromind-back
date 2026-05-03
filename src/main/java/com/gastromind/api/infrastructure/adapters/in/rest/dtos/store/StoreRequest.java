@@ -4,9 +4,18 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
 @Schema(description = "Objeto para registrar un nuevo supermercado")
+/**
+ * Representa store request dentro del dominio de la aplicacion.
+ */
 public record StoreRequest(
         @Schema(example = "Mercadona")
         @NotBlank(message = "El nombre del supermercado es obligatorio")
         String name
 ) {
 }
+
+
+
+
+
+

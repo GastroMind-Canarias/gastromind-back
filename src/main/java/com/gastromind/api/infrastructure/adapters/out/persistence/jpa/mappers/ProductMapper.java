@@ -8,6 +8,9 @@ import org.mapstruct.Mapping;
 import java.util.List;
 
 @Mapper(componentModel = "spring", uses = { CategoryMapper.class })
+/**
+ * Define el contrato de product.
+ */
 public interface ProductMapper {
 
     @Mapping(source = "is_essential", target = "isEssential")
@@ -22,3 +25,9 @@ public interface ProductMapper {
 
     List<Product> toDomainList(List<ProductEntity> entityList);
 }
+
+
+
+
+
+

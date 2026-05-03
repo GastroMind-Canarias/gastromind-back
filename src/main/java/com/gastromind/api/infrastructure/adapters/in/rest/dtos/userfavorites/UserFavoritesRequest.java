@@ -4,6 +4,9 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotBlank;
 
 @Schema(description = "Datos para marcar una receta como favorita")
+/**
+ * Representa user favorites request dentro del dominio de la aplicacion.
+ */
 public record UserFavoritesRequest(
 
         @Schema(example = "usr-456-abc", description = "ID del usuario que marca el favorito")
@@ -14,3 +17,9 @@ public record UserFavoritesRequest(
         @NotBlank(message = "El recipe_id es obligatorio")
         String recipe_id
 ) {}
+
+
+
+
+
+
