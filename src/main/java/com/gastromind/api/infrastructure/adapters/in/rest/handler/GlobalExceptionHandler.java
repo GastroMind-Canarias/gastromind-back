@@ -17,6 +17,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 
@@ -85,7 +86,7 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AiRecipeException.class)
     public ResponseEntity<ErrorResponse> handleAiRecipeException(AiRecipeException ex) {
-        return buildResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+        return buildResponse(resolveAiProviderHttpStatus(ex), ex.getMessage());
     }
     /**
      * Realiza handle ai ticket exception.
@@ -95,7 +96,26 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AiTicketException.class)
     public ResponseEntity<ErrorResponse> handleAiTicketException(AiTicketException ex) {
-        return buildResponse(HttpStatus.SERVICE_UNAVAILABLE, ex.getMessage());
+        return buildResponse(resolveAiProviderHttpStatus(ex), ex.getMessage());
+    }
+
+    /**
+     * 429 si la causa raiz es rate limit del cliente HTTP hacia el proveedor de IA; en caso contrario 503.
+     */
+    private static HttpStatus resolveAiProviderHttpStatus(Throwable ex) {
+        if (isTooManyRequestsInCauseChain(ex)) {
+            return HttpStatus.TOO_MANY_REQUESTS;
+        }
+        return HttpStatus.SERVICE_UNAVAILABLE;
+    }
+
+    private static boolean isTooManyRequestsInCauseChain(Throwable ex) {
+        for (Throwable t = ex; t != null; t = t.getCause()) {
+            if (t instanceof RestClientResponseException r && r.getStatusCode().value() == 429) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @ExceptionHandler({

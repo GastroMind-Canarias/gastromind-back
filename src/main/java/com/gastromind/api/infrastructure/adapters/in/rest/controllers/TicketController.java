@@ -7,6 +7,7 @@ import com.gastromind.api.domain.exceptions.ForbiddenException;
 import com.gastromind.api.domain.models.Ticket;
 import com.gastromind.api.domain.models.User;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
+import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostExternalAiDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketMeRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketRequest;
@@ -143,7 +144,7 @@ public class TicketController {
      * @param storeId identificador de la tienda (opcional).
      * @return resultado de la operacion solicitada.
      */
-    @ApiPostDoc
+    @ApiPostExternalAiDoc
     @PostMapping(value = "/from-image", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<TicketResponse> importFromImage(
