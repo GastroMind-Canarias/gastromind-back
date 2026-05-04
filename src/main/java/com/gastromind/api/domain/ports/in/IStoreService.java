@@ -1,6 +1,8 @@
 package com.gastromind.api.domain.ports.in;
 
+import com.gastromind.api.domain.models.PendingStore;
 import com.gastromind.api.domain.models.Store;
+import com.gastromind.api.domain.models.StoreAlias;
 
 import java.util.List;
 
@@ -13,4 +15,10 @@ public interface IStoreService {
     Store create(Store store);
     Store update(String id, Store store);
     void delete(String id);
+    StoreAlias createAliasForUser(String userId, String storeId, String aliasName);
+    List<StoreAlias> listAliases(String storeId);
+    void deleteAlias(String aliasId);
+    List<PendingStore> listPendingStores();
+    PendingStore rejectPendingStore(String pendingId, String reason);
+    PendingStore promotePendingStore(String pendingId, String existingStoreId, String newStoreName);
 }

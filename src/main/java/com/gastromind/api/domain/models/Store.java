@@ -6,6 +6,7 @@ package com.gastromind.api.domain.models;
 public class Store {
     String id;
     String name;
+    String nameNorm;
     /**
      * Crea una nueva instancia.
      * @param id el identificador del recurso
@@ -61,6 +62,14 @@ public class Store {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getNameNorm() {
+        return nameNorm;
+    }
+
+    public void setNameNorm(String nameNorm) {
+        this.nameNorm = nameNorm;
     }
     /**
      * Calcula el hash de esta instancia.

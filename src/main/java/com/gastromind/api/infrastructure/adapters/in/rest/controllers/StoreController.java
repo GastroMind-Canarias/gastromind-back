@@ -1,9 +1,19 @@
 package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
 import com.gastromind.api.application.services.StoreServiceImpl;
+import com.gastromind.api.application.services.UserServiceImpl;
+import com.gastromind.api.domain.exceptions.ForbiddenException;
+import com.gastromind.api.domain.models.PendingStore;
 import com.gastromind.api.domain.models.Store;
+import com.gastromind.api.domain.models.StoreAlias;
+import com.gastromind.api.domain.models.User;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.store.PendingStorePromoteRequest;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.store.PendingStoreRejectRequest;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.store.PendingStoreResponse;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.store.StoreAliasRequest;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.store.StoreAliasResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.store.StoreRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.store.StoreResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.StoreRestMapper;
@@ -15,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +44,18 @@ public class StoreController {
 
     @Autowired
     private StoreRestMapper storeMapper;
+    @Autowired
+    private UserServiceImpl userServiceImpl;
+
+    private User getCurrentUser(Authentication authentication) {
+        if (authentication == null) {
+            authentication = SecurityContextHolder.getContext().getAuthentication();
+        }
+        if (authentication == null) {
+            throw new ForbiddenException("Usuario no autenticado");
+        }
+        return userServiceImpl.findByUsername(authentication.getName());
+    }
     /**
      * Lista todas las tiendas.
      *
@@ -110,6 +134,56 @@ public class StoreController {
     public ResponseEntity<Void> delete(@PathVariable String id) {
         storeServiceImpl.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{storeId}/aliases")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<StoreAliasResponse>> listAliases(@PathVariable String storeId) {
+        List<StoreAlias> aliases = storeServiceImpl.listAliases(storeId);
+        return ResponseEntity.ok(storeMapper.toAliasResponseList(aliases));
+    }
+
+    @PostMapping("/{storeId}/aliases")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
+    public ResponseEntity<StoreAliasResponse> createAliasForStore(
+            Authentication authentication,
+            @PathVariable String storeId,
+            @Valid @RequestBody StoreAliasRequest request) {
+        User user = getCurrentUser(authentication);
+        StoreAlias alias = storeServiceImpl.createAliasForUser(user.getId(), storeId, request.alias());
+        return ResponseEntity.status(HttpStatus.CREATED).body(storeMapper.toAliasResponse(alias));
+    }
+
+    @DeleteMapping("/aliases/{aliasId}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<Void> deleteAlias(@PathVariable String aliasId) {
+        storeServiceImpl.deleteAlias(aliasId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/pending")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<PendingStoreResponse>> listPendingStores() {
+        List<PendingStore> pendingStores = storeServiceImpl.listPendingStores();
+        return ResponseEntity.ok(storeMapper.toPendingResponseList(pendingStores));
+    }
+
+    @PostMapping("/pending/{pendingId}/promote")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PendingStoreResponse> promotePendingStore(
+            @PathVariable String pendingId,
+            @RequestBody PendingStorePromoteRequest request) {
+        PendingStore promoted = storeServiceImpl.promotePendingStore(pendingId, request.store_id(), request.store_name());
+        return ResponseEntity.ok(storeMapper.toPendingResponse(promoted));
+    }
+
+    @PostMapping("/pending/{pendingId}/reject")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<PendingStoreResponse> rejectPendingStore(
+            @PathVariable String pendingId,
+            @RequestBody PendingStoreRejectRequest request) {
+        PendingStore rejected = storeServiceImpl.rejectPendingStore(pendingId, request.reason());
+        return ResponseEntity.ok(storeMapper.toPendingResponse(rejected));
     }
 }
 

@@ -57,6 +57,14 @@ app:
     low-stock-fraction: 0.3
     recency-half-life-days: 30
     ticket-sync-blend-weight: 0.35
+  store:
+    pending-cache:
+      ttl-days: 5
+      key-prefix: "gastromind:store:pending:"
+    alias-rate-limit:
+      max-attempts: 8
+      window-seconds: 3600
+      key-prefix: "gastromind:store:alias:rate:"
   cors:
     allowed-origins:
       - "http://localhost:3000"

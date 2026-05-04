@@ -1,6 +1,8 @@
 package com.gastromind.api.application.usecases;
 
 import com.gastromind.api.application.services.TicketQuantityUnitResolver;
+import com.gastromind.api.application.services.StoreResolutionResult;
+import com.gastromind.api.application.services.StoreResolutionService;
 import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.models.Fridge;
 import com.gastromind.api.domain.models.HouseHold;
@@ -17,7 +19,6 @@ import com.gastromind.api.domain.ports.in.IFridgeItemService;
 import com.gastromind.api.domain.ports.in.ITicketService;
 import com.gastromind.api.domain.ports.out.FridgeRepository;
 import com.gastromind.api.domain.ports.out.ProductRepository;
-import com.gastromind.api.domain.ports.out.StoreRepository;
 import com.gastromind.api.domain.ports.out.TicketExtractionPort;
 import com.gastromind.api.domain.ports.out.UserRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
@@ -49,16 +50,16 @@ class ImportTicketFromImageUseCaseTest {
         TicketQuantityUnitResolver unitResolver = mock(TicketQuantityUnitResolver.class);
         ITicketService ticketService = mock(ITicketService.class);
         UserRepository userRepository = mock(UserRepository.class);
-        StoreRepository storeRepository = mock(StoreRepository.class);
+        StoreResolutionService storeResolutionService = mock(StoreResolutionService.class);
         FridgeRepository fridgeRepository = mock(FridgeRepository.class);
         IFridgeItemService fridgeItemService = mock(IFridgeItemService.class);
         ImportTicketFromImageUseCase useCase = new ImportTicketFromImageUseCase(
-                extraction, productRepository, unitResolver, ticketService, userRepository, storeRepository, fridgeRepository, fridgeItemService);
+                extraction, productRepository, unitResolver, ticketService, userRepository, storeResolutionService, fridgeRepository, fridgeItemService);
 
         when(userRepository.findById("user-1")).thenReturn(Optional.of(new User("user-1")));
         Store store = new Store();
         store.setId("store-1");
-        when(storeRepository.findById("store-1")).thenReturn(Optional.of(store));
+        when(storeResolutionService.resolve("store-1", "Store X")).thenReturn(new StoreResolutionResult(store, null, "Store X"));
 
         ExtractedTicketLine known = new ExtractedTicketLine("Tomate", new BigDecimal("0"), "kg", null, new BigDecimal("4.00"), false, null);
         ExtractedTicketLine unknown = new ExtractedTicketLine("Pan", new BigDecimal("500"), "g", null, new BigDecimal("1.50"), true, "  OCR dudoso ");
@@ -88,7 +89,7 @@ class ImportTicketFromImageUseCaseTest {
             return t;
         });
 
-        Ticket saved = useCase.execute(new byte[]{1, 2}, "image/png", "user-1", "store-1");
+        Ticket saved = useCase.execute(new byte[]{1, 2}, "image/png", "user-1", "store-1").ticket();
 
         assertEquals(2, saved.getItems().size());
         TicketItem i0 = saved.getItems().get(0);
@@ -114,11 +115,11 @@ class ImportTicketFromImageUseCaseTest {
         TicketQuantityUnitResolver unitResolver = mock(TicketQuantityUnitResolver.class);
         ITicketService ticketService = mock(ITicketService.class);
         UserRepository userRepository = mock(UserRepository.class);
-        StoreRepository storeRepository = mock(StoreRepository.class);
+        StoreResolutionService storeResolutionService = mock(StoreResolutionService.class);
         FridgeRepository fridgeRepository = mock(FridgeRepository.class);
         IFridgeItemService fridgeItemService = mock(IFridgeItemService.class);
         ImportTicketFromImageUseCase useCase = new ImportTicketFromImageUseCase(
-                extraction, productRepository, unitResolver, ticketService, userRepository, storeRepository, fridgeRepository, fridgeItemService);
+                extraction, productRepository, unitResolver, ticketService, userRepository, storeResolutionService, fridgeRepository, fridgeItemService);
 
         when(userRepository.findById("user-1")).thenReturn(Optional.of(new User("user-1")));
         when(extraction.extractFromImage(any(), eq("image/png"))).thenReturn(new ExtractedTicketReceipt(
@@ -126,12 +127,12 @@ class ImportTicketFromImageUseCaseTest {
                 List.of(new ExtractedTicketLine("Leche", new BigDecimal("1"), "ud", new BigDecimal("1.20"), new BigDecimal("1.20"), false, null))));
         Store store = new Store();
         store.setId("store-by-name");
-        when(storeRepository.findFirstByNameIgnoreCase("Mi Tienda")).thenReturn(Optional.of(store));
+        when(storeResolutionService.resolve(null, "  Mi Tienda  ")).thenReturn(new StoreResolutionResult(store, null, "  Mi Tienda  "));
         when(productRepository.findFirstByNameIgnoreCase("leche")).thenReturn(Optional.empty());
         when(unitResolver.resolveFromAiCode("ud")).thenReturn(new Unit("u-ud", "ud"));
         when(ticketService.create(any(Ticket.class))).thenAnswer(inv -> inv.getArgument(0));
 
-        Ticket out = useCase.execute(new byte[]{3}, "image/png", "user-1", null);
+        Ticket out = useCase.execute(new byte[]{3}, "image/png", "user-1", null).ticket();
 
         assertEquals("store-by-name", out.getStore_id().getId());
         verify(fridgeRepository, never()).findFirstByHouseholdId(any());
@@ -145,23 +146,23 @@ class ImportTicketFromImageUseCaseTest {
         TicketQuantityUnitResolver unitResolver = mock(TicketQuantityUnitResolver.class);
         ITicketService ticketService = mock(ITicketService.class);
         UserRepository userRepository = mock(UserRepository.class);
-        StoreRepository storeRepository = mock(StoreRepository.class);
+        StoreResolutionService storeResolutionService = mock(StoreResolutionService.class);
         FridgeRepository fridgeRepository = mock(FridgeRepository.class);
         IFridgeItemService fridgeItemService = mock(IFridgeItemService.class);
         ImportTicketFromImageUseCase useCase = new ImportTicketFromImageUseCase(
-                extraction, productRepository, unitResolver, ticketService, userRepository, storeRepository, fridgeRepository, fridgeItemService);
+                extraction, productRepository, unitResolver, ticketService, userRepository, storeResolutionService, fridgeRepository, fridgeItemService);
 
         when(userRepository.findById("missing")).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> useCase.execute(new byte[]{1}, "image/png", "missing", "store-1"));
 
         when(userRepository.findById("user-1")).thenReturn(Optional.of(new User("user-1")));
-        when(storeRepository.findById("store-404")).thenReturn(Optional.empty());
+        when(storeResolutionService.resolve("store-404", "Store")).thenThrow(new NotFoundException("Tienda no encontrada"));
         when(extraction.extractFromImage(any(), eq("image/png"))).thenReturn(new ExtractedTicketReceipt(
                 "Store", LocalDate.now(), BigDecimal.ONE,
                 List.of(new ExtractedTicketLine("Leche", BigDecimal.ONE, "ud", BigDecimal.ONE, BigDecimal.ONE, false, null))));
         assertThrows(NotFoundException.class, () -> useCase.execute(new byte[]{1}, "image/png", "user-1", "store-404"));
 
-        when(storeRepository.findById("store-1")).thenReturn(Optional.of(new Store("store-1", "s")));
+        when(storeResolutionService.resolve("store-1", "Store")).thenReturn(new StoreResolutionResult(new Store("store-1", "s"), null, "Store"));
         when(extraction.extractFromImage(any(), eq("image/png"))).thenReturn(new ExtractedTicketReceipt(
                 "Store", LocalDate.now(), BigDecimal.ONE,
                 List.of(new ExtractedTicketLine("   ", BigDecimal.ONE, "ud", BigDecimal.ONE, BigDecimal.ONE, false, null))));
@@ -177,14 +178,14 @@ class ImportTicketFromImageUseCaseTest {
         TicketQuantityUnitResolver unitResolver = mock(TicketQuantityUnitResolver.class);
         ITicketService ticketService = mock(ITicketService.class);
         UserRepository userRepository = mock(UserRepository.class);
-        StoreRepository storeRepository = mock(StoreRepository.class);
+        StoreResolutionService storeResolutionService = mock(StoreResolutionService.class);
         FridgeRepository fridgeRepository = mock(FridgeRepository.class);
         IFridgeItemService fridgeItemService = mock(IFridgeItemService.class);
         ImportTicketFromImageUseCase useCase = new ImportTicketFromImageUseCase(
-                extraction, productRepository, unitResolver, ticketService, userRepository, storeRepository, fridgeRepository, fridgeItemService);
+                extraction, productRepository, unitResolver, ticketService, userRepository, storeResolutionService, fridgeRepository, fridgeItemService);
 
         when(userRepository.findById("user-1")).thenReturn(Optional.of(new User("user-1")));
-        when(storeRepository.findById("store-1")).thenReturn(Optional.of(new Store("store-1", "s")));
+        when(storeResolutionService.resolve("store-1", "Store")).thenReturn(new StoreResolutionResult(new Store("store-1", "s"), null, "Store"));
         when(extraction.extractFromImage(any(), eq("image/png"))).thenReturn(new ExtractedTicketReceipt(
                 "Store", LocalDate.now(), BigDecimal.ZERO,
                 List.of(new ExtractedTicketLine("Arroz", new BigDecimal("750"), "g", new BigDecimal("3.20"), BigDecimal.ZERO, false, null))));

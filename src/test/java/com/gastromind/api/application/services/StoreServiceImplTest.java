@@ -2,6 +2,8 @@ package com.gastromind.api.application.services;
 
 import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.models.Store;
+import com.gastromind.api.domain.ports.out.AliasRateLimitPort;
+import com.gastromind.api.domain.ports.out.StoreAliasRepository;
 import com.gastromind.api.domain.ports.out.StoreRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,14 @@ class StoreServiceImplTest {
 
     @Mock
     private StoreRepository repository;
+    @Mock
+    private StoreAliasRepository storeAliasRepository;
+    @Mock
+    private AliasRateLimitPort aliasRateLimitPort;
+    @Mock
+    private StoreNameNormalizer normalizer;
+    @Mock
+    private PendingStoreService pendingStoreService;
 
     @InjectMocks
     private StoreServiceImpl service;
@@ -60,9 +70,10 @@ class StoreServiceImplTest {
     void create_savesAndReturns() {
         Store input = new Store(null, "Nuevo");
         Store saved = new Store("new-id", "Nuevo");
-        when(repository.save(input)).thenReturn(saved);
+        when(normalizer.normalize("Nuevo")).thenReturn("nuevo");
+        when(repository.save(any(Store.class))).thenReturn(saved);
         assertEquals(saved, service.create(input));
-        verify(repository).save(input);
+        verify(repository).save(any(Store.class));
     }
 
     @Test
@@ -70,6 +81,7 @@ class StoreServiceImplTest {
         when(repository.findById("id-1")).thenReturn(Optional.of(existing));
         Store patch = new Store(null, "Actualizado");
         Store saved = new Store("id-1", "Actualizado");
+        when(normalizer.normalize("Actualizado")).thenReturn("actualizado");
         when(repository.save(any(Store.class))).thenReturn(saved);
         assertEquals(saved, service.update("id-1", patch));
         verify(repository).findById("id-1");

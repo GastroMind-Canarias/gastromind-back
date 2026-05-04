@@ -2,10 +2,12 @@ package com.gastromind.api.infrastructure.adapters.in.rest.handler;
 
 import com.gastromind.api.domain.exceptions.AiRecipeException;
 import com.gastromind.api.domain.exceptions.AiTicketException;
+import com.gastromind.api.domain.exceptions.ConflictException;
 import com.gastromind.api.domain.exceptions.ForbiddenException;
 import com.gastromind.api.domain.exceptions.FridgeAlreadyExistsException;
 import com.gastromind.api.domain.exceptions.ImageProcessingException;
 import com.gastromind.api.domain.exceptions.NotFoundException;
+import com.gastromind.api.domain.exceptions.RateLimitExceededException;
 import com.gastromind.api.domain.exceptions.UnsupportedUnitException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -77,6 +79,16 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(FridgeAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleFridgeAlreadyExistsException(FridgeAlreadyExistsException ex) {
         return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<ErrorResponse> handleConflictException(ConflictException ex) {
+        return buildResponse(HttpStatus.CONFLICT, ex.getMessage());
+    }
+
+    @ExceptionHandler(RateLimitExceededException.class)
+    public ResponseEntity<ErrorResponse> handleRateLimitException(RateLimitExceededException ex) {
+        return buildResponse(HttpStatus.TOO_MANY_REQUESTS, ex.getMessage());
     }
     /**
      * Realiza handle ai recipe exception.

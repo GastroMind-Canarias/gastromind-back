@@ -10,6 +10,7 @@ import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.enums.TicketLineVerificationStatus;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketItemRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketItemResponse;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.PendingStoreInfoResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketMeRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketResponse;
@@ -39,6 +40,7 @@ public interface TicketRestMapper {
     @Mapping(target = "user_id", source = "user_id.id")
     @Mapping(target = "store_id", source = "store_id.id")
     @Mapping(target = "items", source = "items")
+    @Mapping(target = "pending_store", expression = "java(null)")
     TicketResponse toResponse(Ticket domain);
 
     List<TicketResponse> toResponseList(List<Ticket> tickets);
@@ -82,6 +84,20 @@ public interface TicketRestMapper {
                 item.getPriceUnit(),
                 verificationStatus,
                 item.getLineNote());
+    }
+
+    default TicketResponse withPendingInfo(Ticket domain, PendingStoreInfoResponse pendingStoreInfoResponse) {
+        TicketResponse base = toResponse(domain);
+        return new TicketResponse(
+                base.id(),
+                base.household_id(),
+                base.uploaded_by_user_id(),
+                base.user_id(),
+                base.store_id(),
+                base.total_amount(),
+                base.purchaseDate(),
+                base.items(),
+                pendingStoreInfoResponse);
     }
 
     @AfterMapping

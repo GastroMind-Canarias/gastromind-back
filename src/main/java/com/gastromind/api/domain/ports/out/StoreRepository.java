@@ -18,4 +18,8 @@ public interface StoreRepository {
     List<Store> findAll();
 
     Optional<Store> findFirstByNameIgnoreCase(String name);
+
+    Optional<Store> findFirstByNameNorm(String nameNorm);
+
+    List<Store> findByNameNorm(String nameNorm);
 }

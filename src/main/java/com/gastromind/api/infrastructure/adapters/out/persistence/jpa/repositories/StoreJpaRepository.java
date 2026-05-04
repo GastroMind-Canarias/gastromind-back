@@ -11,6 +11,10 @@ import org.springframework.stereotype.Repository;
 public interface StoreJpaRepository extends JpaRepository<StoreEntity, String> {
 
     java.util.Optional<StoreEntity> findFirstByNameIgnoreCase(String name);
+
+    java.util.Optional<StoreEntity> findFirstByNameNorm(String nameNorm);
+
+    java.util.List<StoreEntity> findByNameNorm(String nameNorm);
 }
 
 

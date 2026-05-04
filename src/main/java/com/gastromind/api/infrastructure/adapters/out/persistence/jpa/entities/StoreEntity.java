@@ -16,6 +16,8 @@ public class StoreEntity {
     private String id;
 
     private String name;
+    @Column(name = "name_norm")
+    private String nameNorm;
 
     @OneToMany(mappedBy = "store")
     private List<TicketEntity> tickets;
@@ -76,6 +78,14 @@ public class StoreEntity {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getNameNorm() {
+        return nameNorm;
+    }
+
+    public void setNameNorm(String nameNorm) {
+        this.nameNorm = nameNorm;
     }
     /**
      * Devuelve tickets.
