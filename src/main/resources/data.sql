@@ -96,6 +96,7 @@ FROM (VALUES
     ('Carrefour', 'carrefour'),
     ('Lidl', 'lidl'),
     ('Dia', 'dia'),
+    ('Spar', 'spar'),
     ('Alcampo', 'alcampo'),
     ('Eroski', 'eroski'),
     ('Consum', 'consum'),
