@@ -2,6 +2,7 @@ package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
 import com.gastromind.api.application.services.TicketServiceImpl;
 import com.gastromind.api.application.services.UserServiceImpl;
+import com.gastromind.api.application.usecases.ImportTicketFromImageResult;
 import com.gastromind.api.application.usecases.ImportTicketFromImageUseCase;
 import com.gastromind.api.domain.exceptions.ForbiddenException;
 import com.gastromind.api.domain.models.Ticket;
@@ -10,6 +11,7 @@ import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostExternalAiDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketMeRequest;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.PendingStoreInfoResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.TicketRestMapper;
@@ -170,8 +172,15 @@ public class TicketController {
         } catch (IOException e) {
             throw new IllegalArgumentException("No se pudo leer el archivo de imagen", e);
         }
-        Ticket saved = importTicketFromImageUseCase.execute(bytes, contentType, user.getId(), storeId);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ticketMapper.toResponse(saved));
+        ImportTicketFromImageResult result = importTicketFromImageUseCase.execute(bytes, contentType, user.getId(), storeId);
+        if (result.unresolvedStore()) {
+            PendingStoreInfoResponse pendingInfo = new PendingStoreInfoResponse(
+                    result.pendingStore().getId(),
+                    result.detectedStoreName(),
+                    "PENDING_STORE_REVIEW");
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(ticketMapper.withPendingInfo(result.ticket(), pendingInfo));
+        }
+        return ResponseEntity.status(HttpStatus.CREATED).body(ticketMapper.toResponse(result.ticket()));
     }
     /**
      * Registra un nuevo ticket.

@@ -3,6 +3,7 @@ package com.gastromind.api;
 import com.gastromind.api.infrastructure.adapters.out.ai.GeminiProperties;
 import com.gastromind.api.infrastructure.adapters.out.ai.TicketImageProperties;
 import com.gastromind.api.infrastructure.adapters.out.cache.RecipeSuggestionCacheProperties;
+import com.gastromind.api.infrastructure.adapters.out.cache.StoreFlowProperties;
 import com.gastromind.api.infrastructure.config.UsualPurchaseProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -10,7 +11,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 
 @SpringBootApplication
 @EnableConfigurationProperties({ GeminiProperties.class, RecipeSuggestionCacheProperties.class, TicketImageProperties.class,
-        UsualPurchaseProperties.class })
+        UsualPurchaseProperties.class, StoreFlowProperties.class })
 /**
  * Representa gastro mind api application dentro del dominio de la aplicacion.
  */
