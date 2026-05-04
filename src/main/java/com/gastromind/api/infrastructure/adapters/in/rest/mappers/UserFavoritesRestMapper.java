@@ -23,6 +23,9 @@ public interface UserFavoritesRestMapper {
 
     @Mapping(target = "user_id", source = "user_id.id")
     @Mapping(target = "recipe_id", source = "recipe_id.id")
+    @Mapping(target = "title", source = "recipe_id.title")
+    @Mapping(target = "prep_time", source = "recipe_id.prep_time")
+    @Mapping(target = "appliance_needed", source = "recipe_id.appliance_needed")
     UserFavoritesResponse toResponse(UserFavorites domain);
 
     List<UserFavoritesResponse> toResponseList(List<UserFavorites> userFavorites);
