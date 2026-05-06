@@ -83,4 +83,31 @@ class ProductServiceImplTest {
         verify(repository).findById("id-1");
         verify(repository).deleteById(eq("id-1"));
     }
+
+    @Test
+    void createBatch_reusesExistingAndCreatesOnlyMissing() {
+        Product existingByName = new Product("id-1", "Leche", false, null);
+        Product created = new Product("id-2", "Huevos", false, null);
+        when(repository.findFirstByNameIgnoreCase("Leche")).thenReturn(Optional.of(existingByName));
+        when(repository.findFirstByNameIgnoreCase("Huevos")).thenReturn(Optional.empty());
+        when(repository.save(any(Product.class))).thenReturn(created);
+
+        List<Product> result = service.createBatch(List.of(" Leche ", "leche", "Huevos"));
+
+        assertEquals(2, result.size());
+        assertEquals("id-1", result.get(0).getId());
+        assertEquals("id-2", result.get(1).getId());
+        verify(repository).findFirstByNameIgnoreCase("Leche");
+        verify(repository).findFirstByNameIgnoreCase("Huevos");
+        verify(repository).save(any(Product.class));
+    }
+
+    @Test
+    void createBatch_throwsWhenListIsNullOrEmpty() {
+        IllegalArgumentException nullEx = assertThrows(IllegalArgumentException.class, () -> service.createBatch(null));
+        assertEquals("Debes indicar al menos un nombre de producto", nullEx.getMessage());
+
+        IllegalArgumentException emptyEx = assertThrows(IllegalArgumentException.class, () -> service.createBatch(List.of()));
+        assertEquals("Debes indicar al menos un nombre de producto", emptyEx.getMessage());
+    }
 }

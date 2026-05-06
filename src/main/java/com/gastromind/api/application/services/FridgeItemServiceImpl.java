@@ -97,6 +97,24 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
         fridgeRepository.findById(fridgeId).orElseThrow(() -> new NotFoundException("Nevera no encontrada"));
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new NotFoundException("Producto no encontrado"));
+        List<FridgeItem> existingItems = repository.findByFridgeId(fridgeId);
+
+        for (FridgeItem existing : existingItems) {
+            if (existing.getProduct() == null || existing.getProduct().getId() == null) {
+                continue;
+            }
+            if (!existing.getProduct().getId().equals(product.getId())) {
+                continue;
+            }
+            existing.setQuantity(existing.getQuantity().add(quantity));
+            if (existing.getExpirationDate() == null) {
+                existing.setExpirationDate(expirationDate);
+            }
+            if (existing.getStatus() == null) {
+                existing.setStatus(initialStatus != null ? initialStatus : ItemStatus.GOOD);
+            }
+            return repository.save(existing);
+        }
 
         FridgeItem newItem = new FridgeItem();
         newItem.setFridgeId(fridgeId);

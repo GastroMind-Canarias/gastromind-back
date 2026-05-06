@@ -78,6 +78,7 @@ class FridgeItemServiceImplTest {
     void addProductToFridge_buildsItem() {
         when(fridgeRepository.findById("fr-1")).thenReturn(Optional.of(new Fridge("fr-1")));
         when(productRepository.findById("p-1")).thenReturn(Optional.of(product));
+        when(repository.findByFridgeId("fr-1")).thenReturn(List.of());
         when(repository.save(any(FridgeItem.class))).thenAnswer(inv -> {
             FridgeItem i = inv.getArgument(0);
             i.setId("new-id");
@@ -90,6 +91,31 @@ class FridgeItemServiceImplTest {
         assertEquals("fr-1", out.getFridgeId());
         assertEquals(product, out.getProduct());
         assertEquals(ItemStatus.IN_FRIDGE, out.getStatus());
+    }
+
+    @Test
+    void addProductToFridge_accumulatesQuantityWhenProductAlreadyExists() {
+        FridgeItem existingLine = new FridgeItem();
+        Product sameProduct = new Product("p-1");
+        existingLine.setId("fi-existing");
+        existingLine.setFridgeId("fr-1");
+        existingLine.setProduct(sameProduct);
+        existingLine.setQuantity(new BigDecimal("1.50"));
+        existingLine.setExpirationDate(LocalDate.of(2026, 12, 31));
+        existingLine.setStatus(ItemStatus.GOOD);
+
+        when(fridgeRepository.findById("fr-1")).thenReturn(Optional.of(new Fridge("fr-1")));
+        when(productRepository.findById("p-1")).thenReturn(Optional.of(sameProduct));
+        when(repository.findByFridgeId("fr-1")).thenReturn(List.of(existingLine));
+        when(repository.save(any(FridgeItem.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        FridgeItem out = service.addProductToFridge("fr-1", "p-1", new BigDecimal("2.00"),
+                LocalDate.of(2027, 1, 1), ItemStatus.IN_FRIDGE);
+
+        assertEquals("fi-existing", out.getId());
+        assertEquals(0, new BigDecimal("3.50").compareTo(out.getQuantity()));
+        assertEquals(LocalDate.of(2026, 12, 31), out.getExpirationDate());
+        assertEquals(ItemStatus.GOOD, out.getStatus());
     }
 
     @Test

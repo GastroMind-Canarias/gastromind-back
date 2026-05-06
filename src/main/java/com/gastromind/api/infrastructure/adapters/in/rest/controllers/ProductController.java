@@ -4,6 +4,7 @@ import com.gastromind.api.application.services.ProductServiceImpl;
 import com.gastromind.api.domain.models.Product;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.product.ProductBatchRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.product.ProductRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.product.ProductResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.ProductRestMapper;
@@ -77,6 +78,15 @@ public class ProductController {
         Product productDomain = productMapper.toDomain(request);
         Product savedProduct = productServiceImpl.create(productDomain);
         return ResponseEntity.status(HttpStatus.CREATED).body(productMapper.toResponse(savedProduct));
+    }
+
+    @Operation(summary = "Crear productos por lote", description = "Registra multiples productos por nombre, reutilizando existentes sin duplicados.")
+    @ApiPostDoc
+    @PostMapping("/batch")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<ProductResponse>> createBatch(@Valid @RequestBody ProductBatchRequest request) {
+        List<Product> savedProducts = productServiceImpl.createBatch(request.names());
+        return ResponseEntity.status(HttpStatus.CREATED).body(productMapper.toResponseList(savedProducts));
     }
     /**
      * Define un producto existente.

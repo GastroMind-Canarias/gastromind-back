@@ -3,7 +3,6 @@ package com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
@@ -15,8 +14,10 @@ import java.time.LocalDate;
  */
 public record MyFridgeItemRequest(
         @Schema(description = "ID del producto maestro", example = "550e8400-e29b-41d4-a716-446655440001")
-        @NotBlank(message = "El identificador del producto es obligatorio")
         String productId,
+
+        @Schema(description = "Nombre del producto para resolver o crear en catalogo", example = "Leche")
+        String productName,
 
         @Schema(description = "Cantidad disponible (permite decimales)", example = "1.50")
         @NotNull(message = "La cantidad es obligatoria")

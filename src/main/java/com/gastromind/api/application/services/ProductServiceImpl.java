@@ -6,7 +6,11 @@ import com.gastromind.api.domain.ports.in.IProductService;
 import com.gastromind.api.domain.ports.out.ProductRepository;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 @Service
 /**
@@ -53,6 +57,41 @@ public class ProductServiceImpl implements IProductService {
     @Override
     public Product create(Product product) {
         return repository.save(product);
+    }
+
+    @Override
+    public List<Product> createBatch(List<String> names) {
+        if (names == null || names.isEmpty()) {
+            throw new IllegalArgumentException("Debes indicar al menos un nombre de producto");
+        }
+
+        Map<String, String> uniqueNamesByLowercase = new LinkedHashMap<>();
+        for (String name : names) {
+            if (name == null) {
+                continue;
+            }
+            String trimmed = name.trim();
+            if (trimmed.isEmpty()) {
+                continue;
+            }
+            uniqueNamesByLowercase.putIfAbsent(trimmed.toLowerCase(Locale.ROOT), trimmed);
+        }
+        if (uniqueNamesByLowercase.isEmpty()) {
+            throw new IllegalArgumentException("Debes indicar al menos un nombre de producto");
+        }
+
+        List<Product> result = new ArrayList<>();
+        for (String normalizedKey : uniqueNamesByLowercase.keySet()) {
+            String candidateName = uniqueNamesByLowercase.get(normalizedKey);
+            Product product = repository.findFirstByNameIgnoreCase(candidateName).orElseGet(() -> {
+                Product newProduct = new Product();
+                newProduct.setName(candidateName);
+                newProduct.setIs_essential(false);
+                return repository.save(newProduct);
+            });
+            result.add(product);
+        }
+        return result;
     }
     /**
      * Define un producto existente.
