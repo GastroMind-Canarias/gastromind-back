@@ -11,6 +11,7 @@ public interface IProductService {
     List<Product> findAll();
     Product findById(String id);
     Product create(Product product);
+    List<Product> createBatch(List<String> names);
     Product update(String id, Product product);
     void delete(String id);
 }

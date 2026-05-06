@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Test;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -80,6 +81,29 @@ class TicketProductResolutionServiceTest {
         Product resolved = service.resolveOrCreateProduct("Producto   Nuevo");
         assertEquals("prod-new", resolved.getId());
         assertTrue(resolved.isNeedsReview());
+        assertEquals("Creado automaticamente por OCR pendiente de revision", resolved.getReviewNote());
+        verify(aliasRepository).save(any(ProductAlias.class));
+    }
+
+    @Test
+    void resolveOrCreateProductFromManualEntry_createsWithoutOcrFlags() {
+        ProductRepository productRepository = mock(ProductRepository.class);
+        ProductAliasRepository aliasRepository = mock(ProductAliasRepository.class);
+        TicketProductResolutionService service = new TicketProductResolutionService(productRepository, aliasRepository);
+        when(productRepository.findFirstByNameIgnoreCase("leche")).thenReturn(Optional.empty());
+        when(aliasRepository.findFirstByAliasNorm("leche")).thenReturn(Optional.empty());
+        when(productRepository.save(any(Product.class))).thenAnswer(inv -> {
+            Product p = inv.getArgument(0);
+            p.setId("prod-manual");
+            return p;
+        });
+
+        Product resolved = service.resolveOrCreateProductFromManualEntry("Leche");
+
+        assertEquals("prod-manual", resolved.getId());
+        assertEquals("leche", resolved.getName());
+        assertEquals(false, resolved.isNeedsReview());
+        assertNull(resolved.getReviewNote());
         verify(aliasRepository).save(any(ProductAlias.class));
     }
 }

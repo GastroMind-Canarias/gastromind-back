@@ -13,6 +13,7 @@ import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.FridgeItemRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.FridgeItemResponse;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.MyFridgeItemBatchRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.MyFridgeItemRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.FridgeItemRestMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,10 +28,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/fridge-items")
-@Tag(name = "Items de Nevera", description = "Gestion de productos y stock en neveras. Rutas /me: Solo Owner y Admin. Rutas globales: Solo Admin.")
+@Tag(name = "Items de Nevera", description = "Gestion de productos y stock en neveras. Rutas /me: Owner, Member y Admin. Rutas globales: Solo Admin.")
 /**
  * Controlador REST para operaciones de fridge item.
  */
@@ -103,10 +105,10 @@ public class FridgeItemController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Listar items de mi nevera (Solo Owner y Admin)", description = "Devuelve los productos de la nevera del hogar del usuario autenticado.")
+    @Operation(summary = "Listar items de mi nevera (Owner, Member y Admin)", description = "Devuelve los productos de la nevera del hogar del usuario autenticado.")
     @ApiStandardDoc
     @GetMapping("/me")
-    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<List<FridgeItemResponse>> listMyItems(Authentication authentication) {
         return ResponseEntity.ok(fridgeItemRestMapper.toResponseList(listMyFridgeItemsUseCase.execute(authentication.getName())));
     }
@@ -136,19 +138,41 @@ public class FridgeItemController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Anadir item a mi nevera (Solo Owner y Admin)", description = "Registra un nuevo producto en la nevera del hogar autenticado. No incluye fridgeId: se toma de tu hogar.")
+    @Operation(summary = "Anadir item a mi nevera (Owner, Member y Admin)", description = "Registra un nuevo producto en la nevera del hogar autenticado. No incluye fridgeId: se toma de tu hogar.")
     @ApiPostDoc
     @PostMapping("/me")
-    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<FridgeItemResponse> createMyItem(Authentication authentication,
             @Valid @RequestBody MyFridgeItemRequest body) {
+        validateCreateMyItemBody(body);
         return ResponseEntity.status(HttpStatus.CREATED).body(fridgeItemRestMapper.toResponse(
                 createMyFridgeItemUseCase.execute(
                         authentication.getName(),
                         body.productId(),
+                        body.productName(),
                         body.quantity(),
                         body.expirationDate(),
                         body.status())));
+    }
+
+    @Operation(summary = "Anadir items a mi nevera por lote (Owner, Member y Admin)", description = "Registra multiples productos en la nevera del hogar autenticado.")
+    @ApiPostDoc
+    @PostMapping("/me/batch")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
+    public ResponseEntity<List<FridgeItemResponse>> createMyItemsBatch(Authentication authentication,
+            @Valid @RequestBody MyFridgeItemBatchRequest body) {
+        List<FridgeItemResponse> created = body.items().stream()
+                .peek(this::validateCreateMyItemBody)
+                .map(item -> createMyFridgeItemUseCase.execute(
+                        authentication.getName(),
+                        item.productId(),
+                        item.productName(),
+                        item.quantity(),
+                        item.expirationDate(),
+                        item.status()))
+                .map(fridgeItemRestMapper::toResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
     /**
      * Define un fridge item existente.
@@ -174,13 +198,16 @@ public class FridgeItemController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Actualizar item de mi nevera (Solo Owner y Admin)", description = "Modifica un producto de la nevera del hogar autenticado.")
+    @Operation(summary = "Actualizar item de mi nevera (Owner, Member y Admin)", description = "Modifica un producto de la nevera del hogar autenticado.")
     @ApiStandardDoc
     @PutMapping("/me/{itemId}")
-    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<FridgeItemResponse> updateMyItem(Authentication authentication,
             @PathVariable String itemId,
             @Valid @RequestBody MyFridgeItemRequest body) {
+        if (body.productId() == null || body.productId().trim().isEmpty()) {
+            throw new IllegalArgumentException("El identificador del producto es obligatorio");
+        }
         return ResponseEntity.ok(fridgeItemRestMapper.toResponse(updateMyFridgeItemUseCase.execute(
                 authentication.getName(),
                 itemId,
@@ -210,10 +237,10 @@ public class FridgeItemController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Consumir parte de un item de mi nevera (Solo Owner y Admin)", description = "Descuenta cantidad del stock; si queda en cero, el item se elimina del inventario.")
+    @Operation(summary = "Consumir parte de un item de mi nevera (Owner, Member y Admin)", description = "Descuenta cantidad del stock; si queda en cero, el item se elimina del inventario.")
     @ApiStandardDoc
     @PutMapping("/me/{itemId}/consume")
-    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<FridgeItemResponse> consumePartiallyMyItem(Authentication authentication,
             @PathVariable String itemId,
             @RequestBody java.math.BigDecimal quantity) {
@@ -241,10 +268,10 @@ public class FridgeItemController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Marcar item de mi nevera como consumido (Solo Owner y Admin)", description = "Quita el item del inventario de tu nevera (consumido por completo).")
+    @Operation(summary = "Marcar item de mi nevera como consumido (Owner, Member y Admin)", description = "Quita el item del inventario de tu nevera (consumido por completo).")
     @ApiStandardDoc
     @PutMapping("/me/{itemId}/mark-consumed")
-    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<Void> markMyItemAsConsumed(Authentication authentication, @PathVariable String itemId) {
         markMyFridgeItemConsumedUseCase.execute(authentication.getName(), itemId);
         return ResponseEntity.ok().build();
@@ -273,10 +300,10 @@ public class FridgeItemController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Listar mis items por caducar (Solo Owner y Admin)", description = "Recupera productos proximos a caducar para la nevera del hogar autenticado.")
+    @Operation(summary = "Listar mis items por caducar (Owner, Member y Admin)", description = "Recupera productos proximos a caducar para la nevera del hogar autenticado.")
     @ApiStandardDoc
     @GetMapping("/me/expiring")
-    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<List<FridgeItemResponse>> getMyExpiring(
             Authentication authentication,
             @org.springframework.web.bind.annotation.RequestParam(defaultValue = "7") int days) {
@@ -306,10 +333,10 @@ public class FridgeItemController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Filtrar mi inventario por categoria (Solo Owner y Admin)", description = "Devuelve el inventario de la nevera autenticada filtrado por categoria.")
+    @Operation(summary = "Filtrar mi inventario por categoria (Owner, Member y Admin)", description = "Devuelve el inventario de la nevera autenticada filtrado por categoria.")
     @ApiStandardDoc
     @GetMapping("/me/category/{categoryId}")
-    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<List<FridgeItemResponse>> getMyByCategory(Authentication authentication,
             @PathVariable String categoryId) {
         return ResponseEntity.ok(fridgeItemRestMapper.toResponseList(
@@ -336,13 +363,20 @@ public class FridgeItemController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Eliminar item de mi nevera (Solo Owner y Admin)", description = "Borra un producto del inventario de la nevera autenticada.")
+    @Operation(summary = "Eliminar item de mi nevera (Owner, Member y Admin)", description = "Borra un producto del inventario de la nevera autenticada.")
     @ApiStandardDoc
     @DeleteMapping("/me/{itemId}")
-    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<Void> deleteMyItem(Authentication authentication, @PathVariable String itemId) {
         deleteMyFridgeItemUseCase.execute(authentication.getName(), itemId);
         return ResponseEntity.noContent().build();
+    }
+
+    private void validateCreateMyItemBody(MyFridgeItemRequest body) {
+        if ((body.productId() == null || body.productId().trim().isEmpty())
+                && (body.productName() == null || body.productName().trim().isEmpty())) {
+            throw new IllegalArgumentException("Debes indicar productId o productName");
+        }
     }
 }
 

@@ -47,6 +47,14 @@ public class TicketProductResolutionService {
     }
 
     public Product resolveOrCreateProduct(String rawName) {
+        return resolveOrCreateProduct(rawName, true, "Creado automaticamente por OCR pendiente de revision");
+    }
+
+    public Product resolveOrCreateProductFromManualEntry(String rawName) {
+        return resolveOrCreateProduct(rawName, false, null);
+    }
+
+    private Product resolveOrCreateProduct(String rawName, boolean needsReviewOnCreate, String reviewNoteOnCreate) {
         String normalized = normalizeName(rawName);
         if (normalized.isEmpty()) {
             throw new IllegalArgumentException("Nombre de producto vacio en una linea del ticket");
@@ -69,8 +77,8 @@ public class TicketProductResolutionService {
 
         Product provisional = new Product();
         provisional.setName(normalized);
-        provisional.setNeedsReview(true);
-        provisional.setReviewNote("Creado automaticamente por OCR pendiente de revision");
+        provisional.setNeedsReview(needsReviewOnCreate);
+        provisional.setReviewNote(reviewNoteOnCreate);
         provisional.setIs_essential(false);
         Product saved = productRepository.save(provisional);
         ensureAlias(normalized, rawName, saved);
