@@ -193,7 +193,7 @@ class TicketServiceImplTest {
     }
 
     @Test
-    void create_acceptsLineProductNameWithoutCatalogProduct() {
+    void create_throwsWhenOnlyLineProductNameWithoutProductId() {
         when(unitRepository.findFirstByNameIgnoreCase("Unidades")).thenReturn(Optional.of(defaultUd));
 
         TicketItem line = new TicketItem();
@@ -204,13 +204,7 @@ class TicketServiceImplTest {
         Ticket t = new Ticket();
         t.setItems(List.of(line));
 
-        when(repository.save(any(Ticket.class))).thenAnswer(inv -> inv.getArgument(0));
-
-        Ticket saved = service.create(t);
-
-        assertEquals("Yogur sin catalogo", line.getLineProductName());
-        assertEquals(defaultUd, line.getUnit());
-        verify(usualPurchaseTicketSyncService).syncAfterTicketCreated(saved);
+        assertThrows(IllegalArgumentException.class, () -> service.create(t));
     }
 
     @Test

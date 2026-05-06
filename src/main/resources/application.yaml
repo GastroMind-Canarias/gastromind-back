@@ -32,7 +32,6 @@ gastromind:
       - "/swagger-ui/**"
       - "/swagger-ui.html"
       - "/api/v1/auth/**"
-      - "/api/v1/**"
       - "/actuator/**"
 
 app:

@@ -184,18 +184,17 @@ public class TicketServiceImpl implements ITicketService {
                         "Unidad 'Unidades' no encontrada en catalogo. Revise la tabla unit / data.sql."));
         for (TicketItem item : ticket.getItems()) {
             boolean hasProductId = item.getProduct() != null && item.getProduct().getId() != null;
-            boolean hasLineName = item.getLineProductName() != null && !item.getLineProductName().isBlank();
-            if (!hasProductId && !hasLineName) {
+            if (!hasProductId) {
                 throw new IllegalArgumentException(
-                        "Cada linea del ticket debe tener un producto con id o un nombre de linea (sin catalogo)");
+                        "Cada linea del ticket debe tener un producto con id");
             }
             if (hasProductId) {
                 Product fullProduct = productRepository.findById(item.getProduct().getId())
                         .orElseThrow(() -> new NotFoundException("Producto no encontrado: " + item.getProduct().getId()));
                 item.setProduct(fullProduct);
-            } else {
+            }
+            if (item.getLineProductName() != null && !item.getLineProductName().isBlank()) {
                 item.setLineProductName(item.getLineProductName().trim());
-                item.setProduct(null);
             }
 
             if (item.getUnit() == null || item.getUnit().getId() == null) {

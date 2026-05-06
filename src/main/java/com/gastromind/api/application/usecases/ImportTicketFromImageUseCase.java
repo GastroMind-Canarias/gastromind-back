@@ -17,7 +17,6 @@ import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.ports.in.IFridgeItemService;
 import com.gastromind.api.domain.ports.in.ITicketService;
 import com.gastromind.api.domain.ports.out.FridgeRepository;
-import com.gastromind.api.domain.ports.out.ProductRepository;
 import com.gastromind.api.domain.ports.out.TicketExtractionPort;
 import com.gastromind.api.domain.ports.out.UserRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
@@ -39,7 +38,7 @@ import java.util.Optional;
 public class ImportTicketFromImageUseCase {
 
     private final TicketExtractionPort extraction;
-    private final ProductRepository productRepository;
+    private final TicketProductResolutionService ticketProductResolutionService;
     private final TicketQuantityUnitResolver unitResolver;
     private final ITicketService ticketService;
     private final UserRepository userRepository;
@@ -61,7 +60,7 @@ public class ImportTicketFromImageUseCase {
 
     public ImportTicketFromImageUseCase(
             TicketExtractionPort extraction,
-            ProductRepository productRepository,
+            TicketProductResolutionService ticketProductResolutionService,
             TicketQuantityUnitResolver unitResolver,
             ITicketService ticketService,
             UserRepository userRepository,
@@ -69,7 +68,7 @@ public class ImportTicketFromImageUseCase {
             FridgeRepository fridgeRepository,
             IFridgeItemService fridgeItemService) {
         this.extraction = extraction;
-        this.productRepository = productRepository;
+        this.ticketProductResolutionService = ticketProductResolutionService;
         this.unitResolver = unitResolver;
         this.ticketService = ticketService;
         this.userRepository = userRepository;
@@ -103,7 +102,7 @@ public class ImportTicketFromImageUseCase {
             if (normalized.isEmpty()) {
                 throw new IllegalArgumentException("Nombre de producto vacio en una linea del ticket");
             }
-            Optional<Product> catalog = productRepository.findFirstByNameIgnoreCase(normalized);
+            Product resolvedProduct = ticketProductResolutionService.resolveOrCreateProduct(line.productName());
 
             BigDecimal qtyAmt = line.quantityAmount().max(BigDecimal.ZERO);
             if (qtyAmt.compareTo(BigDecimal.ZERO) <= 0) {
@@ -114,7 +113,8 @@ public class ImportTicketFromImageUseCase {
             BigDecimal unitPrice = inferUnitPrice(line, qtyAmt, unit);
 
             TicketItem ti = new TicketItem();
-            catalog.ifPresentOrElse(ti::setProduct, () -> ti.setLineProductName(normalized));
+            ti.setProduct(resolvedProduct);
+            ti.setLineProductName(normalized);
             ti.setQuantity(qtyAmt);
             ti.setUnit(unit);
             ti.setPriceUnit(unitPrice);

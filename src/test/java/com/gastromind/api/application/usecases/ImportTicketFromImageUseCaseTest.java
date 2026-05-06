@@ -1,6 +1,7 @@
 package com.gastromind.api.application.usecases;
 
 import com.gastromind.api.application.services.TicketQuantityUnitResolver;
+import com.gastromind.api.application.services.TicketProductResolutionService;
 import com.gastromind.api.application.services.StoreResolutionResult;
 import com.gastromind.api.application.services.StoreResolutionService;
 import com.gastromind.api.domain.exceptions.NotFoundException;
@@ -18,7 +19,6 @@ import com.gastromind.api.domain.models.ticket.ExtractedTicketReceipt;
 import com.gastromind.api.domain.ports.in.IFridgeItemService;
 import com.gastromind.api.domain.ports.in.ITicketService;
 import com.gastromind.api.domain.ports.out.FridgeRepository;
-import com.gastromind.api.domain.ports.out.ProductRepository;
 import com.gastromind.api.domain.ports.out.TicketExtractionPort;
 import com.gastromind.api.domain.ports.out.UserRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
@@ -46,7 +46,7 @@ class ImportTicketFromImageUseCaseTest {
     @Test
     void execute_shouldBuildTicketAndPushBothCatalogAndLabeledItemsToFridge() {
         TicketExtractionPort extraction = mock(TicketExtractionPort.class);
-        ProductRepository productRepository = mock(ProductRepository.class);
+        TicketProductResolutionService productResolutionService = mock(TicketProductResolutionService.class);
         TicketQuantityUnitResolver unitResolver = mock(TicketQuantityUnitResolver.class);
         ITicketService ticketService = mock(ITicketService.class);
         UserRepository userRepository = mock(UserRepository.class);
@@ -54,7 +54,8 @@ class ImportTicketFromImageUseCaseTest {
         FridgeRepository fridgeRepository = mock(FridgeRepository.class);
         IFridgeItemService fridgeItemService = mock(IFridgeItemService.class);
         ImportTicketFromImageUseCase useCase = new ImportTicketFromImageUseCase(
-                extraction, productRepository, unitResolver, ticketService, userRepository, storeResolutionService, fridgeRepository, fridgeItemService);
+                extraction, productResolutionService, unitResolver, ticketService, userRepository, storeResolutionService,
+                fridgeRepository, fridgeItemService);
 
         when(userRepository.findById("user-1")).thenReturn(Optional.of(new User("user-1")));
         Store store = new Store();
@@ -68,13 +69,11 @@ class ImportTicketFromImageUseCaseTest {
 
         Product catalogProduct = new Product();
         catalogProduct.setId("prod-1");
-        when(productRepository.findFirstByNameIgnoreCase(anyString())).thenAnswer(inv -> {
-            String name = inv.getArgument(0, String.class);
-            if ("tomate".equalsIgnoreCase(name)) {
-                return Optional.of(catalogProduct);
-            }
-            return Optional.empty();
-        });
+        Product provisional = new Product();
+        provisional.setId("prod-provisional");
+        provisional.setNeedsReview(true);
+        when(productResolutionService.resolveOrCreateProduct("Tomate")).thenReturn(catalogProduct);
+        when(productResolutionService.resolveOrCreateProduct("Pan")).thenReturn(provisional);
         when(unitResolver.resolveFromAiCode("kg")).thenReturn(new Unit("u-kg", "kg"));
         when(unitResolver.resolveFromAiCode("g")).thenReturn(new Unit("u-g", "g"));
 
@@ -105,13 +104,13 @@ class ImportTicketFromImageUseCaseTest {
         assertEquals(5.5f, saved.getTotal_amount(), 0.0001f);
 
         verify(fridgeItemService).addProductToFridge("fridge-1", "prod-1", new BigDecimal("1"), null, ItemStatus.GOOD);
-        verify(fridgeItemService).addLabeledItemToFridge("fridge-1", "Pan", new BigDecimal("500"), null, ItemStatus.GOOD);
+        verify(fridgeItemService).addProductToFridge("fridge-1", "prod-provisional", new BigDecimal("500"), null, ItemStatus.GOOD);
     }
 
     @Test
     void execute_shouldUseStoreNameFallbackAndSkipFridgePushWhenNoHouseholdContext() {
         TicketExtractionPort extraction = mock(TicketExtractionPort.class);
-        ProductRepository productRepository = mock(ProductRepository.class);
+        TicketProductResolutionService productResolutionService = mock(TicketProductResolutionService.class);
         TicketQuantityUnitResolver unitResolver = mock(TicketQuantityUnitResolver.class);
         ITicketService ticketService = mock(ITicketService.class);
         UserRepository userRepository = mock(UserRepository.class);
@@ -119,7 +118,8 @@ class ImportTicketFromImageUseCaseTest {
         FridgeRepository fridgeRepository = mock(FridgeRepository.class);
         IFridgeItemService fridgeItemService = mock(IFridgeItemService.class);
         ImportTicketFromImageUseCase useCase = new ImportTicketFromImageUseCase(
-                extraction, productRepository, unitResolver, ticketService, userRepository, storeResolutionService, fridgeRepository, fridgeItemService);
+                extraction, productResolutionService, unitResolver, ticketService, userRepository, storeResolutionService,
+                fridgeRepository, fridgeItemService);
 
         when(userRepository.findById("user-1")).thenReturn(Optional.of(new User("user-1")));
         when(extraction.extractFromImage(any(), eq("image/png"))).thenReturn(new ExtractedTicketReceipt(
@@ -128,7 +128,9 @@ class ImportTicketFromImageUseCaseTest {
         Store store = new Store();
         store.setId("store-by-name");
         when(storeResolutionService.resolve(null, "  Mi Tienda  ")).thenReturn(new StoreResolutionResult(store, null, "  Mi Tienda  "));
-        when(productRepository.findFirstByNameIgnoreCase("leche")).thenReturn(Optional.empty());
+        Product provisional = new Product();
+        provisional.setId("prod-leche");
+        when(productResolutionService.resolveOrCreateProduct("Leche")).thenReturn(provisional);
         when(unitResolver.resolveFromAiCode("ud")).thenReturn(new Unit("u-ud", "ud"));
         when(ticketService.create(any(Ticket.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -142,7 +144,7 @@ class ImportTicketFromImageUseCaseTest {
     @Test
     void execute_shouldFail_whenUserOrStoreOrProductNameInvalid() {
         TicketExtractionPort extraction = mock(TicketExtractionPort.class);
-        ProductRepository productRepository = mock(ProductRepository.class);
+        TicketProductResolutionService productResolutionService = mock(TicketProductResolutionService.class);
         TicketQuantityUnitResolver unitResolver = mock(TicketQuantityUnitResolver.class);
         ITicketService ticketService = mock(ITicketService.class);
         UserRepository userRepository = mock(UserRepository.class);
@@ -150,7 +152,8 @@ class ImportTicketFromImageUseCaseTest {
         FridgeRepository fridgeRepository = mock(FridgeRepository.class);
         IFridgeItemService fridgeItemService = mock(IFridgeItemService.class);
         ImportTicketFromImageUseCase useCase = new ImportTicketFromImageUseCase(
-                extraction, productRepository, unitResolver, ticketService, userRepository, storeResolutionService, fridgeRepository, fridgeItemService);
+                extraction, productResolutionService, unitResolver, ticketService, userRepository, storeResolutionService,
+                fridgeRepository, fridgeItemService);
 
         when(userRepository.findById("missing")).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class, () -> useCase.execute(new byte[]{1}, "image/png", "missing", "store-1"));
@@ -165,16 +168,16 @@ class ImportTicketFromImageUseCaseTest {
         when(storeResolutionService.resolve("store-1", "Store")).thenReturn(new StoreResolutionResult(new Store("store-1", "s"), null, "Store"));
         when(extraction.extractFromImage(any(), eq("image/png"))).thenReturn(new ExtractedTicketReceipt(
                 "Store", LocalDate.now(), BigDecimal.ONE,
-                List.of(new ExtractedTicketLine("   ", BigDecimal.ONE, "ud", BigDecimal.ONE, BigDecimal.ONE, false, null))));
-        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class,
-                () -> useCase.execute(new byte[]{1}, "image/png", "user-1", "store-1"));
-        assertEquals("Nombre de producto vacio en una linea del ticket", ex.getMessage());
+                List.of(new ExtractedTicketLine("Leche", BigDecimal.ONE, "ud", BigDecimal.ONE, BigDecimal.ONE, false, null))));
+        when(productResolutionService.resolveOrCreateProduct("Leche"))
+                .thenThrow(new IllegalArgumentException("Nombre de producto vacio en una linea del ticket"));
+        assertThrows(IllegalArgumentException.class, () -> useCase.execute(new byte[]{1}, "image/png", "user-1", "store-1"));
     }
 
     @Test
     void execute_shouldFallbackTotalToApproximateItems_whenNoLineOrReceiptTotal() {
         TicketExtractionPort extraction = mock(TicketExtractionPort.class);
-        ProductRepository productRepository = mock(ProductRepository.class);
+        TicketProductResolutionService productResolutionService = mock(TicketProductResolutionService.class);
         TicketQuantityUnitResolver unitResolver = mock(TicketQuantityUnitResolver.class);
         ITicketService ticketService = mock(ITicketService.class);
         UserRepository userRepository = mock(UserRepository.class);
@@ -182,14 +185,17 @@ class ImportTicketFromImageUseCaseTest {
         FridgeRepository fridgeRepository = mock(FridgeRepository.class);
         IFridgeItemService fridgeItemService = mock(IFridgeItemService.class);
         ImportTicketFromImageUseCase useCase = new ImportTicketFromImageUseCase(
-                extraction, productRepository, unitResolver, ticketService, userRepository, storeResolutionService, fridgeRepository, fridgeItemService);
+                extraction, productResolutionService, unitResolver, ticketService, userRepository, storeResolutionService,
+                fridgeRepository, fridgeItemService);
 
         when(userRepository.findById("user-1")).thenReturn(Optional.of(new User("user-1")));
         when(storeResolutionService.resolve("store-1", "Store")).thenReturn(new StoreResolutionResult(new Store("store-1", "s"), null, "Store"));
         when(extraction.extractFromImage(any(), eq("image/png"))).thenReturn(new ExtractedTicketReceipt(
                 "Store", LocalDate.now(), BigDecimal.ZERO,
                 List.of(new ExtractedTicketLine("Arroz", new BigDecimal("750"), "g", new BigDecimal("3.20"), BigDecimal.ZERO, false, null))));
-        when(productRepository.findFirstByNameIgnoreCase("arroz")).thenReturn(Optional.empty());
+        Product provisional = new Product();
+        provisional.setId("prod-arroz");
+        when(productResolutionService.resolveOrCreateProduct("Arroz")).thenReturn(provisional);
         when(unitResolver.resolveFromAiCode("g")).thenReturn(new Unit("g", "Gramos"));
         when(ticketService.create(any(Ticket.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -198,5 +204,36 @@ class ImportTicketFromImageUseCaseTest {
         ArgumentCaptor<Ticket> captor = ArgumentCaptor.forClass(Ticket.class);
         verify(ticketService).create(captor.capture());
         assertEquals(2.4f, captor.getValue().getTotal_amount(), 0.0001f);
+    }
+
+    @Test
+    void execute_shouldReuseExistingAliasProductAcrossRepeatedImports() {
+        TicketExtractionPort extraction = mock(TicketExtractionPort.class);
+        TicketProductResolutionService productResolutionService = mock(TicketProductResolutionService.class);
+        TicketQuantityUnitResolver unitResolver = mock(TicketQuantityUnitResolver.class);
+        ITicketService ticketService = mock(ITicketService.class);
+        UserRepository userRepository = mock(UserRepository.class);
+        StoreResolutionService storeResolutionService = mock(StoreResolutionService.class);
+        FridgeRepository fridgeRepository = mock(FridgeRepository.class);
+        IFridgeItemService fridgeItemService = mock(IFridgeItemService.class);
+        ImportTicketFromImageUseCase useCase = new ImportTicketFromImageUseCase(
+                extraction, productResolutionService, unitResolver, ticketService, userRepository, storeResolutionService,
+                fridgeRepository, fridgeItemService);
+
+        when(userRepository.findById("user-1")).thenReturn(Optional.of(new User("user-1")));
+        when(storeResolutionService.resolve("store-1", "Store")).thenReturn(new StoreResolutionResult(new Store("store-1", "s"), null, "Store"));
+        when(extraction.extractFromImage(any(), eq("image/png"))).thenReturn(new ExtractedTicketReceipt(
+                "Store", LocalDate.now(), new BigDecimal("3.20"),
+                List.of(new ExtractedTicketLine("Tomate Pera", BigDecimal.ONE, "ud", new BigDecimal("1.60"), new BigDecimal("1.60"), false, null))));
+        when(unitResolver.resolveFromAiCode("ud")).thenReturn(new Unit("u-ud", "ud"));
+        Product provisional = new Product("prod-shared");
+        when(productResolutionService.resolveOrCreateProduct("Tomate Pera")).thenReturn(provisional);
+        when(ticketService.create(any(Ticket.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        Ticket first = useCase.execute(new byte[]{1}, "image/png", "user-1", "store-1").ticket();
+        Ticket second = useCase.execute(new byte[]{2}, "image/png", "user-1", "store-1").ticket();
+
+        assertEquals("prod-shared", first.getItems().get(0).getProduct().getId());
+        assertEquals("prod-shared", second.getItems().get(0).getProduct().getId());
     }
 }
