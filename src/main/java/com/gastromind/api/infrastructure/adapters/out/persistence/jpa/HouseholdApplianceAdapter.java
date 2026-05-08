@@ -49,7 +49,8 @@ public class HouseholdApplianceAdapter implements HouseholdApplianceRepository {
 
     @Override
     public void deleteAllByHouseholdId(String householdId) {
-        jpaRepository.deleteAllByHousehold_Id(householdId);
+        jpaRepository.deleteAllForHousehold(householdId);
+        jpaRepository.flush();
     }
     /**
      * Devuelve household appliance por id.

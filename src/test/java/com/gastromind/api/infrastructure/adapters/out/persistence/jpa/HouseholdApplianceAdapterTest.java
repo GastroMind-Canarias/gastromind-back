@@ -55,6 +55,7 @@ class HouseholdApplianceAdapterTest {
         verify(jpaRepository).deleteById("ha-1");
 
         adapter.deleteAllByHouseholdId("h-1");
-        verify(jpaRepository).deleteAllByHousehold_Id("h-1");
+        verify(jpaRepository).deleteAllForHousehold("h-1");
+        verify(jpaRepository).flush();
     }
 }

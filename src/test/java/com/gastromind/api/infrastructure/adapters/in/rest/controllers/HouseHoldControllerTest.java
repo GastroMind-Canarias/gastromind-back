@@ -26,9 +26,11 @@ import static org.mockito.Mockito.when;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.same;
 
 class HouseHoldControllerTest {
 
@@ -183,5 +185,66 @@ class HouseHoldControllerTest {
         ForbiddenException ex = assertThrows(ForbiddenException.class,
                 () -> controller.addMyAppliance(authentication, Appliance.HORNO));
         assertEquals("Solo el OWNER del hogar puede gestionar los electrodomesticos", ex.getMessage());
+    }
+
+    @Test
+    void addMyAppliancesBatch_shouldReturnExpectedPostBody() {
+        HouseHoldServiceImpl holdServiceImpl = mock(HouseHoldServiceImpl.class);
+        UserServiceImpl userServiceImpl = mock(UserServiceImpl.class);
+        HouseHoldRestMapper houseHoldMapper = mock(HouseHoldRestMapper.class);
+        HouseholdApplianceRestMapper applianceRestMapper = mock(HouseholdApplianceRestMapper.class);
+        UserRestMapper userRestMapper = mock(UserRestMapper.class);
+        org.springframework.security.core.Authentication authentication = mock(org.springframework.security.core.Authentication.class);
+
+        HouseHoldController controller = new HouseHoldController();
+        ReflectionTestUtils.setField(controller, "holdServiceImpl", holdServiceImpl);
+        ReflectionTestUtils.setField(controller, "houseHoldMapper", houseHoldMapper);
+        ReflectionTestUtils.setField(controller, "applianceRestMapper", applianceRestMapper);
+        ReflectionTestUtils.setField(controller, "userRestMapper", userRestMapper);
+        ReflectionTestUtils.setField(controller, "userServiceImpl", userServiceImpl);
+
+        HouseHold house = new HouseHold();
+        house.setId("house-1");
+        User owner = new User();
+        owner.setName("owner1");
+        owner.setRole(Role.ROLE_OWNER);
+        owner.setHouseHold_id(house);
+
+        ApplianceTypeListRequest request = new ApplianceTypeListRequest(java.util.List.of(
+                Appliance.HORNO,
+                Appliance.MICROONDAS
+        ));
+
+        HouseholdAppliance row1 = new HouseholdAppliance("ap-1", Appliance.HORNO, "house-1");
+        HouseholdAppliance row2 = new HouseholdAppliance("ap-2", Appliance.MICROONDAS, "house-1");
+        java.util.List<HouseholdAppliance> serviceOut = java.util.List.of(row1, row2);
+
+        ApplianceResponse response1 = new ApplianceResponse();
+        response1.setId("ap-1");
+        response1.setAppliance(Appliance.HORNO);
+        response1.setHouseholdId("house-1");
+        ApplianceResponse response2 = new ApplianceResponse();
+        response2.setId("ap-2");
+        response2.setAppliance(Appliance.MICROONDAS);
+        response2.setHouseholdId("house-1");
+        java.util.List<ApplianceResponse> mapped = java.util.List.of(response1, response2);
+
+        when(authentication.getName()).thenReturn("owner1");
+        when(userServiceImpl.findByUsername("owner1")).thenReturn(owner);
+        when(holdServiceImpl.addAppliancesBulk(eq("house-1"), same(request.appliances()))).thenReturn(serviceOut);
+        when(applianceRestMapper.toResponseList(serviceOut)).thenReturn(mapped);
+
+        var result = controller.addMyAppliancesBatch(authentication, request);
+
+        assertEquals(HttpStatus.CREATED, result.getStatusCode());
+        assertNotNull(result.getBody());
+        assertEquals(2, result.getBody().size());
+        assertEquals("ap-1", result.getBody().get(0).getId());
+        assertEquals(Appliance.HORNO, result.getBody().get(0).getAppliance());
+        assertEquals("house-1", result.getBody().get(0).getHouseholdId());
+        assertEquals("ap-2", result.getBody().get(1).getId());
+        assertEquals(Appliance.MICROONDAS, result.getBody().get(1).getAppliance());
+        assertEquals("house-1", result.getBody().get(1).getHouseholdId());
+        assertTrue(result.getBody() == mapped);
     }
 }
