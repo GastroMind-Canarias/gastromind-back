@@ -207,15 +207,15 @@ public class HouseHoldServiceImpl implements IHouseHoldService {
         if (appliances == null || appliances.isEmpty()) {
             return listAppliances(householdId);
         }
+        applianceRepository.deleteAllByHouseholdId(householdId);
+        List<HouseholdAppliance> saved = new ArrayList<>();
         for (Appliance a : new LinkedHashSet<>(appliances)) {
-            if (!applianceTypeExistsInHousehold(householdId, a, null)) {
-                HouseholdAppliance row = new HouseholdAppliance();
-                row.setAppliance(a);
-                row.setHouseholdId(householdId);
-                applianceRepository.save(row);
-            }
+            HouseholdAppliance row = new HouseholdAppliance();
+            row.setAppliance(a);
+            row.setHouseholdId(householdId);
+            saved.add(applianceRepository.save(row));
         }
-        return listAppliances(householdId);
+        return saved;
     }
     /**
      * Elimina varios electrodomesticos de un hogar por identificador de registro.

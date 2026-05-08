@@ -303,7 +303,7 @@ public class HouseHoldController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Anadir varios electrodomesticos a mi hogar (solo OWNER; ignora tipos ya existentes)")
+    @Operation(summary = "Sincronizar electrodomesticos de mi hogar con una lista final (solo OWNER)")
     @ApiPostDoc
     @PostMapping("/me/appliances/batch")
     @PreAuthorize("isAuthenticated()")

@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.ArgumentCaptor;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Arrays;
@@ -30,6 +31,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.inOrder;
+import org.mockito.InOrder;
 
 @ExtendWith(MockitoExtension.class)
 class HouseHoldServiceImplTest {
@@ -168,10 +173,61 @@ class HouseHoldServiceImplTest {
     @Test
     void addAppliancesBulk_emptyReturnsCurrentList() {
         when(repository.existsById("h-1")).thenReturn(true);
-        when(applianceRepository.findByHouseholdId("h-1")).thenReturn(List.of());
+        HouseholdAppliance existing = new HouseholdAppliance("ap-existing", Appliance.HORNO, "h-1");
+        when(applianceRepository.findByHouseholdId("h-1")).thenReturn(List.of(existing));
 
-        assertTrue(service.addAppliancesBulk("h-1", null).isEmpty());
-        assertTrue(service.addAppliancesBulk("h-1", List.of()).isEmpty());
+        assertEquals(List.of(existing), service.addAppliancesBulk("h-1", null));
+        assertEquals(List.of(existing), service.addAppliancesBulk("h-1", List.of()));
+        verify(applianceRepository, never()).deleteAllByHouseholdId("h-1");
+    }
+
+    @Test
+    void addAppliancesBulk_nonEmptyReplacesAllAndDeduplicates() {
+        when(repository.existsById("h-1")).thenReturn(true);
+
+        HouseholdAppliance savedHorno = new HouseholdAppliance("ap-1", Appliance.HORNO, "h-1");
+        HouseholdAppliance savedMicro = new HouseholdAppliance("ap-2", Appliance.MICROONDAS, "h-1");
+
+        when(applianceRepository.save(any(HouseholdAppliance.class)))
+                .thenReturn(savedHorno)
+                .thenReturn(savedMicro);
+
+        List<HouseholdAppliance> out = service.addAppliancesBulk(
+                "h-1",
+                List.of(Appliance.HORNO, Appliance.HORNO, Appliance.MICROONDAS)
+        );
+
+        InOrder orderedCalls = inOrder(applianceRepository);
+        orderedCalls.verify(applianceRepository).deleteAllByHouseholdId("h-1");
+        orderedCalls.verify(applianceRepository, times(2)).save(any(HouseholdAppliance.class));
+        verify(applianceRepository).deleteAllByHouseholdId("h-1");
+        ArgumentCaptor<HouseholdAppliance> captor = ArgumentCaptor.forClass(HouseholdAppliance.class);
+        verify(applianceRepository, times(2)).save(captor.capture());
+        List<HouseholdAppliance> savedRows = captor.getAllValues();
+        assertEquals(Appliance.HORNO, savedRows.get(0).getAppliance());
+        assertEquals(Appliance.MICROONDAS, savedRows.get(1).getAppliance());
+        assertEquals("h-1", savedRows.get(0).getHouseholdId());
+        assertEquals("h-1", savedRows.get(1).getHouseholdId());
+        assertEquals(List.of(savedHorno, savedMicro), out);
+    }
+
+    @Test
+    void addAppliancesBulk_replaceFromAirfryerAndHornoToOnlyHorno() {
+        when(repository.existsById("h-1")).thenReturn(true);
+        HouseholdAppliance savedHorno = new HouseholdAppliance("ap-new", Appliance.HORNO, "h-1");
+        when(applianceRepository.save(any(HouseholdAppliance.class))).thenReturn(savedHorno);
+
+        List<HouseholdAppliance> out = service.addAppliancesBulk("h-1", List.of(Appliance.HORNO));
+
+        InOrder orderedCalls = inOrder(applianceRepository);
+        orderedCalls.verify(applianceRepository).deleteAllByHouseholdId("h-1");
+        orderedCalls.verify(applianceRepository).save(any(HouseholdAppliance.class));
+
+        ArgumentCaptor<HouseholdAppliance> captor = ArgumentCaptor.forClass(HouseholdAppliance.class);
+        verify(applianceRepository).save(captor.capture());
+        assertEquals(Appliance.HORNO, captor.getValue().getAppliance());
+        assertEquals("h-1", captor.getValue().getHouseholdId());
+        assertEquals(List.of(savedHorno), out);
     }
 
     @Test
