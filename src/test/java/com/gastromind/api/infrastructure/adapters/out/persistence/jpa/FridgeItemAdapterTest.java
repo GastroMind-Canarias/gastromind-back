@@ -42,9 +42,9 @@ class FridgeItemAdapterTest {
         when(fridgeItemMapper.toDomain(saved)).thenReturn(domain);
         assertEquals(domain, adapter.save(domain));
 
-        when(fridgeItemJpaRepository.findById("x")).thenReturn(Optional.empty());
+        when(fridgeItemJpaRepository.findWithProductAndCategoryById("x")).thenReturn(Optional.empty());
         assertTrue(adapter.findById("x").isEmpty());
-        when(fridgeItemJpaRepository.findById("fi-1")).thenReturn(Optional.of(entity));
+        when(fridgeItemJpaRepository.findWithProductAndCategoryById("fi-1")).thenReturn(Optional.of(entity));
         when(fridgeItemMapper.toDomain(entity)).thenReturn(domain);
         assertEquals(Optional.of(domain), adapter.findById("fi-1"));
 
@@ -59,7 +59,7 @@ class FridgeItemAdapterTest {
         when(fridgeItemJpaRepository.findByFridgeIdAndProductCategoryId("f1", "c1")).thenReturn(List.of(entity));
         assertEquals(List.of(domain), adapter.findByFridgeIdAndCategoryId("f1", "c1"));
 
-        when(fridgeItemJpaRepository.findAll()).thenReturn(List.of(entity));
+        when(fridgeItemJpaRepository.findAllWithProductAndCategory()).thenReturn(List.of(entity));
         assertEquals(List.of(domain), adapter.findAll());
 
         adapter.deleteById("fi-1");

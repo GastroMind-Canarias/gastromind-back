@@ -1,7 +1,7 @@
 package com.gastromind.api.domain.models;
 
 /**
- * Producto del catálogo global: nombre, esencialidad, alérgeno asociado y banderas de revisión cuando el dato viene del OCR o de importaciones.
+ * Producto del catálogo global: nombre, categoría opcional, esencialidad, alérgeno asociado y banderas de revisión cuando el dato viene del OCR o de importaciones.
  */
 public class Product {
     String id;
@@ -10,6 +10,8 @@ public class Product {
     boolean needsReview;
     String reviewNote;
     Allergen allergen;
+    /** Clasificación del catálogo; puede ser null si aún no se ha enlazado categoría. */
+    Category category;
 
     public Product(String id) {
         this.id = id;
@@ -96,6 +98,14 @@ public class Product {
 
     public void setAllergen(Allergen allerge) {
         this.allergen = allerge;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
 }

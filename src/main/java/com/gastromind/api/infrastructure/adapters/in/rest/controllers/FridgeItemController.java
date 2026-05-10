@@ -2,6 +2,7 @@ package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
 import com.gastromind.api.application.services.FridgeItemServiceImpl;
 import com.gastromind.api.application.usecases.ConsumeMyFridgeItemUseCase;
+import com.gastromind.api.application.usecases.ConsumeMyFridgeItemsBatchUseCase;
 import com.gastromind.api.application.usecases.CreateMyFridgeItemUseCase;
 import com.gastromind.api.application.usecases.DeleteMyFridgeItemUseCase;
 import com.gastromind.api.application.usecases.ListMyExpiringFridgeItemsUseCase;
@@ -11,6 +12,8 @@ import com.gastromind.api.application.usecases.MarkMyFridgeItemConsumedUseCase;
 import com.gastromind.api.application.usecases.UpdateMyFridgeItemUseCase;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
+import com.gastromind.api.domain.models.FridgeItemConsumeLine;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.FridgeItemConsumeBatchRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.FridgeItemRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.FridgeItemResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.MyFridgeItemBatchRequest;
@@ -53,6 +56,8 @@ public class FridgeItemController {
     private DeleteMyFridgeItemUseCase deleteMyFridgeItemUseCase;
     @Autowired
     private ConsumeMyFridgeItemUseCase consumeMyFridgeItemUseCase;
+    @Autowired
+    private ConsumeMyFridgeItemsBatchUseCase consumeMyFridgeItemsBatchUseCase;
     @Autowired
     private MarkMyFridgeItemConsumedUseCase markMyFridgeItemConsumedUseCase;
     @Autowired
@@ -191,23 +196,18 @@ public class FridgeItemController {
                 .toResponse(fridgeItemService.update(id, fridgeItemRestMapper.toDomain(fridgeItem))));
     }
     /**
-     * Realiza update my item.
-     * @param authentication usuario autenticado.
-     * @param itemId identificador del item.
-     * @param body datos enviados en el cuerpo de la solicitud.
-     * @return resultado de la operacion solicitada.
+     * Variante de actualizacion acotada al inventario de tu hogar. No hace falta repetir el
+     * producto del catalogo: el item ya lo tiene guardado; solo envia lo que quieres cambiar
+     * (cantidad, caducidad, estado).
      */
 
-    @Operation(summary = "Actualizar item de mi nevera (Owner, Member y Admin)", description = "Modifica un producto de la nevera del hogar autenticado.")
+    @Operation(summary = "Actualizar item de mi nevera (Owner, Member y Admin)", description = "Modifica cantidad, caducidad y estado del item. El producto del catalogo queda asociado al item; no hace falta enviar productId.")
     @ApiStandardDoc
     @PutMapping("/me/{itemId}")
     @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<FridgeItemResponse> updateMyItem(Authentication authentication,
             @PathVariable String itemId,
             @Valid @RequestBody MyFridgeItemRequest body) {
-        if (body.productId() == null || body.productId().trim().isEmpty()) {
-            throw new IllegalArgumentException("El identificador del producto es obligatorio");
-        }
         return ResponseEntity.ok(fridgeItemRestMapper.toResponse(updateMyFridgeItemUseCase.execute(
                 authentication.getName(),
                 itemId,
@@ -219,6 +219,21 @@ public class FridgeItemController {
      * @param quantity la cantidad
      * @return resultado de la operacion solicitada.
      */
+
+    /**
+     * Descuenta stock en bloque (admin). Sirve para registrar varios usos sin viajes extra al servidor.
+     */
+    @Operation(summary = "Consumir parte de varios items (Solo Admin)", description = "Varios descuentos en una peticion; la respuesta sigue el orden del body. Si una linea falla, no se aplica ninguna.")
+    @ApiStandardDoc
+    @PutMapping("/batch/consume")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<FridgeItemResponse>> consumePartiallyBatch(
+            @Valid @RequestBody FridgeItemConsumeBatchRequest body) {
+        List<FridgeItemConsumeLine> lines = body.items().stream()
+                .map(line -> new FridgeItemConsumeLine(line.itemId(), line.quantity()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(fridgeItemRestMapper.toResponseList(fridgeItemService.consumePartiallyBatch(lines)));
+    }
 
     @Operation(summary = "Consumir parte de un item (Solo Admin)", description = "Descuenta una cantidad del stock. Si el stock llega a cero, el item se elimina del inventario.")
     @ApiStandardDoc
@@ -236,6 +251,22 @@ public class FridgeItemController {
      * @param quantity la cantidad
      * @return resultado de la operacion solicitada.
      */
+
+    /**
+     * Igual que consumir una linea en /me, pero en lista; solo items de tu nevera.
+     */
+    @Operation(summary = "Consumir parte de varios items de mi nevera (Owner, Member y Admin)", description = "Mismo criterio que el consume unitario /me, pero varias lineas; todo o nada si algo falla.")
+    @ApiStandardDoc
+    @PutMapping("/me/batch/consume")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
+    public ResponseEntity<List<FridgeItemResponse>> consumePartiallyMyItemsBatch(Authentication authentication,
+            @Valid @RequestBody FridgeItemConsumeBatchRequest body) {
+        List<FridgeItemConsumeLine> lines = body.items().stream()
+                .map(line -> new FridgeItemConsumeLine(line.itemId(), line.quantity()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(fridgeItemRestMapper.toResponseList(
+                consumeMyFridgeItemsBatchUseCase.execute(authentication.getName(), lines)));
+    }
 
     @Operation(summary = "Consumir parte de un item de mi nevera (Owner, Member y Admin)", description = "Descuenta cantidad del stock; si queda en cero, el item se elimina del inventario.")
     @ApiStandardDoc

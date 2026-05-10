@@ -11,10 +11,11 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring")
 /**
- * Define el contrato de user favorites rest.
+ * Arma DTOs de favoritos: empuja {@link com.gastromind.api.domain.models.Recipe} por {@link RecipeRestMapper} para que
+ * el JSON luzca como el detalle de receta y el cliente no tenga que acordarse de otra ruta.
  */
+@Mapper(componentModel = "spring", uses = RecipeRestMapper.class)
 public interface UserFavoritesRestMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "user_id.id", source = "user_id")
@@ -22,10 +23,7 @@ public interface UserFavoritesRestMapper {
     UserFavorites toDomain(UserFavoritesRequest request);
 
     @Mapping(target = "user_id", source = "user_id.id")
-    @Mapping(target = "recipe_id", source = "recipe_id.id")
-    @Mapping(target = "title", source = "recipe_id.title")
-    @Mapping(target = "prep_time", source = "recipe_id.prep_time")
-    @Mapping(target = "appliance_needed", source = "recipe_id.appliance_needed")
+    @Mapping(target = "recipe", source = "recipe_id")
     UserFavoritesResponse toResponse(UserFavorites domain);
 
     List<UserFavoritesResponse> toResponseList(List<UserFavorites> userFavorites);

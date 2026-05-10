@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 /**
  * Caso de uso para crear la nevera del hogar autenticado.
- * Solo admite la operaciAn para usuarios con rol OWNER y hogares sin nevera previa.
+ * Solo admite la operacion para usuarios con rol OWNER y hogares sin nevera previa.
  */
 public class CreateMyFridgeUseCase {
 

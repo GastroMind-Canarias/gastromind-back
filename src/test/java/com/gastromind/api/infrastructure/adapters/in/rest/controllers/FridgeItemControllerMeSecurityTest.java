@@ -3,6 +3,7 @@ package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gastromind.api.application.services.FridgeItemServiceImpl;
 import com.gastromind.api.application.usecases.ConsumeMyFridgeItemUseCase;
+import com.gastromind.api.application.usecases.ConsumeMyFridgeItemsBatchUseCase;
 import com.gastromind.api.application.usecases.CreateMyFridgeItemUseCase;
 import com.gastromind.api.application.usecases.DeleteMyFridgeItemUseCase;
 import com.gastromind.api.application.usecases.ListMyExpiringFridgeItemsUseCase;
@@ -79,6 +80,8 @@ class FridgeItemControllerMeSecurityTest {
     @MockBean
     private ConsumeMyFridgeItemUseCase consumeMyFridgeItemUseCase;
     @MockBean
+    private ConsumeMyFridgeItemsBatchUseCase consumeMyFridgeItemsBatchUseCase;
+    @MockBean
     private MarkMyFridgeItemConsumedUseCase markMyFridgeItemConsumedUseCase;
     @MockBean
     private ListMyExpiringFridgeItemsUseCase listMyExpiringFridgeItemsUseCase;
@@ -97,7 +100,7 @@ class FridgeItemControllerMeSecurityTest {
     @Test
     void meRoutes_shouldAllowOwnerMemberAndAdmin() throws Exception {
         FridgeItem domain = buildItem("item-1", "fridge-1");
-        FridgeItemResponse response = new FridgeItemResponse("item-1", new BigDecimal("2.0"), LocalDate.of(2026, 5, 1), "IN_FRIDGE", "Leche");
+        FridgeItemResponse response = new FridgeItemResponse("item-1", new BigDecimal("2.0"), LocalDate.of(2026, 5, 1), "IN_FRIDGE", "Leche", null);
         String body = objectMapper.writeValueAsString(Map.of(
                 "productId", "product-1",
                 "quantity", "2.0",
@@ -127,6 +130,11 @@ class FridgeItemControllerMeSecurityTest {
                 )
         ));
         String consumeBody = objectMapper.writeValueAsString(new BigDecimal("1.0"));
+        String consumeBatchBody = objectMapper.writeValueAsString(Map.of(
+                "items", List.of(
+                        Map.of("itemId", "item-1", "quantity", "1.0"),
+                        Map.of("itemId", "item-2", "quantity", "0.5")
+                )));
 
         when(fridgeItemRestMapper.toDomain(any(MyFridgeItemRequest.class))).thenReturn(domain);
         when(fridgeItemRestMapper.toResponse(any())).thenReturn(response);
@@ -159,6 +167,7 @@ class FridgeItemControllerMeSecurityTest {
                 .thenReturn(domain);
         when(updateMyFridgeItemUseCase.execute(any(), eq("item-1"), any())).thenReturn(domain);
         when(consumeMyFridgeItemUseCase.execute(any(), eq("item-1"), eq(new BigDecimal("1.0")))).thenReturn(domain);
+        when(consumeMyFridgeItemsBatchUseCase.execute(any(), any())).thenReturn(List.of(domain));
         when(listMyExpiringFridgeItemsUseCase.execute(any(), eq(5))).thenReturn(List.of(domain));
         when(listMyFridgeItemsByCategoryUseCase.execute(any(), eq("cat-1"))).thenReturn(List.of(domain));
 
@@ -195,6 +204,12 @@ class FridgeItemControllerMeSecurityTest {
             mockMvc.perform(put("/api/v1/fridge-items/me/item-1/consume")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(consumeBody)
+                            .with(user("user1").authorities(new SimpleGrantedAuthority(role))))
+                    .andExpect(status().isOk());
+
+            mockMvc.perform(put("/api/v1/fridge-items/me/batch/consume")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(consumeBatchBody)
                             .with(user("user1").authorities(new SimpleGrantedAuthority(role))))
                     .andExpect(status().isOk());
 
@@ -245,6 +260,9 @@ class FridgeItemControllerMeSecurityTest {
                 .andExpect(status().isForbidden());
         mockMvc.perform(put("/api/v1/fridge-items/me/item-1/consume").contentType(MediaType.APPLICATION_JSON).content(consumeBody).with(unauthorized))
                 .andExpect(status().isForbidden());
+        mockMvc.perform(put("/api/v1/fridge-items/me/batch/consume").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Map.of(
+                "items", List.of(Map.of("itemId", "item-1", "quantity", "1.0"))
+        ))).with(unauthorized)).andExpect(status().isForbidden());
         mockMvc.perform(put("/api/v1/fridge-items/me/item-1/mark-consumed").with(unauthorized)).andExpect(status().isForbidden());
         mockMvc.perform(delete("/api/v1/fridge-items/me/item-1").with(unauthorized)).andExpect(status().isForbidden());
         mockMvc.perform(get("/api/v1/fridge-items/me/expiring").param("days", "5").with(unauthorized)).andExpect(status().isForbidden());
@@ -260,6 +278,38 @@ class FridgeItemControllerMeSecurityTest {
         ));
 
         mockMvc.perform(post("/api/v1/fridge-items/me")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidBody)
+                        .with(user("user1").authorities(new SimpleGrantedAuthority("ROLE_OWNER"))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void updateMyItem_shouldAcceptJsonWithoutProductId() throws Exception {
+        FridgeItem domain = buildItem("item-1", "fridge-1");
+        FridgeItemResponse response = new FridgeItemResponse("item-1", new BigDecimal("2.0"), LocalDate.of(2026, 5, 1), "IN_FRIDGE", "Leche", null);
+        String bodyWithoutProductId = objectMapper.writeValueAsString(Map.of(
+                "quantity", "2.0",
+                "expirationDate", "2026-05-01",
+                "status", "IN_FRIDGE"
+        ));
+
+        when(fridgeItemRestMapper.toDomain(any(MyFridgeItemRequest.class))).thenReturn(domain);
+        when(fridgeItemRestMapper.toResponse(any())).thenReturn(response);
+        when(updateMyFridgeItemUseCase.execute(any(), eq("item-1"), any())).thenReturn(domain);
+
+        mockMvc.perform(put("/api/v1/fridge-items/me/item-1")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bodyWithoutProductId)
+                        .with(user("user1").authorities(new SimpleGrantedAuthority("ROLE_OWNER"))))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void consumeMyItemsBatch_shouldReturnBadRequestWhenEmpty() throws Exception {
+        String invalidBody = objectMapper.writeValueAsString(Map.of("items", List.of()));
+
+        mockMvc.perform(put("/api/v1/fridge-items/me/batch/consume")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidBody)
                         .with(user("user1").authorities(new SimpleGrantedAuthority("ROLE_OWNER"))))

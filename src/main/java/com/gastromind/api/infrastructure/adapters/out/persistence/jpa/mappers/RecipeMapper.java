@@ -1,13 +1,16 @@
 package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.mappers;
 
 import com.gastromind.api.domain.models.Recipe;
+import com.gastromind.api.domain.models.RecipeIngredientUsage;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.RecipeEntity;
+import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.RecipeIngredientEntity;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.DifficultyLevel;
 import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.Named;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -65,6 +68,39 @@ public interface RecipeMapper {
     @Named("difficultyLevelToString")
     default String difficultyLevelToString(DifficultyLevel level) {
         return level == null ? null : level.name();
+    }
+
+    /**
+     * Igual que {@link #toDomain(RecipeEntity)} pero rellena ingredientes desde filas JPA.
+     * Solo conviene cuando la entidad ya trae {@code ingredients} cargados (p. ej. favoritos con fetch),
+     * para no disparar consultas extra en listados genericos de recetas.
+     */
+    @Named("toDomainWithIngredients")
+    default Recipe toDomainWithIngredients(RecipeEntity entity) {
+        if (entity == null) {
+            return null;
+        }
+        Recipe recipe = toDomain(entity);
+        List<RecipeIngredientEntity> rows = entity.getIngredients();
+        if (rows == null || rows.isEmpty()) {
+            return recipe;
+        }
+        List<RecipeIngredientUsage> usages = new ArrayList<>();
+        for (RecipeIngredientEntity row : rows) {
+            if (row == null) {
+                continue;
+            }
+            RecipeIngredientUsage u = new RecipeIngredientUsage();
+            if (row.getProduct() != null) {
+                u.setProductId(row.getProduct().getId());
+                u.setProductName(row.getProduct().getName());
+            }
+            u.setQuantityUsed(row.getQuantityRequired());
+            u.setQuantityAvailable(null);
+            usages.add(u);
+        }
+        recipe.setIngredientsUsed(usages);
+        return recipe;
     }
 }
 

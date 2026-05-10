@@ -3,6 +3,7 @@ package com.gastromind.api.application.services;
 import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.models.Fridge;
 import com.gastromind.api.domain.models.FridgeItem;
+import com.gastromind.api.domain.models.FridgeItemConsumeLine;
 import com.gastromind.api.domain.models.Product;
 import com.gastromind.api.domain.ports.out.FridgeItemRepository;
 import com.gastromind.api.domain.ports.out.FridgeRepository;
@@ -168,6 +169,25 @@ class FridgeItemServiceImplTest {
     void consumePartially_throwsWhenTooMuch() {
         when(repository.findById("fi-1")).thenReturn(Optional.of(existing));
         assertThrows(IllegalArgumentException.class, () -> service.consumePartially("fi-1", new BigDecimal("11")));
+    }
+
+    @Test
+    void consumePartiallyBatch_appliesLinesInOrder() {
+        FridgeItem second = new FridgeItem();
+        second.setId("fi-2");
+        second.setQuantity(new BigDecimal("3"));
+
+        when(repository.findById("fi-1")).thenReturn(Optional.of(existing));
+        when(repository.findById("fi-2")).thenReturn(Optional.of(second));
+        when(repository.save(any(FridgeItem.class))).thenAnswer(inv -> inv.getArgument(0));
+
+        List<FridgeItem> out = service.consumePartiallyBatch(List.of(
+                new FridgeItemConsumeLine("fi-1", new BigDecimal("5")),
+                new FridgeItemConsumeLine("fi-2", new BigDecimal("1"))));
+
+        assertEquals(2, out.size());
+        assertEquals(0, new BigDecimal("5").compareTo(out.get(0).getQuantity()));
+        assertEquals(0, new BigDecimal("2").compareTo(out.get(1).getQuantity()));
     }
 
     @Test

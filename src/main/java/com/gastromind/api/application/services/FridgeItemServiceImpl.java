@@ -2,6 +2,7 @@ package com.gastromind.api.application.services;
 
 import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.models.FridgeItem;
+import com.gastromind.api.domain.models.FridgeItemConsumeLine;
 import com.gastromind.api.domain.models.Product;
 import com.gastromind.api.domain.ports.in.IFridgeItemService;
 import com.gastromind.api.domain.ports.out.FridgeItemRepository;
@@ -13,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -164,6 +166,23 @@ public class FridgeItemServiceImpl implements IFridgeItemService {
     @Override
     @Transactional
     public FridgeItem consumePartially(String itemId, BigDecimal quantityToConsume) {
+        return applyConsumePartially(itemId, quantityToConsume);
+    }
+
+    /**
+     * Varios descuentos en una sola transaccion (si una linea falla, ninguna se aplica).
+     */
+    @Override
+    @Transactional
+    public List<FridgeItem> consumePartiallyBatch(List<FridgeItemConsumeLine> lines) {
+        List<FridgeItem> updated = new ArrayList<>(lines.size());
+        for (FridgeItemConsumeLine line : lines) {
+            updated.add(applyConsumePartially(line.itemId(), line.quantity()));
+        }
+        return updated;
+    }
+
+    private FridgeItem applyConsumePartially(String itemId, BigDecimal quantityToConsume) {
         FridgeItem item = findById(itemId);
         if (item.getQuantity().compareTo(quantityToConsume) < 0) {
             throw new IllegalArgumentException("Cantidad a consumir mayor que la disponible");

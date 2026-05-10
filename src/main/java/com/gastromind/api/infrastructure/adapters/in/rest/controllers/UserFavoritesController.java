@@ -60,7 +60,7 @@ public class UserFavoritesController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Listar todos los favoritos (solo ADMIN)", description = "Lista global de enlaces usuario-receta.")
+    @Operation(summary = "Listar todos los favoritos (solo ADMIN)", description = "Lista global; cada elemento incluye la receta completa anidada en recipe.")
     @ApiStandardDoc
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
@@ -74,7 +74,7 @@ public class UserFavoritesController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Mis recetas favoritas", description = "Solo favoritos del usuario autenticado.")
+    @Operation(summary = "Mis recetas favoritas", description = "Solo favoritos del usuario autenticado; cada item trae recipe con el mismo detalle que GET /recipes/{id}.")
     @ApiStandardDoc
     @GetMapping("/me")
     @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
