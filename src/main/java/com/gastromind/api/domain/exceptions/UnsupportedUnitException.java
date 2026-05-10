@@ -1,13 +1,9 @@
 package com.gastromind.api.domain.exceptions;
 
 /**
- * ExcepciAn de dominio para unidades de medida no soportadas.
+ * La unidad del ticket o del catálogo no se puede convertir al sistema interno.
  */
 public class UnsupportedUnitException extends RuntimeException {
-    /**
-     * Crea una nueva instancia.
-     * @param message detalle del error
-     */
     public UnsupportedUnitException(String message) {
         super(message);
     }

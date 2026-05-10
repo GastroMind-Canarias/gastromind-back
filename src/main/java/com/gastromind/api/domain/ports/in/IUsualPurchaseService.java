@@ -5,7 +5,7 @@ import com.gastromind.api.domain.models.UsualPurchase;
 import java.util.List;
 
 /**
- * Define las operaciones de negocio para compras habituales.
+ * Puerto de entrada para patrones de recompra y sugerencias derivadas del histórico de tickets.
  */
 public interface IUsualPurchaseService {
     List<UsualPurchase> findAll();

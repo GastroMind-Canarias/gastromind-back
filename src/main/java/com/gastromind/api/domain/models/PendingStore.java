@@ -4,6 +4,9 @@ import com.gastromind.api.domain.models.enums.PendingStoreStatus;
 
 import java.time.LocalDateTime;
 
+/**
+ * Tienda vista en tickets u orígenes externos aún no fusionada al catálogo: acumula avistamientos hasta promoción o rechazo manual.
+ */
 public class PendingStore {
     private String id;
     private String detectedName;

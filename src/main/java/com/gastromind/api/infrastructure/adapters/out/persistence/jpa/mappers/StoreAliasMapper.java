@@ -7,6 +7,9 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
+/**
+ * Convierte alias de tienda entre modelo de dominio y filas JPA con {@code StoreEntity}.
+ */
 @Mapper(componentModel = "spring")
 public interface StoreAliasMapper {
     @Mapping(target = "store.id", source = "storeId")

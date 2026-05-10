@@ -5,7 +5,7 @@ import com.gastromind.api.domain.models.Recipe;
 import java.util.List;
 
 /**
- * Define las operaciones de negocio para recetas.
+ * Puerto de entrada para consultar recetas persistidas y metadatos asociados.
  */
 public interface IRecipeService {
     List<Recipe> findAll();

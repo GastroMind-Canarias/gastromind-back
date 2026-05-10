@@ -1,7 +1,7 @@
 package com.gastromind.api.domain.models.enums;
 
 /**
- * Enum con el estado de validaciAn de una lAnea de ticket.
+ * Si la línea del ticket ya cuadró con catálogo y unidades o sigue pendiente de revisión humana.
  */
 public enum TicketLineVerificationStatus {
     PENDING_REVIEW,

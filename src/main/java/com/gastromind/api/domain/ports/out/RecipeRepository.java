@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Define el contrato de persistencia o integracion para recipe.
+ * Recetas guardadas y sus metadatos para consulta desde la API y favoritos.
  */
 public interface RecipeRepository {
     Recipe save(Recipe recipe);

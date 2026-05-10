@@ -5,7 +5,7 @@ import com.gastromind.api.domain.models.Ticket;
 import java.util.List;
 
 /**
- * Define las operaciones de negocio para tickets de compra.
+ * Puerto de entrada para registrar tickets, importar desde imagen y consultar histórico del hogar.
  */
 public interface ITicketService {
     List<Ticket> findAll();

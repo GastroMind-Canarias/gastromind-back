@@ -5,6 +5,9 @@ import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 
+/**
+ * Sugiere creación de varios productos del catálogo a partir de nombres libres (flujo admin).
+ */
 @Schema(description = "Objeto para registrar multiples productos por nombre")
 public record ProductBatchRequest(
         @Schema(description = "Listado de nombres de producto", example = "[\"Leche\", \"Huevos\"]")

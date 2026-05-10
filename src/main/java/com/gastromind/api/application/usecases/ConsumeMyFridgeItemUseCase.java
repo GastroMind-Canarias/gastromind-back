@@ -20,13 +20,6 @@ public class ConsumeMyFridgeItemUseCase {
     private final ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase;
     private final FridgeItemRepository fridgeItemRepository;
     private final FridgeItemServiceImpl fridgeItemService;
-    /**
-     * Constructor con dependencias para validaciAn de pertenencia y consumo.
-     *
-     * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
-     * @param fridgeItemRepository repositorio de items de nevera
-     * @param fridgeItemService servicio de operaciones sobre items de nevera
-     */
 
     public ConsumeMyFridgeItemUseCase(
             ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase,

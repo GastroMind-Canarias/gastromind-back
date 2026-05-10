@@ -8,6 +8,9 @@ import org.springframework.stereotype.Component;
 
 import java.util.Optional;
 
+/**
+ * Persiste sinónimos de producto y resolución por forma normalizada del texto.
+ */
 @Component
 public class ProductAliasAdapter implements ProductAliasRepository {
     private final ProductAliasJpaRepository repository;

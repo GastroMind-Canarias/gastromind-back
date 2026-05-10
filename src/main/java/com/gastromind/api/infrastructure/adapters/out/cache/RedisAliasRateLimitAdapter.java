@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 
+/**
+ * Ventana deslizante en Redis por usuario para limitar alta de alias de producto/tienda.
+ */
 @Component
 public class RedisAliasRateLimitAdapter implements AliasRateLimitPort {
     private final StringRedisTemplate redisTemplate;

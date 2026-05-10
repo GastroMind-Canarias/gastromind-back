@@ -8,7 +8,7 @@ import com.gastromind.api.domain.models.enums.Appliance;
 import java.util.List;
 
 /**
- * Define las operaciones de negocio para hogares.
+ * Puerto de entrada para gestionar el hogar, miembros y electrodomésticos declarados.
  */
 public interface IHouseHoldService {
     List<HouseHold> findAll();

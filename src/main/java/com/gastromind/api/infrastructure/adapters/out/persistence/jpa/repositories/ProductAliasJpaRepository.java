@@ -5,6 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
+/**
+ * Búsqueda de sinónimos de producto por texto normalizado.
+ */
 public interface ProductAliasJpaRepository extends JpaRepository<ProductAliasEntity, String> {
     Optional<ProductAliasEntity> findFirstByAliasNorm(String aliasNorm);
 }

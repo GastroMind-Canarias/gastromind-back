@@ -6,6 +6,9 @@ import jakarta.validation.constraints.NotEmpty;
 
 import java.util.List;
 
+/**
+ * Alta masiva de líneas de inventario desde el cliente (validación por elemento del listado).
+ */
 @Schema(description = "Objeto para registrar multiples items en mi nevera")
 public record MyFridgeItemBatchRequest(
         @Schema(description = "Listado de items a registrar en mi nevera")

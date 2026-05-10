@@ -1,70 +1,39 @@
 package com.gastromind.api.domain.models;
+
 /**
- * Modelo de dominio para una unidad de medida.
+ * Unidad de medida del catálogo (kg, litros, unidades) para cantidades en tickets y nevera.
  */
 public class Unit {
     String id;
     String name;
-    /**
-     * Crea una nueva instancia.
-     * @param id el identificador del recurso
-     * @param name el nombre
-     */
 
     public Unit(String id, String name) {
         this.id = id;
         this.name = name;
     }
-    /**
-     * Crea una nueva instancia.
-     * @param id el identificador del recurso
-     */
 
     public Unit(String id) {
         this.id = id;
     }
-    /**
-     * Crea una nueva instancia.
-     */
 
     public Unit() {
     }
-    /**
-     * Devuelve id.
-     * @return el valor actual
-     */
 
     public String getId() {
         return id;
     }
-    /**
-     * Define id.
-     * @param id el identificador del recurso
-     */
 
     public void setId(String id) {
         this.id = id;
     }
-    /**
-     * Devuelve name.
-     * @return el valor actual
-     */
 
     public String getName() {
         return name;
     }
-    /**
-     * Define name.
-     * @param name el nombre
-     */
 
     public void setName(String name) {
         this.name = name;
     }
-    /**
-     * Calcula el hash de esta instancia.
-     * @return el hash calculado
-     */
 
     @Override
     public int hashCode() {
@@ -73,11 +42,6 @@ public class Unit {
         result = prime * result + ((id == null) ? 0 : id.hashCode());
         return result;
     }
-    /**
-     * Compara esta instancia con otro objeto.
-     * @param obj objeto a comparar
-     * @return true si ambos objetos son equivalentes; false en caso contrario
-     */
 
     @Override
     public boolean equals(Object obj) {

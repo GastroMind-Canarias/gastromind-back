@@ -5,7 +5,7 @@ import com.gastromind.api.domain.models.Category;
 import java.util.List;
 
 /**
- * Define las operaciones de negocio para categorias.
+ * Puerto de entrada para categorías de productos y recetas expuestas al cliente.
  */
 public interface ICategoryService {
     List<Category> findAll();

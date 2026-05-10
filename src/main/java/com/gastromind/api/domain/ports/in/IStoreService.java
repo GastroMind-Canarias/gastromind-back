@@ -7,7 +7,7 @@ import com.gastromind.api.domain.models.StoreAlias;
 import java.util.List;
 
 /**
- * Define las operaciones de negocio para tiendas.
+ * Puerto de entrada para tiendas del catálogo, alias y flujo de tiendas pendientes de revisión.
  */
 public interface IStoreService {
     List<Store> findAll();

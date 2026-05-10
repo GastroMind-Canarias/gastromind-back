@@ -5,7 +5,7 @@ import com.gastromind.api.domain.models.Recipe;
 import java.util.Optional;
 
 /**
- * Define el contrato de persistencia o integracion para recipe suggestion cache.
+ * Caché efímera (Redis) para sugerencias de receta ya calculadas y direccionadas por hogar/usuario.
  */
 public interface RecipeSuggestionCachePort {
 

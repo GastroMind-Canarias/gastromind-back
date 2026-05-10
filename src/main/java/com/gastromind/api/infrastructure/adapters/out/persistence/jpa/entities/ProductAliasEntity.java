@@ -10,6 +10,9 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
+/**
+ * Sinónimos de producto con texto libre y forma normalizada única para resolución rápida.
+ */
 @Entity
 @Table(
         name = "product_alias",

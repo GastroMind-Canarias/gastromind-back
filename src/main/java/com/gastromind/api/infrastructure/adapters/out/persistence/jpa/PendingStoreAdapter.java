@@ -10,6 +10,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Implementación JPA del repositorio de tiendas candidatas.
+ */
 @Component
 public class PendingStoreAdapter implements PendingStoreRepository {
     private final PendingStoreJpaRepository repository;

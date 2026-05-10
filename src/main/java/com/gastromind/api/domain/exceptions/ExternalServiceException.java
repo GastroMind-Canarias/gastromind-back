@@ -1,13 +1,9 @@
 package com.gastromind.api.domain.exceptions;
 
 /**
- * ExcepciAn de dominio por fallo en servicios externos.
+ * Error al hablar con un proveedor externo (Gemini, almacenamiento, etc.); el mensaje debería ser operativo.
  */
 public class ExternalServiceException extends RuntimeException {
-    /**
-     * Crea una nueva instancia.
-     * @param message detalle del error
-     */
     public ExternalServiceException(String message) {
         super(message);
     }

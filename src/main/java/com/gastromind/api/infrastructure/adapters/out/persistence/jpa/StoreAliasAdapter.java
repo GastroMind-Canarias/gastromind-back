@@ -9,6 +9,9 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Persiste alias de tienda enlazados al {@code store_id} oficial.
+ */
 @Component
 public class StoreAliasAdapter implements StoreAliasRepository {
     private final StoreAliasJpaRepository repository;

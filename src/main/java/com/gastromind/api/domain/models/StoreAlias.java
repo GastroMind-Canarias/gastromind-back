@@ -1,5 +1,8 @@
 package com.gastromind.api.domain.models;
 
+/**
+ * Variante normalizada del nombre de una tienda (ticket, texto libre) enlazada a un {@code storeId} canónico.
+ */
 public class StoreAlias {
     private String id;
     private String storeId;

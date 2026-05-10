@@ -1,14 +1,10 @@
 package com.gastromind.api.domain.exceptions;
 
 /**
- * ExcepciAn de dominio cuando no hay permisos suficientes.
+ * El usuario autenticado no puede realizar la operación sobre ese recurso (403).
  */
 public class ForbiddenException extends RuntimeException {
-     /**
-      * Crea una nueva instancia.
-      * @param message detalle del error
-      */
-     public ForbiddenException(String message) {
+    public ForbiddenException(String message) {
         super(message);
     }
 }

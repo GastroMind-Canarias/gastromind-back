@@ -6,6 +6,9 @@ import org.mapstruct.Mapper;
 
 import java.util.List;
 
+/**
+ * MapStruct entre el modelo de dominio {@link PendingStore} y su fila JPA.
+ */
 @Mapper(componentModel = "spring")
 public interface PendingStoreMapper {
     PendingStoreEntity toEntity(PendingStore domain);

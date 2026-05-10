@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 /**
- * Define el contrato de persistencia o integracion para ticket purchase history.
+ * Lecturas agregadas sobre tickets pasados para sugerir compras habituales por hogar.
  */
 public interface TicketPurchaseHistoryRepository {
 

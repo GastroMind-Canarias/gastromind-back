@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Resuelve identidad de tienda: ID explícito, catálogo por nombre normalizado, alias o cola de pendientes.
+ */
 @Service
 public class StoreResolutionService {
     private final StoreRepository storeRepository;

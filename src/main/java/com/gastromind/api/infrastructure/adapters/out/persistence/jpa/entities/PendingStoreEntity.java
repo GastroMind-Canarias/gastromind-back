@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 
+/**
+ * Tabla {@code pending_store}: cola de nombres de tienda detectados en tickets antes de promoción.
+ */
 @Entity
 @Table(name = "pending_store")
 public class PendingStoreEntity {

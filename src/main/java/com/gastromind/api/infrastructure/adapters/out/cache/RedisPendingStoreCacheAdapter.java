@@ -6,6 +6,9 @@ import org.springframework.stereotype.Component;
 
 import java.time.Duration;
 
+/**
+ * Dedupe ligero en Redis cuando reaparece el mismo nombre de tienda normalizado en días recientes.
+ */
 @Component
 public class RedisPendingStoreCacheAdapter implements PendingStoreCachePort {
     private final StringRedisTemplate redisTemplate;

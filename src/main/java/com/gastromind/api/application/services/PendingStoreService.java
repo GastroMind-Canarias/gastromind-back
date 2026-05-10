@@ -11,6 +11,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Orquesta avistamientos de tiendas no resueltas: normaliza el nombre, fusiona en pendientes y avisa a caché.
+ */
 @Service
 public class PendingStoreService {
     private final PendingStoreRepository repository;

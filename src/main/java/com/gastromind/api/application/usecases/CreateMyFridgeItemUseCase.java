@@ -19,13 +19,6 @@ public class CreateMyFridgeItemUseCase {
     private final ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase;
     private final FridgeItemServiceImpl fridgeItemService;
     private final TicketProductResolutionService ticketProductResolutionService;
-    /**
-     * Constructor con dependencias de contexto y gestion de items de nevera.
-     *
-     * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
-     * @param fridgeItemService servicio de creacion de items de nevera
-     * @param ticketProductResolutionService servicio de resolucion de productos por nombre
-     */
 
     public CreateMyFridgeItemUseCase(
             ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase,

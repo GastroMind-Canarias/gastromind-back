@@ -7,6 +7,9 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+/**
+ * Convierte nombres de tienda en una firma estable (minúsculas, sin acentos, sin ruido corporativo).
+ */
 @Component
 public class StoreNameNormalizer {
     private static final Set<String> STOP_WORDS = Set.of(

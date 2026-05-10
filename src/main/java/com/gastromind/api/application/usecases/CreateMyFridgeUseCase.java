@@ -18,12 +18,6 @@ public class CreateMyFridgeUseCase {
 
     private final ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase;
     private final FridgeRepository fridgeRepository;
-    /**
-     * Constructor con dependencias para validar contexto y crear nevera.
-     *
-     * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
-     * @param fridgeRepository repositorio de neveras
-     */
 
     public CreateMyFridgeUseCase(
             ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase,

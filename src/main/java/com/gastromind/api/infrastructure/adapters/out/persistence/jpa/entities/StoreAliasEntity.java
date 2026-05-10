@@ -2,6 +2,9 @@ package com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities;
 
 import jakarta.persistence.*;
 
+/**
+ * Variantes de nombre enlazadas a {@link StoreEntity} para matching desde OCR.
+ */
 @Entity
 @Table(name = "store_alias")
 public class StoreAliasEntity {

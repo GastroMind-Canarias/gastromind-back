@@ -5,6 +5,9 @@ import com.gastromind.api.domain.models.StoreAlias;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Alias textuales ligados a una tienda canónica para matching fuzzy desde OCR.
+ */
 public interface StoreAliasRepository {
     StoreAlias save(StoreAlias alias);
 

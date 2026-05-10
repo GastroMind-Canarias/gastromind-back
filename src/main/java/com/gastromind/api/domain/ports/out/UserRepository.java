@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Define el contrato de persistencia o integracion para user.
+ * Cuentas de usuario, credenciales y vínculo al hogar en Postgres (vía adaptador).
  */
 public interface UserRepository {
 

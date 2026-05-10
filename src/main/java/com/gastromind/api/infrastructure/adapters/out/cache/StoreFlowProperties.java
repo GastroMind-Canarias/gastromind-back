@@ -2,6 +2,9 @@ package com.gastromind.api.infrastructure.adapters.out.cache;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+/**
+ * Prefijos Redis y TTL para cola de tiendas pendientes y rate-limit de alias ({@code app.store.*}).
+ */
 @ConfigurationProperties(prefix = "app.store")
 public class StoreFlowProperties {
     private PendingCache pendingCache = new PendingCache();

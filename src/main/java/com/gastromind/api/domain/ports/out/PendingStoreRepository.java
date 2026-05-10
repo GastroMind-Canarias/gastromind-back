@@ -6,6 +6,9 @@ import com.gastromind.api.domain.models.enums.PendingStoreStatus;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Persistencia de tiendas candidatas antes de promoverlas al catálogo o rechazarlas.
+ */
 public interface PendingStoreRepository {
     PendingStore save(PendingStore pendingStore);
 

@@ -1,5 +1,8 @@
 package com.gastromind.api.domain.models;
 
+/**
+ * Sinónimo de texto (p. ej. línea de ticket) resuelto contra un producto del catálogo mediante {@code productId} y forma normalizada {@code aliasNorm}.
+ */
 public class ProductAlias {
     private String id;
     private String productId;

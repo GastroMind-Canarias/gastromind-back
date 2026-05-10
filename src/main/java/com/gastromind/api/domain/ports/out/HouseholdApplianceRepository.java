@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Define el contrato de persistencia o integracion para household appliance.
+ * Electrodomésticos declarados por hogar para filtrar recetas compatibles.
  */
 public interface HouseholdApplianceRepository {
     HouseholdAppliance save(HouseholdAppliance appliance);

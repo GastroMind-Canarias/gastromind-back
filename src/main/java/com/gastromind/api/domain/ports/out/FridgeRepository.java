@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Define el contrato de persistencia o integracion para fridge.
+ * Neveras por hogar (normalmente una por hogar en el modelo actual).
  */
 public interface FridgeRepository {
     Fridge save(Fridge fridge);

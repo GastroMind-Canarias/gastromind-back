@@ -1,13 +1,9 @@
 package com.gastromind.api.domain.exceptions;
 
 /**
- * ExcepciAn de dominio cuando un recurso no existe.
+ * El identificador solicitado no existe en persistencia; suele mapearse a 404.
  */
 public class NotFoundException extends RuntimeException {
-    /**
-     * Crea una nueva instancia.
-     * @param message detalle del error
-     */
     public NotFoundException(String message) {
         super(message);
     }

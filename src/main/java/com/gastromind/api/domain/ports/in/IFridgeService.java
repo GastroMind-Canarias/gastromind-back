@@ -5,7 +5,7 @@ import com.gastromind.api.domain.models.Fridge;
 import java.util.List;
 
 /**
- * Define las operaciones de negocio para neveras de hogar.
+ * Puerto de entrada para crear y consultar la nevera ligada al hogar del usuario autenticado.
  */
 public interface IFridgeService {
     List<Fridge> findAll();

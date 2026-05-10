@@ -5,7 +5,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 /**
- * Resultado agregado de la extracciAn automAtica de un ticket.
+ * Cabecera y líneas tal como las interpretó la IA a partir de la foto del ticket.
  */
 public record ExtractedTicketReceipt(
         String storeName,

@@ -15,12 +15,6 @@ public class DeleteMyFridgeUseCase {
 
     private final ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase;
     private final FridgeRepository fridgeRepository;
-    /**
-     * Constructor con dependencias para resolver contexto y eliminar nevera.
-     *
-     * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
-     * @param fridgeRepository repositorio de neveras
-     */
 
     public DeleteMyFridgeUseCase(
             ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase,

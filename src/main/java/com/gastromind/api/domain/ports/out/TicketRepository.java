@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Define el contrato de persistencia o integracion para ticket.
+ * Tickets de compra con líneas persistidas para histórico e importaciones.
  */
 public interface TicketRepository {
     Ticket save(Ticket ticket);

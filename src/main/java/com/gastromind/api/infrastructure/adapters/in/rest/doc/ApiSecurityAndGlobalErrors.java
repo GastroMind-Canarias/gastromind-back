@@ -8,6 +8,9 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Errores transversales de Spring Security y servidor para reusar en Swagger sin repetir texto.
+ */
 @Target({ElementType.METHOD, ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
 @ApiResponses({
@@ -16,4 +19,3 @@ import java.lang.annotation.Target;
     @ApiResponse(responseCode = "500", description = "Error interno del servidor")
 })
 public @interface ApiSecurityAndGlobalErrors {}
-
