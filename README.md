@@ -1,59 +1,98 @@
-﻿# GastroMind API: El Cerebro de la Cocina Inteligente YYZ
+﻿# GastroMind API
 
-GastroMind no es solo una lista de la compra o un recetario; es un ecosistema de Inteligencia Artificial disenado para optimizar la economia domestica y erradicar el desperdicio alimentario. Actua como el centro neuralgico que conecta el ticket de compra, el inventario real y la mesa del usuario.
+API REST para inventario doméstico, tickets de compra y sugerencias de receta con Google Gemini. La app corre en el puerto **8081** y usa PostgreSQL como base principal.
 
-A diferencia de las soluciones pasivas, GastroMind es proactiva:
-- **Conciencia de Inventario:** Sabe que tienes y cuando caduca.
-- **Conciencia de Equipo (Hardware Aware):** Filtra su conocimiento basandose en tus electrodomesticos (Air Fryer, Horno, etc.).
-- **Economia Circular:** Transforma datos de tickets borrosos en analiticas de gasto y stock en tiempo real mediante IA multimodal.
+**Objetivo de esta guía:** tener Postgres, Redis y la API funcionando en local en unos minutos.
 
-Este es un motor API REST disenado para procesar grandes volumenes de datos de inventario, gestionar la seguridad alimentaria de multiples hogares y servir como puente seguro entre la base de datos relacional.
+## Stack
 
-## Arquitectura del Proyecto
+| Capa | Tecnología |
+| --- | --- |
+| Runtime | Java 21, Spring Boot 3.5 |
+| API | Spring Web, Validation, Spring Security + JWT |
+| Datos | PostgreSQL (JPA), Redis (caché y límites) |
+| IA | Gemini API (`GEMINI_API_KEY`) |
+| Docs | SpringDoc OpenAPI (Swagger) |
+| Observabilidad | Spring Boot Actuator, Micrometer Prometheus |
+| Contenedores | Docker Compose (Postgres, MongoDB, Redis, pgAdmin, Prometheus opcional) |
 
-El proyecto sigue una **Arquitectura Hexagonal (Puertos y Adaptadores)**, lo que permite una total independencia entre la logica de negocio (nucleo) y las tecnologias externas (bases de datos, frameworks, APIs).
+MongoDB aparece en `compose.yaml` y hay dependencia Maven, pero **el código de aplicación no persiste aún en MongoDB**; puedes ignorar ese servicio para arrancar solo lo que usa la API.
 
-### Estructura de Paquetes
+## Requisitos previos
 
-* **`domain`**: Contiene el corazon de la aplicacion. Modelos de negocio pura, excepciones de dominio e interfaces (puertos) que definen como el sistema interactua con el exterior.
-* **`infrastructure`**: Implementacion de los adaptadores.
-* **`adapters.in.rest`**: Controladores que exponen la API y gestion global de excepciones.
-* **`adapters.out.persistence`**: Implementaciones de persistencia utilizando **PostgreSQL** (JPA) y **MongoDB**.
+- **JDK 21** y **Maven 3.9+**
+- **Docker** y Docker Compose (para bases y Redis en local)
+- **GEMINI_API_KEY** si vas a usar recetas por IA o extracción de tickets desde imagen (sin clave, esas operaciones devuelven error indicando que falta configuración)
 
+## Inicio rápido
 
-* **`security`**: Configuracion centralizada de seguridad, gestion de JWT y politicas de acceso.
+### 1. Alinear PostgreSQL con la aplicación
 
----
+En [`src/main/resources/application.yaml`](src/main/resources/application.yaml) el datasource por defecto es:
 
-## Tecnologias y Dependencias
+- URL: `jdbc:postgresql://localhost:5432/gastromind_local`
+- Usuario: `myuser`
+- Contraseña: `secret`
 
-El stack tecnologico ha sido seleccionado para garantizar escalabilidad, seguridad y una documentacion automatica robusta.
+Tu contenedor Postgres debe exponer **5432** en el host y usar ese mismo usuario, contraseña y base de datos **o** sobrescribe al arrancar:
 
-### Core Framework
+```bash
+set SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:PUERTO/BASE
+set SPRING_DATASOURCE_USERNAME=usuario
+set SPRING_DATASOURCE_PASSWORD=clave
+```
 
-* **Spring Boot 3**: Framework base para el desarrollo de microservicios.
-* **Spring Security & JWT**: Implementacion de seguridad basada en tokens para una autenticacion stateless.
-* **Validation**: Aseguramiento de la integridad de los datos de entrada mediante anotaciones.
+(Linux/macOS: `export` en lugar de `set`.)
 
-### Persistencia y Datos
+### 2. Variables para Docker Compose
 
-* **Spring Data JPA & PostgreSQL**: Gestion de datos relacionales para usuarios y hogares.
-* **Spring Data MongoDB**: Almacenamiento flexible para registros de inventario o logs.
-* **MapStruct**: Mapeo eficiente de objetos entre capas (DTOs, Domain Models y Entities) para mantener el desacoplamiento.
+El fichero [`compose.yaml`](compose.yaml) usa variables como `ENV_NAME`, `DB_NAME`, `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_PORT`, `REDIS_PORT`, etc. Define un `.env` en la raíz del repo (no está versionado) de modo que Postgres y Redis coincidan con lo que usará Spring (`localhost` y los puertos mapeados).
 
-### Documentacion y Desarrollo
+Ejemplo mínimo coherente con el YAML por defecto de la app:
 
-* **SpringDoc OpenAPI (Swagger)**: Interfaz interactiva para pruebas y documentacion tecnica de los endpoints.
-* **Docker Compose Support**: Gestion automatizada del entorno de desarrollo (PostgreSQL, MongoDB, pgAdmin) integrada con Spring Boot.
+```env
+ENV_NAME=local
+DB_NAME=gastromind_local
+POSTGRES_USER=usuario
+POSTGRES_PASSWORD=contraseña
+POSTGRES_PORT=5432
+MONGO_USER=usuario
+MONGO_PASS=contraseña
+MONGO_PORT=27017
+REDIS_PORT=6379
+PGADMIN_PASS=contraseña
+PGADMIN_PORT=5050
+```
 
----
+### 3. Levantar infraestructura y la API
 
-## Entorno de Desarrollo (Docker)
+```bash
+docker compose up -d postgres redis
+```
 
-La infraestructura local se levanta de forma automatizada mediante contenedores, facilitando el despliegue inmediato del entorno de base de datos y herramientas de administracion.
+Opcional: Prometheus para métricas (`docker compose up -d prometheus`). La UI de Prometheus suele estar en `http://localhost:9090`; las métricas de la aplicación se publican en **`http://localhost:8081/actuator/prometheus`** (véase [docs/OBSERVABILITY.md](docs/OBSERVABILITY.md)).
 
-| Servicio | Puerto | Descripcion |
-| --- | --- | --- |
-| **PostgreSQL** | `5432` | Base de datos relacional principal. |
-| **MongoDB** | `27017` | Almacenamiento de documentos no relacionales. |
-| **pgAdmin** | `5050` | Panel de administracion web para PostgreSQL. |
+```bash
+mvn spring-boot:run
+```
+
+El proyecto incluye `spring-boot-docker-compose`: si prefieres que Spring gestione el ciclo del Compose, revisa la documentación de Spring Boot 3 para activarlo según tu flujo; el comando anterior asume que ya tienes Postgres y Redis arriba.
+
+### 4. Comprobar que responde
+
+| Qué | URL |
+| --- | --- |
+| Salud | `GET http://localhost:8081/actuator/health` |
+| Swagger UI | `http://localhost:8081/swagger-ui.html` |
+| OpenAPI JSON | `http://localhost:8081/v3/api-docs` |
+
+Para rutas de negocio necesitas JWT (registro/login bajo `/api/v1/auth/`).
+
+## Documentación adicional
+
+- [Arquitectura y ADR](docs/ARCHITECTURE.md)
+- [Observabilidad (Prometheus, Actuator)](docs/OBSERVABILITY.md)
+- [Integración con IA (Gemini)](docs/AI_INTEGRATION.md)
+- [Casos de uso / flujos](docs/diagrama-flujo.md)
+- [Especificación de diseño Fridge Me (histórico)](docs/superpowers/specs/2026-04-09-fridge-me-flow-design.md)
+- [Plan de implementación relacionado](docs/superpowers/plans/2026-04-09-fridge-me-flow-implementation-plan.md)
