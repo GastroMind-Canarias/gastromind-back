@@ -10,7 +10,7 @@ La lógica de negocio no depende de Spring, de la base de datos ni de Gemini: ha
 | --- | --- | --- |
 | **Dominio** | `com.gastromind.api.domain` | Modelos de negocio, excepciones de dominio, contratos `ports/in` y `ports/out`. Sin frameworks. |
 | **Aplicación** | `com.gastromind.api.application` | Casos de uso (`usecases`), servicios que orquestan puertos y reglas que atraviesan varios agregados. |
-| **Infraestructura** | `com.gastromind.api.infrastructure` | Adaptadores: REST (`adapters/in/rest`), JPA (`adapters/out/persistence/jpa`), caché Redis (`adapters/out/cache`), IA (`adapters/out/ai`), seguridad JWT (`infrastructure/security`). |
+| **Infraestructura** | `com.gastromind.api.infrastructure` | Adaptadores: REST (`adapters/in/rest`), SOAP JAX-WS (`adapters/in/soap`, Apache CXF), JPA (`adapters/out/persistence/jpa`), caché Redis (`adapters/out/cache`), IA (`adapters/out/ai`), seguridad JWT (`infrastructure/security`). |
 
 El paquete `application/services` concentra implementaciones de puertos de entrada (`ports/in`) cuando el proyecto usa servicios como fachada entre controladores y casos de uso.
 
@@ -57,6 +57,8 @@ flowchart LR
 
 MongoDB está definido en Docker Compose y como dependencia Maven, pero **no hay adaptadores Mongo en el código de aplicación actual**: el diagrama no lo incluye hasta que exista un puerto implementado contra Mongo.
 
+Los **endpoints SOAP** comparten el mismo proceso HTTP que REST; delegan en los servicios de aplicación (`*ServiceImpl`) para catálogos de solo lectura. Contrato y pruebas manuales se documentan en [SOAP.md](SOAP.md).
+
 ## Decisiones de diseño (ADR)
 
 ### ADR-001: Puertos para IA frente a proveedor concreto
@@ -82,3 +84,9 @@ MongoDB está definido en Docker Compose y como dependencia Maven, pero **no hay
 - **Contexto:** Clientes móviles o SPAs contra una API sin sesión de servidor.
 - **Decisión:** Spring Security con filtros JWT; rutas públicas configuradas explícitamente (auth, OpenAPI, actuator según configuración actual).
 - **Consecuencias:** Sin estado en servidor para sesiones; revocación de tokens requiere estrategia adicional si se exige más adelante.
+
+### ADR-005: SOAP con CXF para catálogos de consulta
+
+- **Contexto:** Hace falta exponer más de un servicio SOAP (requisito externo o académico) sin duplicar reglas de negocio ni acoplar el dominio a XML.
+- **Decisión:** Apache CXF (`cxf-spring-boot-starter-jaxws`) con endpoints JAX-WS bajo `cxf.path=/soap`, implementaciones en `infrastructure.adapters.in.soap` que llaman a los mismos `*ServiceImpl` que ya implementan puertos de entrada; operaciones de **solo lectura** (listar / obtener por id) y DTOs JAXB dedicados.
+- **Consecuencias:** Rutas `/soap/**` deben figurar como públicas si no se integra JWT en el mensaje SOAP; el front principal no depende de este canal. Detalle operativo en [SOAP.md](SOAP.md).

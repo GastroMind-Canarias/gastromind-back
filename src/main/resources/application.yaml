@@ -1,3 +1,6 @@
+cxf:
+  path: /soap
+
 spring:
   servlet:
     multipart:
@@ -33,6 +36,8 @@ gastromind:
       - "/swagger-ui.html"
       - "/api/v1/auth/**"
       - "/actuator/**"
+      # SOAP demo: sin JWT a propósito (rúbrica). En producción cerrar con API key, mTLS o túnel.
+      - "/soap/**"
 
 app:
   jwt:

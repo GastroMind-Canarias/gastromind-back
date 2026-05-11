@@ -1,6 +1,6 @@
 ﻿# GastroMind API
 
-API REST para inventario doméstico, tickets de compra y sugerencias de receta con Google Gemini. La app corre en el puerto **8081** y usa PostgreSQL como base principal.
+API principal **REST** para inventario doméstico, tickets de compra y sugerencias de receta con Google Gemini; además expone **SOAP** (catálogos de solo lectura vía Apache CXF) para integraciones o requisitos académicos. La app corre en el puerto **8081** y usa PostgreSQL como base principal.
 
 **Objetivo de esta guía:** tener Postgres, Redis y la API funcionando en local en unos minutos.
 
@@ -9,7 +9,8 @@ API REST para inventario doméstico, tickets de compra y sugerencias de receta c
 | Capa | Tecnología |
 | --- | --- |
 | Runtime | Java 21, Spring Boot 3.5 |
-| API | Spring Web, Validation, Spring Security + JWT |
+| API | Spring Web (REST), Validation, Spring Security + JWT |
+| SOAP | Apache CXF (JAX-WS), catálogos bajo `/soap` ([detalle](docs/SOAP.md)) |
 | Datos | PostgreSQL (JPA), Redis (caché y límites) |
 | IA | Gemini API (`GEMINI_API_KEY`) |
 | Docs | SpringDoc OpenAPI (Swagger) |
@@ -85,12 +86,14 @@ El proyecto incluye `spring-boot-docker-compose`: si prefieres que Spring gestio
 | Salud | `GET http://localhost:8081/actuator/health` |
 | Swagger UI | `http://localhost:8081/swagger-ui.html` |
 | OpenAPI JSON | `http://localhost:8081/v3/api-docs` |
+| WSDL SOAP (ejemplo categorías) | `http://localhost:8081/soap/categoryCatalog?wsdl` |
 
-Para rutas de negocio necesitas JWT (registro/login bajo `/api/v1/auth/`).
+Para rutas **REST** de negocio necesitas JWT (registro/login bajo `/api/v1/auth/`). Las rutas **`/soap/**`** van públicas en la configuración por defecto (solo catálogos); véase [docs/SOAP.md](docs/SOAP.md).
 
 ## Documentación adicional
 
 - [Arquitectura y ADR](docs/ARCHITECTURE.md)
+- [Servicios SOAP (CXF, catálogos)](docs/SOAP.md)
 - [Observabilidad (Prometheus, Actuator)](docs/OBSERVABILITY.md)
 - [Integración con IA (Gemini)](docs/AI_INTEGRATION.md)
 - [Casos de uso / flujos](docs/diagrama-flujo.md)
