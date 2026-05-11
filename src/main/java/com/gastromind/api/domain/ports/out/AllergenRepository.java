@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Define el contrato de persistencia o integracion para allergen.
+ * Listado maestro de alérgenos para etiquetar productos y preferencias.
  */
 public interface AllergenRepository {
     Allergen save(Allergen allergen);

@@ -1,13 +1,9 @@
 package com.gastromind.api.domain.exceptions;
 
 /**
- * ExcepciAn de dominio cuando el hogar ya tiene nevera.
+ * El hogar ya tiene una nevera; no se permite crear otra sin cerrar la existente.
  */
 public class FridgeAlreadyExistsException extends RuntimeException {
-    /**
-     * Crea una nueva instancia.
-     * @param message detalle del error
-     */
     public FridgeAlreadyExistsException(String message) {
         super(message);
     }

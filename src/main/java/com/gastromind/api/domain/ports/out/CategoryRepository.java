@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Define el contrato de persistencia o integracion para category.
+ * Categorías jerárquicas o planas del catálogo de productos/recetas.
  */
 public interface CategoryRepository {
     Category save(Category category);

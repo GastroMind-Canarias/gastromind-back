@@ -4,7 +4,7 @@ import com.gastromind.api.domain.models.HouseholdRecipeContext;
 import com.gastromind.api.domain.models.Recipe;
 
 /**
- * Define el contrato de persistencia o integracion para recipe ai.
+ * Genera una receta usando el modelo externo a partir del stock y restricciones del hogar.
  */
 public interface RecipeAiPort {
 

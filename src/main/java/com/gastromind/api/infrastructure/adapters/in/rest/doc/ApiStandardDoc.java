@@ -8,12 +8,14 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * Respuestas típicas GET/PUT/PATCH: 200 OK y 404, junto con bloque de seguridad y fallos genéricos.
+ */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@ApiSecurityAndGlobalErrors 
+@ApiSecurityAndGlobalErrors
 @ApiResponses({
-    @ApiResponse(responseCode = "200", description = "OperaciAn realizada correctamente"),
+    @ApiResponse(responseCode = "200", description = "Operacion realizada correctamente"),
     @ApiResponse(responseCode = "404", description = "Recurso no encontrado")
 })
 public @interface ApiStandardDoc {}
-

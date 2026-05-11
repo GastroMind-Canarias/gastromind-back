@@ -9,18 +9,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 /**
  * Caso de uso para eliminar la nevera del hogar autenticado.
- * Solo usuarios con rol OWNER pueden ejecutar esta operaciAn.
+ * Solo usuarios con rol OWNER pueden ejecutar esta operacion.
  */
 public class DeleteMyFridgeUseCase {
 
     private final ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase;
     private final FridgeRepository fridgeRepository;
-    /**
-     * Constructor con dependencias para resolver contexto y eliminar nevera.
-     *
-     * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
-     * @param fridgeRepository repositorio de neveras
-     */
 
     public DeleteMyFridgeUseCase(
             ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase,

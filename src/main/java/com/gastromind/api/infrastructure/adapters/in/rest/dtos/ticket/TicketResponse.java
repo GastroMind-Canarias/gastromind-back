@@ -32,7 +32,9 @@ public record TicketResponse(
         LocalDate purchaseDate,
 
         @Schema(description = "Lineas del ticket con productos del catalogo")
-        List<TicketItemResponse> items
+        List<TicketItemResponse> items,
+        @Schema(description = "Informacion de tienda pendiente cuando no se pudo resolver")
+        PendingStoreInfoResponse pending_store
 ) {}
 
 

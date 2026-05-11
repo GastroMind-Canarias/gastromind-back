@@ -15,12 +15,6 @@ public class ListMyFridgeItemsUseCase {
 
     private final ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase;
     private final FridgeItemRepository fridgeItemRepository;
-    /**
-     * Constructor con dependencias para resolver contexto y consultar inventario.
-     *
-     * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
-     * @param fridgeItemRepository repositorio de items de nevera
-     */
 
     public ListMyFridgeItemsUseCase(
             ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase,

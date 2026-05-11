@@ -13,7 +13,7 @@ import java.util.Optional;
 
 @Component
 /**
- * Representa fridge item dentro del dominio de la aplicacion.
+ * Traduce entre el modelo de dominio y JPA; las lecturas usan las queries con fetch explícito cuando el repositorio las ofrece.
  */
 public class FridgeItemAdapter implements FridgeItemRepository {
 
@@ -41,7 +41,7 @@ public class FridgeItemAdapter implements FridgeItemRepository {
 
     @Override
     public Optional<FridgeItem> findById(String id) {
-        return fridgeItemJpaRepository.findById(id).map(fridgeItemMapper::toDomain);
+        return fridgeItemJpaRepository.findWithProductAndCategoryById(id).map(fridgeItemMapper::toDomain);
     }
     /**
      * Devuelve fridge item por fridge id.
@@ -96,7 +96,7 @@ public class FridgeItemAdapter implements FridgeItemRepository {
 
     @Override
     public List<FridgeItem> findAll() {
-        List<FridgeItemEntity> entities = fridgeItemJpaRepository.findAll();
+        List<FridgeItemEntity> entities = fridgeItemJpaRepository.findAllWithProductAndCategory();
         return fridgeItemMapper.toDomainList(entities);
     }
 }

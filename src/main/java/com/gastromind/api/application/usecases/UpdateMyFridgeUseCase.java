@@ -11,18 +11,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 /**
  * Caso de uso para actualizar los datos de la nevera del hogar autenticado.
- * Solo permite la operaciAn a usuarios con rol OWNER.
+ * Solo permite la operacion a usuarios con rol OWNER.
  */
 public class UpdateMyFridgeUseCase {
 
     private final ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase;
     private final FridgeRepository fridgeRepository;
-    /**
-     * Constructor con dependencias para resolver contexto y persistir nevera.
-     *
-     * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
-     * @param fridgeRepository repositorio de neveras
-     */
 
     public UpdateMyFridgeUseCase(
             ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase,

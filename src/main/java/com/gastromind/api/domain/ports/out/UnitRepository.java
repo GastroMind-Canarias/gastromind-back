@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Define el contrato de persistencia o integracion para unit.
+ * Unidades de medida del catálogo para cuantificar líneas de ticket y nevera.
  */
 public interface UnitRepository {
     Unit save(Unit unit);

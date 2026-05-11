@@ -22,14 +22,6 @@ public class SaveSuggestedRecipeAsFavoriteUseCase {
     private final IRecipeService recipeService;
     private final IUserFavoritesService userFavoritesService;
     private final RecipeIngredientWritePort recipeIngredientWritePort;
-    /**
-     * Constructor con dependencias para materializar sugerencias en favoritos.
-     *
-     * @param suggestionCache cachA de sugerencias de receta
-     * @param recipeService servicio de persistencia de recetas
-     * @param userFavoritesService servicio de favoritos de usuario
-     * @param recipeIngredientWritePort puerto de escritura de ingredientes de receta
-     */
 
     public SaveSuggestedRecipeAsFavoriteUseCase(
             RecipeSuggestionCachePort suggestionCache,

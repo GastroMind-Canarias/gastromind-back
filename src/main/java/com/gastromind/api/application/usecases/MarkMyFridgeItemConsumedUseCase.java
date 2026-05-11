@@ -18,13 +18,6 @@ public class MarkMyFridgeItemConsumedUseCase {
     private final ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase;
     private final FridgeItemRepository fridgeItemRepository;
     private final FridgeItemServiceImpl fridgeItemService;
-    /**
-     * Constructor con dependencias para validar y marcar consumo.
-     *
-     * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
-     * @param fridgeItemRepository repositorio de items de nevera
-     * @param fridgeItemService servicio de actualizaciAn de estado de consumo
-     */
 
     public MarkMyFridgeItemConsumedUseCase(
             ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase,

@@ -15,12 +15,6 @@ public class ListMyExpiringFridgeItemsUseCase {
 
     private final ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase;
     private final FridgeItemServiceImpl fridgeItemService;
-    /**
-     * Constructor con dependencias de contexto autenticado e inventario.
-     *
-     * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
-     * @param fridgeItemService servicio de consulta de caducidades
-     */
 
     public ListMyExpiringFridgeItemsUseCase(
             ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase,

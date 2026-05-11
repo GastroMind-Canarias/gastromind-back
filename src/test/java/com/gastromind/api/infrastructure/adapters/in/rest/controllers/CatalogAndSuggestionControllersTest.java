@@ -19,6 +19,7 @@ import com.gastromind.api.domain.models.Store;
 import com.gastromind.api.domain.models.Unit;
 import com.gastromind.api.domain.models.User;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.category.CategoryRequest;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.product.ProductBatchRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.product.ProductRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.recipe.RecipeRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.recipe.RecipeResponse;
@@ -135,9 +136,11 @@ class CatalogAndSuggestionControllersTest {
         when(mapper.toDomain(req)).thenReturn(domain);
         when(service.create(domain)).thenReturn(domain);
         when(service.update("p-1", domain)).thenReturn(domain);
+        when(service.createBatch(List.of("Leche", "Huevos"))).thenReturn(List.of(domain));
         assertEquals(HttpStatus.OK, c.getAll().getStatusCode());
         assertEquals(HttpStatus.OK, c.getById("p-1").getStatusCode());
         assertEquals(HttpStatus.CREATED, c.create(req).getStatusCode());
+        assertEquals(HttpStatus.CREATED, c.createBatch(new ProductBatchRequest(List.of("Leche", "Huevos"))).getStatusCode());
         assertEquals(HttpStatus.OK, c.update("p-1", req).getStatusCode());
         assertEquals(HttpStatus.NO_CONTENT, c.delete("p-1").getStatusCode());
     }

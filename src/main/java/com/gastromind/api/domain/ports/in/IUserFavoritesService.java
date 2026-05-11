@@ -5,7 +5,7 @@ import com.gastromind.api.domain.models.UserFavorites;
 import java.util.List;
 
 /**
- * Define las operaciones de negocio para favoritos del usuario.
+ * Puerto de entrada para marcar y listar recetas favoritas del usuario autenticado.
  */
 public interface IUserFavoritesService {
     List<UserFavorites> findAll();

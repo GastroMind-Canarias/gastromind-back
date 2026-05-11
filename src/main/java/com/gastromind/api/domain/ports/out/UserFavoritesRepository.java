@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Define el contrato de persistencia o integracion para user favorites.
+ * Recetas marcadas como favoritas por usuario para listados rápidos.
  */
 public interface UserFavoritesRepository {
     UserFavorites save(UserFavorites userFavorites);

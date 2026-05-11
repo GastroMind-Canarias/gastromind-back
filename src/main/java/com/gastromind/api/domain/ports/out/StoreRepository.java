@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Define el contrato de persistencia o integracion para store.
+ * Tiendas canónicas del catálogo y consultas por nombre normalizado.
  */
 public interface StoreRepository {
     Store save(Store store);
@@ -18,4 +18,8 @@ public interface StoreRepository {
     List<Store> findAll();
 
     Optional<Store> findFirstByNameIgnoreCase(String name);
+
+    Optional<Store> findFirstByNameNorm(String nameNorm);
+
+    List<Store> findByNameNorm(String nameNorm);
 }

@@ -17,6 +17,7 @@ import org.springframework.web.client.RestClientException;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -102,6 +103,9 @@ public class GeminiRecipeAdapter implements RecipeAiPort {
         String appliances = ctx.availableAppliances().isEmpty()
                 ? "ninguno especifico (elige el electrodomastico mas razonable)"
                 : ctx.availableAppliances().stream().map(Enum::name).collect(Collectors.joining(", "));
+        String allowedAppliances = Arrays.stream(Appliance.values())
+                .map(Enum::name)
+                .collect(Collectors.joining(", "));
 
         return """
                 Eres un chef asistente. Debes responder SOLO con un JSON valido (sin markdown ni texto fuera del JSON) con exactamente estas claves y tipos:
@@ -110,7 +114,7 @@ public class GeminiRecipeAdapter implements RecipeAiPort {
                   "instructions": string (pasos numerados o claros),
                   "servings": number (entero, raciones),
                   "prep_time": number (entero, minutos totales aproximados),
-                  "appliance_needed": string (uno de: HORNO, MICROONDAS, AIR_FRYER, VITROCERAMICA, ROBOT_COCINA, BATIDORA, OLLA_EXPRESS),
+                  "appliance_needed": string (uno de: %s),
                   "difficulty": string (exactamente uno de: EASY, MEDIUM, HARD),
                   "ingredients_used": array de { "product_id": string (uuid del inventario), "quantity_used": number }
                 }
@@ -123,8 +127,8 @@ public class GeminiRecipeAdapter implements RecipeAiPort {
                 - Si el inventario esta vacio, ingredients_used puede ser [] y sugiere una receta muy sencilla con ingredientes habituales (sin inventario estructurado).
                 - Raciones objetivo (comensales): %d
                 - Evita completamente alergenos o ingredientes que contengan: %s
-                - Prioriza utensilios disponibles en el hogar: %s; el campo appliance_needed debe ser uno de la lista permitida y coherente con la receta.
-                """.formatted(stockBlock, ctx.servings(), allergens, appliances);
+                - Prioriza electrodomesticos disponibles en el hogar: %s; el campo appliance_needed debe ser uno de la lista permitida y coherente con la receta.
+                """.formatted(allowedAppliances, stockBlock, ctx.servings(), allergens, appliances);
     }
 
     private String buildStockBlock(List<RecipeStockLine> stock) throws java.io.IOException {

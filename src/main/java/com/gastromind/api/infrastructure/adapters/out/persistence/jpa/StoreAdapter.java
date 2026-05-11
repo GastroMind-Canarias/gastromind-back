@@ -71,6 +71,16 @@ public class StoreAdapter implements StoreRepository {
         return storeJpaRepository.findFirstByNameIgnoreCase(name).map(storeMapper::toDomain);
     }
 
+    @Override
+    public Optional<com.gastromind.api.domain.models.Store> findFirstByNameNorm(String nameNorm) {
+        return storeJpaRepository.findFirstByNameNorm(nameNorm).map(storeMapper::toDomain);
+    }
+
+    @Override
+    public List<com.gastromind.api.domain.models.Store> findByNameNorm(String nameNorm) {
+        return storeMapper.toDomainList(storeJpaRepository.findByNameNorm(nameNorm));
+    }
+
 }
 
 

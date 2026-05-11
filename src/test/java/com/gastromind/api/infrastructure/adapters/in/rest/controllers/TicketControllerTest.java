@@ -2,10 +2,13 @@ package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
 import com.gastromind.api.application.services.TicketServiceImpl;
 import com.gastromind.api.application.services.UserServiceImpl;
+import com.gastromind.api.application.usecases.ImportTicketFromImageResult;
 import com.gastromind.api.application.usecases.ImportTicketFromImageUseCase;
 import com.gastromind.api.domain.exceptions.ForbiddenException;
+import com.gastromind.api.domain.models.PendingStore;
 import com.gastromind.api.domain.models.Ticket;
 import com.gastromind.api.domain.models.User;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.PendingStoreInfoResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketMeRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.ticket.TicketResponse;
@@ -96,12 +99,42 @@ class TicketControllerTest {
         MockMultipartFile file = new MockMultipartFile("file", "ticket.png", "image/png", new byte[]{1, 2, 3});
         Ticket saved = new Ticket();
         TicketResponse response = mock(TicketResponse.class);
-        when(importUseCase.execute(any(byte[].class), eq("image/png"), eq("u-1"), eq("s-1"))).thenReturn(saved);
+        when(importUseCase.execute(any(byte[].class), eq("image/png"), eq("u-1"), eq("s-1")))
+                .thenReturn(new ImportTicketFromImageResult(saved, null, "Lidl"));
         when(mapper.toResponse(saved)).thenReturn(response);
 
         var out = c.importFromImage(auth, file, "s-1");
         assertEquals(HttpStatus.CREATED, out.getStatusCode());
         verify(importUseCase).execute(any(byte[].class), eq("image/png"), eq("u-1"), eq("s-1"));
+    }
+
+    @Test
+    void importFromImage_shouldReturn202WhenStoreUnresolved() {
+        TicketServiceImpl ticketService = mock(TicketServiceImpl.class);
+        TicketRestMapper mapper = mock(TicketRestMapper.class);
+        ImportTicketFromImageUseCase importUseCase = mock(ImportTicketFromImageUseCase.class);
+        TicketImageProperties imageProps = new TicketImageProperties();
+        imageProps.setMaxImageBytes(1024);
+        UserServiceImpl userService = mock(UserServiceImpl.class);
+        Authentication auth = mock(Authentication.class);
+        TicketController c = buildController(ticketService, mapper, importUseCase, imageProps, userService);
+
+        User user = new User();
+        user.setId("u-1");
+        when(auth.getName()).thenReturn("owner");
+        when(userService.findByUsername("owner")).thenReturn(user);
+
+        MockMultipartFile file = new MockMultipartFile("file", "ticket.png", "image/png", new byte[]{1, 2, 3});
+        Ticket saved = new Ticket();
+        PendingStore pendingStore = new PendingStore();
+        pendingStore.setId("pending-1");
+        TicketResponse response = mock(TicketResponse.class);
+        when(importUseCase.execute(any(byte[].class), eq("image/png"), eq("u-1"), eq("s-1")))
+                .thenReturn(new ImportTicketFromImageResult(saved, pendingStore, "Unknown Shop"));
+        when(mapper.withPendingInfo(eq(saved), any(PendingStoreInfoResponse.class))).thenReturn(response);
+
+        var out = c.importFromImage(auth, file, "s-1");
+        assertEquals(HttpStatus.ACCEPTED, out.getStatusCode());
     }
 
     @Test

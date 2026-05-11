@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Define el contrato de persistencia o integracion para house hold.
+ * Hogares, miembros y datos compartidos entre usuarios de la misma cuenta familiar.
  */
 public interface HouseHoldRepository {
     HouseHold save(HouseHold houseHold);

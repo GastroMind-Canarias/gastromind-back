@@ -12,18 +12,12 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 /**
  * Caso de uso para crear la nevera del hogar autenticado.
- * Solo admite la operaciAn para usuarios con rol OWNER y hogares sin nevera previa.
+ * Solo admite la operacion para usuarios con rol OWNER y hogares sin nevera previa.
  */
 public class CreateMyFridgeUseCase {
 
     private final ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase;
     private final FridgeRepository fridgeRepository;
-    /**
-     * Constructor con dependencias para validar contexto y crear nevera.
-     *
-     * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
-     * @param fridgeRepository repositorio de neveras
-     */
 
     public CreateMyFridgeUseCase(
             ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase,

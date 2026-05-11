@@ -1,12 +1,13 @@
 package com.gastromind.api.domain.ports.in;
 
 import com.gastromind.api.domain.models.FridgeItem;
+import com.gastromind.api.domain.models.FridgeItemConsumeLine;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
 
 import java.util.List;
 
 /**
- * Define las operaciones de negocio para items de nevera.
+ * Puerto de entrada para altas, bajas y consumo de líneas del inventario de nevera.
  */
 public interface IFridgeItemService {
     List<FridgeItem> findAll();
@@ -24,6 +25,9 @@ public interface IFridgeItemService {
             java.time.LocalDate expirationDate, ItemStatus initialStatus);
 
     FridgeItem consumePartially(String itemId, java.math.BigDecimal quantityToConsume);
+
+    /** Mismo descuento que {@link #consumePartially} pero en cadena; una unica transaccion de punta a punta. */
+    List<FridgeItem> consumePartiallyBatch(List<FridgeItemConsumeLine> lines);
 
     void markAsConsumed(String itemId);
 

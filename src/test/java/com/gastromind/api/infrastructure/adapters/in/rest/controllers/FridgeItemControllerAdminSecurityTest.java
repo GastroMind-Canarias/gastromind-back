@@ -3,6 +3,8 @@ package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gastromind.api.application.services.FridgeItemServiceImpl;
 import com.gastromind.api.application.usecases.ConsumeMyFridgeItemUseCase;
+import com.gastromind.api.application.usecases.ConsumeMyFridgeItemsBatchUseCase;
+import com.gastromind.api.application.usecases.ConsumeMyFridgeItemsFromRecipeUseCase;
 import com.gastromind.api.application.usecases.CreateMyFridgeItemUseCase;
 import com.gastromind.api.application.usecases.DeleteMyFridgeItemUseCase;
 import com.gastromind.api.application.usecases.ListMyExpiringFridgeItemsUseCase;
@@ -36,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.verify;
@@ -80,6 +83,10 @@ class FridgeItemControllerAdminSecurityTest {
     @MockBean
     private ConsumeMyFridgeItemUseCase consumeMyFridgeItemUseCase;
     @MockBean
+    private ConsumeMyFridgeItemsBatchUseCase consumeMyFridgeItemsBatchUseCase;
+    @MockBean
+    private ConsumeMyFridgeItemsFromRecipeUseCase consumeMyFridgeItemsFromRecipeUseCase;
+    @MockBean
     private MarkMyFridgeItemConsumedUseCase markMyFridgeItemConsumedUseCase;
     @MockBean
     private ListMyExpiringFridgeItemsUseCase listMyExpiringFridgeItemsUseCase;
@@ -103,7 +110,8 @@ class FridgeItemControllerAdminSecurityTest {
                 new BigDecimal("2.0"),
                 LocalDate.of(2026, 5, 1),
                 "IN_FRIDGE",
-                "Leche");
+                "Leche",
+                null);
         String body = objectMapper.writeValueAsString(Map.of(
                 "productId", "product-1",
                 "fridgeId", "fridge-1",
@@ -112,6 +120,8 @@ class FridgeItemControllerAdminSecurityTest {
                 "status", "IN_FRIDGE"
         ));
         String consumeBody = objectMapper.writeValueAsString(new BigDecimal("1.0"));
+        String consumeBatchBody = objectMapper.writeValueAsString(Map.of(
+                "items", List.of(Map.of("itemId", "item-1", "quantity", "1.0"))));
 
         when(fridgeItemService.findAll()).thenReturn(List.of(domain));
         when(fridgeItemService.findById("item-1")).thenReturn(domain);
@@ -125,6 +135,7 @@ class FridgeItemControllerAdminSecurityTest {
                 .thenReturn(domain);
         when(fridgeItemService.update(eq("item-1"), any())).thenReturn(domain);
         when(fridgeItemService.consumePartially(eq("item-1"), eq(new BigDecimal("1.0")))).thenReturn(domain);
+        when(fridgeItemService.consumePartiallyBatch(anyList())).thenReturn(List.of(domain));
         when(fridgeItemService.getExpiringItems(eq("fridge-1"), eq(5))).thenReturn(List.of(domain));
         when(fridgeItemService.getInventoryByCategory(eq("fridge-1"), eq("cat-1"))).thenReturn(List.of(domain));
         when(fridgeItemRestMapper.toDomain(any(FridgeItemRequest.class))).thenReturn(domain);
@@ -161,6 +172,12 @@ class FridgeItemControllerAdminSecurityTest {
                         .with(user("admin1").authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
                 .andExpect(status().isOk());
 
+        mockMvc.perform(put("/api/v1/fridge-items/batch/consume")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(consumeBatchBody)
+                        .with(user("admin1").authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
+                .andExpect(status().isOk());
+
         mockMvc.perform(put("/api/v1/fridge-items/item-1/mark-consumed")
                         .with(user("admin1").authorities(new SimpleGrantedAuthority("ROLE_ADMIN"))))
                 .andExpect(status().isOk());
@@ -189,6 +206,7 @@ class FridgeItemControllerAdminSecurityTest {
                 eq(ItemStatus.IN_FRIDGE));
         verify(fridgeItemService).update(eq("item-1"), any());
         verify(fridgeItemService).consumePartially(eq("item-1"), eq(new BigDecimal("1.0")));
+        verify(fridgeItemService).consumePartiallyBatch(anyList());
         verify(fridgeItemService).markAsConsumed("item-1");
         verify(fridgeItemService).getExpiringItems("fridge-1", 5);
         verify(fridgeItemService).getInventoryByCategory("fridge-1", "cat-1");
@@ -235,6 +253,14 @@ class FridgeItemControllerAdminSecurityTest {
             mockMvc.perform(put("/api/v1/fridge-items/item-1/consume")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(consumeBody)
+                            .with(user("user1").authorities(new SimpleGrantedAuthority(role))))
+                    .andExpect(status().isForbidden());
+
+            mockMvc.perform(put("/api/v1/fridge-items/batch/consume")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(Map.of(
+                                    "items", List.of(Map.of("itemId", "item-1", "quantity", "1.0"))
+                            )))
                             .with(user("user1").authorities(new SimpleGrantedAuthority(role))))
                     .andExpect(status().isForbidden());
 

@@ -7,10 +7,11 @@ import org.mapstruct.Mapping;
 
 import java.util.List;
 
-@Mapper(componentModel = "spring", uses = { UserMapper.class, RecipeMapper.class })
 /**
- * Define el contrato de user favorites.
+ * Entidad JPA de favorito ↔ dominio. La receta pasa por {@code toDomainWithIngredients} para alinear
+ * con lo que luego se serializa en API (ingredientes incluidos cuando vienen en el fetch).
  */
+@Mapper(componentModel = "spring", uses = { UserMapper.class, RecipeMapper.class })
 public interface UserFavoritesMapper {
 
     @Mapping(source = "user_id", target = "user")
@@ -18,7 +19,7 @@ public interface UserFavoritesMapper {
     UserFavoritesEntity toEntity(UserFavorites domain);
 
     @Mapping(source = "user", target = "user_id")
-    @Mapping(source = "recipe", target = "recipe_id")
+    @Mapping(source = "recipe", target = "recipe_id", qualifiedByName = "toDomainWithIngredients")
     UserFavorites toDomain(UserFavoritesEntity entity);
 
     List<UserFavoritesEntity> toEntityList(List<UserFavorites> domainList);

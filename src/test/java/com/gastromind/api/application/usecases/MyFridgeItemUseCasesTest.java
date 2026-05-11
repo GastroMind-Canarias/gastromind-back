@@ -4,6 +4,7 @@ import com.gastromind.api.domain.exceptions.ForbiddenException;
 import com.gastromind.api.domain.models.Fridge;
 import com.gastromind.api.domain.models.FridgeItem;
 import com.gastromind.api.domain.models.HouseHold;
+import com.gastromind.api.domain.models.FridgeItemConsumeLine;
 import com.gastromind.api.domain.models.Product;
 import com.gastromind.api.domain.models.User;
 import com.gastromind.api.domain.models.enums.Role;
@@ -14,10 +15,14 @@ import org.junit.jupiter.api.Test;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
+
+import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -47,7 +52,10 @@ class MyFridgeItemUseCasesTest {
     void createMyFridgeItem_shouldForceAuthenticatedFridgeScope() {
         ResolveAuthenticatedHouseholdContextUseCase resolveUseCase = mock(ResolveAuthenticatedHouseholdContextUseCase.class);
         com.gastromind.api.application.services.FridgeItemServiceImpl fridgeItemService = mock(com.gastromind.api.application.services.FridgeItemServiceImpl.class);
-        CreateMyFridgeItemUseCase useCase = new CreateMyFridgeItemUseCase(resolveUseCase, fridgeItemService);
+        com.gastromind.api.application.services.TicketProductResolutionService ticketProductResolutionService =
+                mock(com.gastromind.api.application.services.TicketProductResolutionService.class);
+        CreateMyFridgeItemUseCase useCase =
+                new CreateMyFridgeItemUseCase(resolveUseCase, fridgeItemService, ticketProductResolutionService);
 
         FridgeItem created = buildItem("item-1", "fridge-1");
         when(resolveUseCase.execute("member1")).thenReturn(buildContext(Role.ROLE_MEMBER, "house-1", "fridge-1"));
@@ -62,6 +70,7 @@ class MyFridgeItemUseCasesTest {
         FridgeItem result = useCase.execute(
                 "member1",
                 "product-1",
+                null,
                 new BigDecimal("2.50"),
                 LocalDate.of(2026, 4, 20),
                 ItemStatus.GOOD);
@@ -73,6 +82,103 @@ class MyFridgeItemUseCasesTest {
                 new BigDecimal("2.50"),
                 LocalDate.of(2026, 4, 20),
                 ItemStatus.GOOD);
+    }
+
+    @Test
+    void createMyFridgeItem_shouldResolveByProductNameWhenProductIdMissing() {
+        ResolveAuthenticatedHouseholdContextUseCase resolveUseCase = mock(ResolveAuthenticatedHouseholdContextUseCase.class);
+        com.gastromind.api.application.services.FridgeItemServiceImpl fridgeItemService = mock(com.gastromind.api.application.services.FridgeItemServiceImpl.class);
+        com.gastromind.api.application.services.TicketProductResolutionService ticketProductResolutionService =
+                mock(com.gastromind.api.application.services.TicketProductResolutionService.class);
+        CreateMyFridgeItemUseCase useCase =
+                new CreateMyFridgeItemUseCase(resolveUseCase, fridgeItemService, ticketProductResolutionService);
+
+        Product product = new Product("product-2", "leche", false, null);
+        FridgeItem created = buildItem("item-2", "fridge-1");
+
+        when(resolveUseCase.execute("member1")).thenReturn(buildContext(Role.ROLE_MEMBER, "house-1", "fridge-1"));
+        when(ticketProductResolutionService.resolveOrCreateProductFromManualEntry("Leche")).thenReturn(product);
+        when(fridgeItemService.addProductToFridge(
+                eq("fridge-1"),
+                eq("product-2"),
+                eq(new BigDecimal("1.00")),
+                eq(LocalDate.of(2026, 5, 10)),
+                eq(ItemStatus.IN_FRIDGE)))
+                .thenReturn(created);
+
+        FridgeItem result = useCase.execute(
+                "member1",
+                null,
+                "Leche",
+                new BigDecimal("1.00"),
+                LocalDate.of(2026, 5, 10),
+                ItemStatus.IN_FRIDGE);
+
+        assertEquals("item-2", result.getId());
+        verify(ticketProductResolutionService).resolveOrCreateProductFromManualEntry("Leche");
+        verify(fridgeItemService).addProductToFridge(
+                "fridge-1",
+                "product-2",
+                new BigDecimal("1.00"),
+                LocalDate.of(2026, 5, 10),
+                ItemStatus.IN_FRIDGE);
+    }
+
+    @Test
+    void createMyFridgeItem_shouldPrioritizeProductIdOverProductName() {
+        ResolveAuthenticatedHouseholdContextUseCase resolveUseCase = mock(ResolveAuthenticatedHouseholdContextUseCase.class);
+        com.gastromind.api.application.services.FridgeItemServiceImpl fridgeItemService = mock(com.gastromind.api.application.services.FridgeItemServiceImpl.class);
+        com.gastromind.api.application.services.TicketProductResolutionService ticketProductResolutionService =
+                mock(com.gastromind.api.application.services.TicketProductResolutionService.class);
+        CreateMyFridgeItemUseCase useCase =
+                new CreateMyFridgeItemUseCase(resolveUseCase, fridgeItemService, ticketProductResolutionService);
+
+        FridgeItem created = buildItem("item-3", "fridge-1");
+        when(resolveUseCase.execute("member1")).thenReturn(buildContext(Role.ROLE_MEMBER, "house-1", "fridge-1"));
+        when(fridgeItemService.addProductToFridge(
+                eq("fridge-1"),
+                eq("product-1"),
+                eq(new BigDecimal("3.00")),
+                eq(LocalDate.of(2026, 6, 1)),
+                eq(ItemStatus.GOOD)))
+                .thenReturn(created);
+
+        FridgeItem result = useCase.execute(
+                "member1",
+                "product-1",
+                "Leche",
+                new BigDecimal("3.00"),
+                LocalDate.of(2026, 6, 1),
+                ItemStatus.GOOD);
+
+        assertEquals("item-3", result.getId());
+        verify(fridgeItemService).addProductToFridge(
+                "fridge-1",
+                "product-1",
+                new BigDecimal("3.00"),
+                LocalDate.of(2026, 6, 1),
+                ItemStatus.GOOD);
+        verify(ticketProductResolutionService, never()).resolveOrCreateProductFromManualEntry(any());
+    }
+
+    @Test
+    void createMyFridgeItem_shouldFailWhenProductIdAndProductNameMissing() {
+        ResolveAuthenticatedHouseholdContextUseCase resolveUseCase = mock(ResolveAuthenticatedHouseholdContextUseCase.class);
+        com.gastromind.api.application.services.FridgeItemServiceImpl fridgeItemService = mock(com.gastromind.api.application.services.FridgeItemServiceImpl.class);
+        com.gastromind.api.application.services.TicketProductResolutionService ticketProductResolutionService =
+                mock(com.gastromind.api.application.services.TicketProductResolutionService.class);
+        CreateMyFridgeItemUseCase useCase =
+                new CreateMyFridgeItemUseCase(resolveUseCase, fridgeItemService, ticketProductResolutionService);
+
+        IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> useCase.execute(
+                "member1",
+                " ",
+                " ",
+                new BigDecimal("1.00"),
+                LocalDate.of(2026, 6, 1),
+                ItemStatus.GOOD));
+        assertEquals("Debes indicar productId o productName", ex.getMessage());
+        verify(fridgeItemService, never()).addProductToFridge(any(), any(), any(), any(), any());
     }
 
     @Test
@@ -91,6 +197,40 @@ class MyFridgeItemUseCasesTest {
     }
 
     @Test
+    void updateMyFridgeItem_shouldKeepCatalogLinkWhenRequestHasNoProduct() {
+        ResolveAuthenticatedHouseholdContextUseCase resolveUseCase = mock(ResolveAuthenticatedHouseholdContextUseCase.class);
+        FridgeItemRepository fridgeItemRepository = mock(FridgeItemRepository.class);
+        com.gastromind.api.application.services.FridgeItemServiceImpl fridgeItemService =
+                mock(com.gastromind.api.application.services.FridgeItemServiceImpl.class);
+        UpdateMyFridgeItemUseCase useCase = new UpdateMyFridgeItemUseCase(resolveUseCase, fridgeItemRepository, fridgeItemService);
+
+        FridgeItem existing = buildItem("item-1", "fridge-1");
+        existing.setProductLabel("etiqueta-libre");
+        when(resolveUseCase.execute("member1")).thenReturn(buildContext(Role.ROLE_MEMBER, "house-1", "fridge-1"));
+        when(fridgeItemRepository.findById("item-1")).thenReturn(java.util.Optional.of(existing));
+
+        FridgeItem patch = new FridgeItem();
+        patch.setQuantity(new BigDecimal("0.50"));
+        patch.setExpirationDate(LocalDate.of(2026, 7, 1));
+        patch.setStatus(ItemStatus.GOOD);
+
+        FridgeItem updated = buildItem("item-1", "fridge-1");
+        updated.setProductLabel("etiqueta-libre");
+        updated.setQuantity(new BigDecimal("0.50"));
+        when(fridgeItemService.update(eq("item-1"), any())).thenReturn(updated);
+
+        FridgeItem result = useCase.execute("member1", "item-1", patch);
+
+        assertEquals(0, result.getQuantity().compareTo(new BigDecimal("0.5")));
+        verify(fridgeItemService).update(eq("item-1"), argThat(item ->
+                item.getProduct() != null
+                        && "product-1".equals(item.getProduct().getId())
+                        && "etiqueta-libre".equals(item.getProductLabel())
+                        && item.getQuantity().compareTo(new BigDecimal("0.5")) == 0
+                        && ItemStatus.GOOD.equals(item.getStatus())));
+    }
+
+    @Test
     void deleteMyFridgeItem_shouldDeleteOnlyInsideAuthenticatedFridge() {
         ResolveAuthenticatedHouseholdContextUseCase resolveUseCase = mock(ResolveAuthenticatedHouseholdContextUseCase.class);
         FridgeItemRepository fridgeItemRepository = mock(FridgeItemRepository.class);
@@ -103,6 +243,49 @@ class MyFridgeItemUseCasesTest {
         useCase.execute("member1", "item-1");
 
         verify(fridgeItemService).delete("item-1");
+    }
+
+    @Test
+    void consumeMyFridgeItemsBatch_shouldApplyBatchWhenAllItemsInFridge() {
+        ResolveAuthenticatedHouseholdContextUseCase resolveUseCase = mock(ResolveAuthenticatedHouseholdContextUseCase.class);
+        FridgeItemRepository fridgeItemRepository = mock(FridgeItemRepository.class);
+        com.gastromind.api.application.services.FridgeItemServiceImpl fridgeItemService = mock(com.gastromind.api.application.services.FridgeItemServiceImpl.class);
+        ConsumeMyFridgeItemsBatchUseCase useCase = new ConsumeMyFridgeItemsBatchUseCase(resolveUseCase, fridgeItemRepository, fridgeItemService);
+
+        FridgeItem i1 = buildItem("item-1", "fridge-1");
+        FridgeItem i2 = buildItem("item-2", "fridge-1");
+        List<FridgeItemConsumeLine> lines = List.of(
+                new FridgeItemConsumeLine("item-1", new BigDecimal("1.00")),
+                new FridgeItemConsumeLine("item-2", new BigDecimal("0.50")));
+
+        when(resolveUseCase.execute("member1")).thenReturn(buildContext(Role.ROLE_MEMBER, "house-1", "fridge-1"));
+        when(fridgeItemRepository.findById("item-1")).thenReturn(Optional.of(i1));
+        when(fridgeItemRepository.findById("item-2")).thenReturn(Optional.of(i2));
+        when(fridgeItemService.consumePartiallyBatch(any())).thenReturn(List.of(i1, i2));
+
+        List<FridgeItem> result = useCase.execute("member1", lines);
+
+        assertEquals(2, result.size());
+        verify(fridgeItemService).consumePartiallyBatch(lines);
+    }
+
+    @Test
+    void consumeMyFridgeItemsBatch_shouldRejectWhenAnyItemOutsideAuthenticatedFridge() {
+        ResolveAuthenticatedHouseholdContextUseCase resolveUseCase = mock(ResolveAuthenticatedHouseholdContextUseCase.class);
+        FridgeItemRepository fridgeItemRepository = mock(FridgeItemRepository.class);
+        com.gastromind.api.application.services.FridgeItemServiceImpl fridgeItemService = mock(com.gastromind.api.application.services.FridgeItemServiceImpl.class);
+        ConsumeMyFridgeItemsBatchUseCase useCase = new ConsumeMyFridgeItemsBatchUseCase(resolveUseCase, fridgeItemRepository, fridgeItemService);
+
+        List<FridgeItemConsumeLine> lines = List.of(
+                new FridgeItemConsumeLine("item-1", new BigDecimal("1.00")),
+                new FridgeItemConsumeLine("item-2", new BigDecimal("1.00")));
+
+        when(resolveUseCase.execute("member1")).thenReturn(buildContext(Role.ROLE_MEMBER, "house-1", "fridge-1"));
+        when(fridgeItemRepository.findById("item-1")).thenReturn(Optional.of(buildItem("item-1", "fridge-1")));
+        when(fridgeItemRepository.findById("item-2")).thenReturn(Optional.of(buildItem("item-2", "fridge-2")));
+
+        assertThrows(ForbiddenException.class, () -> useCase.execute("member1", lines));
+        verify(fridgeItemService, never()).consumePartiallyBatch(any());
     }
 
     @Test

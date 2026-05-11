@@ -5,7 +5,7 @@ import com.gastromind.api.domain.models.enums.Appliance;
 import java.util.List;
 
 /**
- * Contexto de dominio usado para sugerir recetas en un hogar.
+ * Snapshot enviado al motor de recetas: stock disponible, alérgenos a evitar, electrodomésticos y raciones deseadas.
  */
 public record HouseholdRecipeContext(
         String householdId,

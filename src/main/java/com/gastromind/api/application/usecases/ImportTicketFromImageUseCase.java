@@ -2,9 +2,10 @@ package com.gastromind.api.application.usecases;
 
 import com.gastromind.api.application.services.TicketProductResolutionService;
 import com.gastromind.api.application.services.TicketQuantityUnitResolver;
+import com.gastromind.api.application.services.StoreResolutionResult;
+import com.gastromind.api.application.services.StoreResolutionService;
 import com.gastromind.api.domain.models.Fridge;
 import com.gastromind.api.domain.models.Product;
-import com.gastromind.api.domain.models.Store;
 import com.gastromind.api.domain.models.Ticket;
 import com.gastromind.api.domain.models.TicketItem;
 import com.gastromind.api.domain.models.Unit;
@@ -16,8 +17,6 @@ import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.ports.in.IFridgeItemService;
 import com.gastromind.api.domain.ports.in.ITicketService;
 import com.gastromind.api.domain.ports.out.FridgeRepository;
-import com.gastromind.api.domain.ports.out.ProductRepository;
-import com.gastromind.api.domain.ports.out.StoreRepository;
 import com.gastromind.api.domain.ports.out.TicketExtractionPort;
 import com.gastromind.api.domain.ports.out.UserRepository;
 import com.gastromind.api.infrastructure.adapters.out.persistence.jpa.entities.enums.ItemStatus;
@@ -39,11 +38,11 @@ import java.util.Optional;
 public class ImportTicketFromImageUseCase {
 
     private final TicketExtractionPort extraction;
-    private final ProductRepository productRepository;
+    private final TicketProductResolutionService ticketProductResolutionService;
     private final TicketQuantityUnitResolver unitResolver;
     private final ITicketService ticketService;
     private final UserRepository userRepository;
-    private final StoreRepository storeRepository;
+    private final StoreResolutionService storeResolutionService;
     private final FridgeRepository fridgeRepository;
     private final IFridgeItemService fridgeItemService;
     /**
@@ -61,19 +60,19 @@ public class ImportTicketFromImageUseCase {
 
     public ImportTicketFromImageUseCase(
             TicketExtractionPort extraction,
-            ProductRepository productRepository,
+            TicketProductResolutionService ticketProductResolutionService,
             TicketQuantityUnitResolver unitResolver,
             ITicketService ticketService,
             UserRepository userRepository,
-            StoreRepository storeRepository,
+            StoreResolutionService storeResolutionService,
             FridgeRepository fridgeRepository,
             IFridgeItemService fridgeItemService) {
         this.extraction = extraction;
-        this.productRepository = productRepository;
+        this.ticketProductResolutionService = ticketProductResolutionService;
         this.unitResolver = unitResolver;
         this.ticketService = ticketService;
         this.userRepository = userRepository;
-        this.storeRepository = storeRepository;
+        this.storeResolutionService = storeResolutionService;
         this.fridgeRepository = fridgeRepository;
         this.fridgeItemService = fridgeItemService;
     }
@@ -90,12 +89,12 @@ public class ImportTicketFromImageUseCase {
      */
 
     @Transactional
-    public Ticket execute(byte[] imageBytes, String mimeType, String userId, String storeIdOrNull) {
+    public ImportTicketFromImageResult execute(byte[] imageBytes, String mimeType, String userId, String storeIdOrNull) {
         userRepository.findById(userId).orElseThrow(() -> new NotFoundException("Usuario no encontrado"));
 
         ExtractedTicketReceipt extracted = extraction.extractFromImage(imageBytes, mimeType);
 
-        Store store = resolveStore(storeIdOrNull, extracted.storeName());
+        StoreResolutionResult resolution = storeResolutionService.resolve(storeIdOrNull, extracted.storeName());
 
         List<TicketItem> items = new ArrayList<>();
         for (ExtractedTicketLine line : extracted.lines()) {
@@ -103,7 +102,7 @@ public class ImportTicketFromImageUseCase {
             if (normalized.isEmpty()) {
                 throw new IllegalArgumentException("Nombre de producto vacio en una linea del ticket");
             }
-            Optional<Product> catalog = productRepository.findFirstByNameIgnoreCase(normalized);
+            Product resolvedProduct = ticketProductResolutionService.resolveOrCreateProduct(line.productName());
 
             BigDecimal qtyAmt = line.quantityAmount().max(BigDecimal.ZERO);
             if (qtyAmt.compareTo(BigDecimal.ZERO) <= 0) {
@@ -114,7 +113,8 @@ public class ImportTicketFromImageUseCase {
             BigDecimal unitPrice = inferUnitPrice(line, qtyAmt, unit);
 
             TicketItem ti = new TicketItem();
-            catalog.ifPresentOrElse(ti::setProduct, () -> ti.setLineProductName(normalized));
+            ti.setProduct(resolvedProduct);
+            ti.setLineProductName(normalized);
             ti.setQuantity(qtyAmt);
             ti.setUnit(unit);
             ti.setPriceUnit(unitPrice);
@@ -137,14 +137,14 @@ public class ImportTicketFromImageUseCase {
         User userRef = new User(userId);
         Ticket ticket = new Ticket();
         ticket.setUser_id(userRef);
-        ticket.setStore_id(store);
+        ticket.setStore_id(resolution.store());
         ticket.setTotal_amount(total);
         ticket.setPurchaseDate(purchaseDate);
         ticket.setItems(items);
 
         Ticket saved = ticketService.create(ticket);
         pushTicketLinesToFridge(saved);
-        return saved;
+        return new ImportTicketFromImageResult(saved, resolution.pendingStore(), resolution.detectedStoreName());
     }
 
     private void pushTicketLinesToFridge(Ticket ticket) {
@@ -208,22 +208,6 @@ public class ImportTicketFromImageUseCase {
             return extracted.totalAmount().floatValue();
         }
         return sumLineTotals(items);
-    }
-
-    private Store resolveStore(String storeIdOrNull, String extractedStoreName) {
-        if (storeIdOrNull != null && !storeIdOrNull.isBlank()) {
-            return storeRepository.findById(storeIdOrNull)
-                    .orElseThrow(() -> new NotFoundException("Tienda no encontrada"));
-        }
-        String name = extractedStoreName != null ? TicketProductResolutionService.normalizeName(extractedStoreName) : "";
-        if (!name.isEmpty()) {
-            return storeRepository.findFirstByNameIgnoreCase(name)
-                    .orElseThrow(() -> new IllegalArgumentException(
-                            "No se indico store_id y no hay tienda en catalogo con nombre: " + name
-                                    + ". Cree la tienda o enviese store_id."));
-        }
-        throw new IllegalArgumentException(
-                "No se indico store_id y el ticket no muestra un nombre de tienda reconocible. Enviese store_id.");
     }
 
     private static float sumLineTotals(List<TicketItem> items) {

@@ -1,50 +1,109 @@
 package com.gastromind.api.application.services;
 
 import com.gastromind.api.domain.models.Product;
+import com.gastromind.api.domain.models.ProductAlias;
+import com.gastromind.api.domain.ports.out.ProductAliasRepository;
 import com.gastromind.api.domain.ports.out.ProductRepository;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-@ExtendWith(MockitoExtension.class)
 class TicketProductResolutionServiceTest {
-
-    @Mock
-    private ProductRepository productRepository;
-
-    @InjectMocks
-    private TicketProductResolutionService service;
 
     @Test
     void findCatalogProductByName_returnsExistingWhenNameMatches() {
+        ProductRepository productRepository = mock(ProductRepository.class);
+        ProductAliasRepository aliasRepository = mock(ProductAliasRepository.class);
+        TicketProductResolutionService service = new TicketProductResolutionService(productRepository, aliasRepository);
         Product p = new Product("p1", "Leche", false, null);
         when(productRepository.findFirstByNameIgnoreCase("leche")).thenReturn(Optional.of(p));
         assertEquals(Optional.of(p), service.findCatalogProductByName("  leche  "));
     }
 
     @Test
-    void findCatalogProductByName_emptyWhenMissing() {
-        when(productRepository.findFirstByNameIgnoreCase("Nuevo")).thenReturn(Optional.empty());
-        assertTrue(service.findCatalogProductByName("Nuevo").isEmpty());
-    }
-
-    @Test
     void findCatalogProductByName_throwsWhenNameBlank() {
+        ProductRepository productRepository = mock(ProductRepository.class);
+        ProductAliasRepository aliasRepository = mock(ProductAliasRepository.class);
+        TicketProductResolutionService service = new TicketProductResolutionService(productRepository, aliasRepository);
         assertThrows(IllegalArgumentException.class, () -> service.findCatalogProductByName("   "));
     }
 
     @Test
-    void normalizeName_trimsAndCollapsesSpaces() {
-        assertEquals("a b", TicketProductResolutionService.normalizeName("  a   b  "));
-        assertEquals("", TicketProductResolutionService.normalizeName(null));
+    void resolveOrCreateProduct_returnsExactCatalogMatch() {
+        ProductRepository productRepository = mock(ProductRepository.class);
+        ProductAliasRepository aliasRepository = mock(ProductAliasRepository.class);
+        TicketProductResolutionService service = new TicketProductResolutionService(productRepository, aliasRepository);
+        Product existing = new Product("prod-1");
+        when(productRepository.findFirstByNameIgnoreCase("tomate")).thenReturn(Optional.of(existing));
+        Product resolved = service.resolveOrCreateProduct("Tomate");
+        assertEquals("prod-1", resolved.getId());
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void resolveOrCreateProduct_usesAliasWhenCatalogNameDiffers() {
+        ProductRepository productRepository = mock(ProductRepository.class);
+        ProductAliasRepository aliasRepository = mock(ProductAliasRepository.class);
+        TicketProductResolutionService service = new TicketProductResolutionService(productRepository, aliasRepository);
+        Product existing = new Product("prod-2");
+        ProductAlias alias = new ProductAlias();
+        alias.setProductId("prod-2");
+        when(productRepository.findFirstByNameIgnoreCase("tomate pera extra")).thenReturn(Optional.empty());
+        when(aliasRepository.findFirstByAliasNorm("tomate pera extra")).thenReturn(Optional.of(alias));
+        when(productRepository.findById("prod-2")).thenReturn(Optional.of(existing));
+        Product resolved = service.resolveOrCreateProduct("tomate pera extra");
+        assertEquals("prod-2", resolved.getId());
+        verify(productRepository, never()).save(any());
+    }
+
+    @Test
+    void resolveOrCreateProduct_createsProvisionalWhenNoMatch() {
+        ProductRepository productRepository = mock(ProductRepository.class);
+        ProductAliasRepository aliasRepository = mock(ProductAliasRepository.class);
+        TicketProductResolutionService service = new TicketProductResolutionService(productRepository, aliasRepository);
+        when(productRepository.findFirstByNameIgnoreCase("producto nuevo")).thenReturn(Optional.empty());
+        when(aliasRepository.findFirstByAliasNorm("producto nuevo")).thenReturn(Optional.empty());
+        when(productRepository.save(any(Product.class))).thenAnswer(inv -> {
+            Product p = inv.getArgument(0);
+            p.setId("prod-new");
+            return p;
+        });
+        Product resolved = service.resolveOrCreateProduct("Producto   Nuevo");
+        assertEquals("prod-new", resolved.getId());
+        assertTrue(resolved.isNeedsReview());
+        assertEquals("Creado automaticamente por OCR pendiente de revision", resolved.getReviewNote());
+        verify(aliasRepository).save(any(ProductAlias.class));
+    }
+
+    @Test
+    void resolveOrCreateProductFromManualEntry_createsWithoutOcrFlags() {
+        ProductRepository productRepository = mock(ProductRepository.class);
+        ProductAliasRepository aliasRepository = mock(ProductAliasRepository.class);
+        TicketProductResolutionService service = new TicketProductResolutionService(productRepository, aliasRepository);
+        when(productRepository.findFirstByNameIgnoreCase("leche")).thenReturn(Optional.empty());
+        when(aliasRepository.findFirstByAliasNorm("leche")).thenReturn(Optional.empty());
+        when(productRepository.save(any(Product.class))).thenAnswer(inv -> {
+            Product p = inv.getArgument(0);
+            p.setId("prod-manual");
+            return p;
+        });
+
+        Product resolved = service.resolveOrCreateProductFromManualEntry("Leche");
+
+        assertEquals("prod-manual", resolved.getId());
+        assertEquals("leche", resolved.getName());
+        assertEquals(false, resolved.isNeedsReview());
+        assertNull(resolved.getReviewNote());
+        verify(aliasRepository).save(any(ProductAlias.class));
     }
 }

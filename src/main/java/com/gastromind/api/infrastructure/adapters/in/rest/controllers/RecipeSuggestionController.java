@@ -8,7 +8,7 @@ import com.gastromind.api.domain.exceptions.NotFoundException;
 import com.gastromind.api.domain.models.Recipe;
 import com.gastromind.api.domain.models.User;
 import com.gastromind.api.application.services.UserServiceImpl;
-import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
+import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostExternalAiDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.recipe.RecipeResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.recipe.SuggestRecipeRequest;
@@ -68,7 +68,7 @@ public class RecipeSuggestionController {
      * @param request los datos de la solicitud
      * @return resultado de la operacion solicitada.
      */
-    @ApiPostDoc
+    @ApiPostExternalAiDoc
     @PostMapping("/me/recipes/suggestions")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<SuggestRecipeResponse> suggest(

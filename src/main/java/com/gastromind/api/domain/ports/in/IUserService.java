@@ -7,7 +7,7 @@ import com.gastromind.api.domain.models.enums.Role;
 import java.util.List;
 
 /**
- * Define las operaciones de negocio para usuarios.
+ * Puerto de entrada para perfil, preferencias alimentarias y cambios de datos del usuario.
  */
 public interface IUserService {
     List<User> findAll();

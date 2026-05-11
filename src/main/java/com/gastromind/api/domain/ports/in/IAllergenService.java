@@ -5,7 +5,7 @@ import com.gastromind.api.domain.models.Allergen;
 import java.util.List;
 
 /**
- * Define las operaciones de negocio para la gestiAn de alergenos.
+ * Puerto de entrada para administrar el catálogo de alérgenos (listado, alta, edición y borrado).
  */
 public interface IAllergenService {
     List<Allergen> findAll();

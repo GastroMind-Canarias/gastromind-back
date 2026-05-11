@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Define el contrato de persistencia o integracion para fridge item.
+ * Líneas de inventario en nevera: cantidades, caducidad y vínculo al producto del catálogo.
  */
 public interface FridgeItemRepository {
     FridgeItem save(FridgeItem fridgeItem);

@@ -7,23 +7,18 @@ import com.gastromind.api.domain.ports.out.FridgeItemRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Service
 /**
- * Caso de uso para actualizar un item de la nevera del usuario autenticado.
- * Verifica que el item pertenezca al hogar antes de aplicar cambios.
+ * Actualiza un item de la nevera del hogar del usuario. Comprueba que la fila exista y sea de
+ * su nevera; el cuerpo del PUT solo trae cantidad, caducidad y estado, asi que reutilizamos
+ * el producto (y la etiqueta libre si la habia) que ya estan en base. Si no hicieramos esto,
+ * el {@code save} del repositorio podria dejar el producto a null y romper el enlace al catalogo.
  */
+@Service
 public class UpdateMyFridgeItemUseCase {
 
     private final ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase;
     private final FridgeItemRepository fridgeItemRepository;
     private final FridgeItemServiceImpl fridgeItemService;
-    /**
-     * Constructor con dependencias de validaciAn y actualizaciAn de items.
-     *
-     * @param resolveAuthenticatedHouseholdContextUseCase resolvedor de contexto autenticado
-     * @param fridgeItemRepository repositorio de items de nevera
-     * @param fridgeItemService servicio de actualizaciAn de items
-     */
 
     public UpdateMyFridgeItemUseCase(
             ResolveAuthenticatedHouseholdContextUseCase resolveAuthenticatedHouseholdContextUseCase,
@@ -34,31 +29,29 @@ public class UpdateMyFridgeItemUseCase {
         this.fridgeItemRepository = fridgeItemRepository;
         this.fridgeItemService = fridgeItemService;
     }
-    /**
-     * Define un item de nevera existente para el usuario autenticado.
-     *
-     * @param principal identificador del usuario autenticado
-     * @param itemId identificador del item a actualizar
-     * @param itemToUpdate datos actualizados del item
-     * @return item actualizado
-     * @throws com.gastromind.api.domain.exceptions.NotFoundException si el item no existe
-     * @throws ForbiddenException si el item no pertenece a la nevera del usuario
-     */
 
+    /**
+     * Aplica los cambios de inventario para un item concreto. {@code itemToUpdate} suele venir
+     * del mapper REST sin producto cuando el cliente no envia {@code productId}; aqui se rellena
+     * desde la fila actual antes de persistir.
+     */
     @Transactional
     public FridgeItem execute(String principal, String itemId, FridgeItem itemToUpdate) {
         String fridgeId = resolveAuthenticatedHouseholdContextUseCase.execute(principal).fridge().getId();
-        assertItemBelongsToFridge(itemId, fridgeId);
+        FridgeItem existing = assertItemBelongsToFridge(itemId, fridgeId);
         itemToUpdate.setFridgeId(fridgeId);
+        itemToUpdate.setProduct(existing.getProduct());
+        itemToUpdate.setProductLabel(existing.getProductLabel());
         return fridgeItemService.update(itemId, itemToUpdate);
     }
 
-    private void assertItemBelongsToFridge(String itemId, String fridgeId) {
+    private FridgeItem assertItemBelongsToFridge(String itemId, String fridgeId) {
         FridgeItem existing = fridgeItemRepository.findById(itemId)
                 .orElseThrow(() -> new com.gastromind.api.domain.exceptions.NotFoundException("Item de nevera no encontrado"));
         if (!fridgeId.equals(existing.getFridgeId())) {
             throw new ForbiddenException("El item no pertenece a la nevera del usuario autenticado");
         }
+        return existing;
     }
 }
 

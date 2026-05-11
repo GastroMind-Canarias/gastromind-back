@@ -2,6 +2,8 @@ package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 
 import com.gastromind.api.application.services.FridgeItemServiceImpl;
 import com.gastromind.api.application.usecases.ConsumeMyFridgeItemUseCase;
+import com.gastromind.api.application.usecases.ConsumeMyFridgeItemsBatchUseCase;
+import com.gastromind.api.application.usecases.ConsumeMyFridgeItemsFromRecipeUseCase;
 import com.gastromind.api.application.usecases.CreateMyFridgeItemUseCase;
 import com.gastromind.api.application.usecases.DeleteMyFridgeItemUseCase;
 import com.gastromind.api.application.usecases.ListMyExpiringFridgeItemsUseCase;
@@ -11,8 +13,16 @@ import com.gastromind.api.application.usecases.MarkMyFridgeItemConsumedUseCase;
 import com.gastromind.api.application.usecases.UpdateMyFridgeItemUseCase;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
+import com.gastromind.api.domain.models.ConsumeRecipeOutcome;
+import com.gastromind.api.domain.models.FridgeItemConsumeLine;
+import com.gastromind.api.domain.models.RecipeIngredientUsage;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.ConsumeFromRecipeResponse;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.ConsumeRecipeRequest;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.FridgeItemConsumeBatchRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.FridgeItemRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.FridgeItemResponse;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.IgnoredIngredientResponse;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.MyFridgeItemBatchRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.MyFridgeItemRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.FridgeItemRestMapper;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,10 +37,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/fridge-items")
-@Tag(name = "Items de Nevera", description = "Gestion de productos y stock en neveras. Rutas /me: Solo Owner y Admin. Rutas globales: Solo Admin.")
+@Tag(name = "Items de Nevera", description = "Gestion de productos y stock en neveras. Rutas /me: Owner, Member y Admin. Rutas globales: Solo Admin.")
 /**
  * Controlador REST para operaciones de fridge item.
  */
@@ -51,6 +62,10 @@ public class FridgeItemController {
     private DeleteMyFridgeItemUseCase deleteMyFridgeItemUseCase;
     @Autowired
     private ConsumeMyFridgeItemUseCase consumeMyFridgeItemUseCase;
+    @Autowired
+    private ConsumeMyFridgeItemsBatchUseCase consumeMyFridgeItemsBatchUseCase;
+    @Autowired
+    private ConsumeMyFridgeItemsFromRecipeUseCase consumeMyFridgeItemsFromRecipeUseCase;
     @Autowired
     private MarkMyFridgeItemConsumedUseCase markMyFridgeItemConsumedUseCase;
     @Autowired
@@ -103,10 +118,10 @@ public class FridgeItemController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Listar items de mi nevera (Solo Owner y Admin)", description = "Devuelve los productos de la nevera del hogar del usuario autenticado.")
+    @Operation(summary = "Listar items de mi nevera (Owner, Member y Admin)", description = "Devuelve los productos de la nevera del hogar del usuario autenticado.")
     @ApiStandardDoc
     @GetMapping("/me")
-    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<List<FridgeItemResponse>> listMyItems(Authentication authentication) {
         return ResponseEntity.ok(fridgeItemRestMapper.toResponseList(listMyFridgeItemsUseCase.execute(authentication.getName())));
     }
@@ -136,19 +151,41 @@ public class FridgeItemController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Anadir item a mi nevera (Solo Owner y Admin)", description = "Registra un nuevo producto en la nevera del hogar autenticado. No incluye fridgeId: se toma de tu hogar.")
+    @Operation(summary = "Anadir item a mi nevera (Owner, Member y Admin)", description = "Registra un nuevo producto en la nevera del hogar autenticado. No incluye fridgeId: se toma de tu hogar.")
     @ApiPostDoc
     @PostMapping("/me")
-    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<FridgeItemResponse> createMyItem(Authentication authentication,
             @Valid @RequestBody MyFridgeItemRequest body) {
+        validateCreateMyItemBody(body);
         return ResponseEntity.status(HttpStatus.CREATED).body(fridgeItemRestMapper.toResponse(
                 createMyFridgeItemUseCase.execute(
                         authentication.getName(),
                         body.productId(),
+                        body.productName(),
                         body.quantity(),
                         body.expirationDate(),
                         body.status())));
+    }
+
+    @Operation(summary = "Anadir items a mi nevera por lote (Owner, Member y Admin)", description = "Registra multiples productos en la nevera del hogar autenticado.")
+    @ApiPostDoc
+    @PostMapping("/me/batch")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
+    public ResponseEntity<List<FridgeItemResponse>> createMyItemsBatch(Authentication authentication,
+            @Valid @RequestBody MyFridgeItemBatchRequest body) {
+        List<FridgeItemResponse> created = body.items().stream()
+                .peek(this::validateCreateMyItemBody)
+                .map(item -> createMyFridgeItemUseCase.execute(
+                        authentication.getName(),
+                        item.productId(),
+                        item.productName(),
+                        item.quantity(),
+                        item.expirationDate(),
+                        item.status()))
+                .map(fridgeItemRestMapper::toResponse)
+                .collect(Collectors.toList());
+        return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
     /**
      * Define un fridge item existente.
@@ -167,17 +204,15 @@ public class FridgeItemController {
                 .toResponse(fridgeItemService.update(id, fridgeItemRestMapper.toDomain(fridgeItem))));
     }
     /**
-     * Realiza update my item.
-     * @param authentication usuario autenticado.
-     * @param itemId identificador del item.
-     * @param body datos enviados en el cuerpo de la solicitud.
-     * @return resultado de la operacion solicitada.
+     * Variante de actualizacion acotada al inventario de tu hogar. No hace falta repetir el
+     * producto del catalogo: el item ya lo tiene guardado; solo envia lo que quieres cambiar
+     * (cantidad, caducidad, estado).
      */
 
-    @Operation(summary = "Actualizar item de mi nevera (Solo Owner y Admin)", description = "Modifica un producto de la nevera del hogar autenticado.")
+    @Operation(summary = "Actualizar item de mi nevera (Owner, Member y Admin)", description = "Modifica cantidad, caducidad y estado del item. El producto del catalogo queda asociado al item; no hace falta enviar productId.")
     @ApiStandardDoc
     @PutMapping("/me/{itemId}")
-    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<FridgeItemResponse> updateMyItem(Authentication authentication,
             @PathVariable String itemId,
             @Valid @RequestBody MyFridgeItemRequest body) {
@@ -192,6 +227,21 @@ public class FridgeItemController {
      * @param quantity la cantidad
      * @return resultado de la operacion solicitada.
      */
+
+    /**
+     * Descuenta stock en bloque (admin). Sirve para registrar varios usos sin viajes extra al servidor.
+     */
+    @Operation(summary = "Consumir parte de varios items (Solo Admin)", description = "Varios descuentos en una peticion; la respuesta sigue el orden del body. Si una linea falla, no se aplica ninguna.")
+    @ApiStandardDoc
+    @PutMapping("/batch/consume")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<FridgeItemResponse>> consumePartiallyBatch(
+            @Valid @RequestBody FridgeItemConsumeBatchRequest body) {
+        List<FridgeItemConsumeLine> lines = body.items().stream()
+                .map(line -> new FridgeItemConsumeLine(line.itemId(), line.quantity()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(fridgeItemRestMapper.toResponseList(fridgeItemService.consumePartiallyBatch(lines)));
+    }
 
     @Operation(summary = "Consumir parte de un item (Solo Admin)", description = "Descuenta una cantidad del stock. Si el stock llega a cero, el item se elimina del inventario.")
     @ApiStandardDoc
@@ -210,15 +260,65 @@ public class FridgeItemController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Consumir parte de un item de mi nevera (Solo Owner y Admin)", description = "Descuenta cantidad del stock; si queda en cero, el item se elimina del inventario.")
+    /**
+     * Igual que consumir una linea en /me, pero en lista; solo items de tu nevera.
+     */
+    @Operation(summary = "Consumir parte de varios items de mi nevera (Owner, Member y Admin)", description = "Mismo criterio que el consume unitario /me, pero varias lineas; todo o nada si algo falla.")
+    @ApiStandardDoc
+    @PutMapping("/me/batch/consume")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
+    public ResponseEntity<List<FridgeItemResponse>> consumePartiallyMyItemsBatch(Authentication authentication,
+            @Valid @RequestBody FridgeItemConsumeBatchRequest body) {
+        List<FridgeItemConsumeLine> lines = body.items().stream()
+                .map(line -> new FridgeItemConsumeLine(line.itemId(), line.quantity()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(fridgeItemRestMapper.toResponseList(
+                consumeMyFridgeItemsBatchUseCase.execute(authentication.getName(), lines)));
+    }
+
+    @Operation(summary = "Consumir parte de un item de mi nevera (Owner, Member y Admin)", description = "Descuenta cantidad del stock; si queda en cero, el item se elimina del inventario.")
     @ApiStandardDoc
     @PutMapping("/me/{itemId}/consume")
-    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<FridgeItemResponse> consumePartiallyMyItem(Authentication authentication,
             @PathVariable String itemId,
             @RequestBody java.math.BigDecimal quantity) {
         return ResponseEntity.ok(fridgeItemRestMapper.toResponse(
                 consumeMyFridgeItemUseCase.execute(authentication.getName(), itemId, quantity)));
+    }
+
+    /**
+     * Marca una receta como cocinada y descuenta del inventario del hogar lo necesario.
+     * Reparte cada ingrediente entre los items disponibles del mismo producto empezando
+     * por los caducados y luego por los que caducan antes; si a algun ingrediente le
+     * falta stock no se aplica nada, asi el inventario nunca queda a medias. Los
+     * ingredientes que llegan sin productId (basicos como sal o agua) se devuelven en
+     * la lista {@code ignored} pero no fallan la peticion. Los miembros del hogar
+     * pueden usarlo igual que el propietario.
+     *
+     * @param authentication usuario autenticado (Owner, Member o Admin)
+     * @param body receta con los ingredientes a descontar
+     * @return items afectados y lista de ingredientes que no se han aplicado con su motivo
+     */
+    @Operation(summary = "Consumir nevera al cocinar una receta (Owner, Member y Admin)",
+            description = "Descuenta el inventario del hogar usando los ingredientsUsed de una receta. Reparte por items mismo producto priorizando EXPIRED y luego por caducidad. Todo o nada: si algun ingrediente no tiene stock, falla la peticion sin tocar nada.")
+    @ApiStandardDoc
+    @PutMapping("/me/consume-from-recipe")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
+    public ResponseEntity<ConsumeFromRecipeResponse> consumeFromRecipe(Authentication authentication,
+            @Valid @RequestBody ConsumeRecipeRequest body) {
+        List<RecipeIngredientUsage> ingredients = body.ingredientsUsed().stream()
+                .map(i -> new RecipeIngredientUsage(i.productId(), i.productName(), i.quantityUsed(), null))
+                .collect(Collectors.toList());
+
+        ConsumeRecipeOutcome outcome = consumeMyFridgeItemsFromRecipeUseCase.execute(
+                authentication.getName(), ingredients);
+
+        List<FridgeItemResponse> consumed = fridgeItemRestMapper.toResponseList(outcome.consumed());
+        List<IgnoredIngredientResponse> ignored = outcome.ignored().stream()
+                .map(ig -> new IgnoredIngredientResponse(ig.productId(), ig.productName(), ig.reason()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new ConsumeFromRecipeResponse(consumed, ignored));
     }
     /**
      * Realiza mark as consumed.
@@ -241,10 +341,10 @@ public class FridgeItemController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Marcar item de mi nevera como consumido (Solo Owner y Admin)", description = "Quita el item del inventario de tu nevera (consumido por completo).")
+    @Operation(summary = "Marcar item de mi nevera como consumido (Owner, Member y Admin)", description = "Quita el item del inventario de tu nevera (consumido por completo).")
     @ApiStandardDoc
     @PutMapping("/me/{itemId}/mark-consumed")
-    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<Void> markMyItemAsConsumed(Authentication authentication, @PathVariable String itemId) {
         markMyFridgeItemConsumedUseCase.execute(authentication.getName(), itemId);
         return ResponseEntity.ok().build();
@@ -273,10 +373,10 @@ public class FridgeItemController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Listar mis items por caducar (Solo Owner y Admin)", description = "Recupera productos proximos a caducar para la nevera del hogar autenticado.")
+    @Operation(summary = "Listar mis items por caducar (Owner, Member y Admin)", description = "Recupera productos proximos a caducar para la nevera del hogar autenticado.")
     @ApiStandardDoc
     @GetMapping("/me/expiring")
-    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<List<FridgeItemResponse>> getMyExpiring(
             Authentication authentication,
             @org.springframework.web.bind.annotation.RequestParam(defaultValue = "7") int days) {
@@ -306,10 +406,10 @@ public class FridgeItemController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Filtrar mi inventario por categoria (Solo Owner y Admin)", description = "Devuelve el inventario de la nevera autenticada filtrado por categoria.")
+    @Operation(summary = "Filtrar mi inventario por categoria (Owner, Member y Admin)", description = "Devuelve el inventario de la nevera autenticada filtrado por categoria.")
     @ApiStandardDoc
     @GetMapping("/me/category/{categoryId}")
-    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<List<FridgeItemResponse>> getMyByCategory(Authentication authentication,
             @PathVariable String categoryId) {
         return ResponseEntity.ok(fridgeItemRestMapper.toResponseList(
@@ -336,13 +436,20 @@ public class FridgeItemController {
      * @return resultado de la operacion solicitada.
      */
 
-    @Operation(summary = "Eliminar item de mi nevera (Solo Owner y Admin)", description = "Borra un producto del inventario de la nevera autenticada.")
+    @Operation(summary = "Eliminar item de mi nevera (Owner, Member y Admin)", description = "Borra un producto del inventario de la nevera autenticada.")
     @ApiStandardDoc
     @DeleteMapping("/me/{itemId}")
-    @PreAuthorize("hasAnyRole('OWNER','ADMIN')")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
     public ResponseEntity<Void> deleteMyItem(Authentication authentication, @PathVariable String itemId) {
         deleteMyFridgeItemUseCase.execute(authentication.getName(), itemId);
         return ResponseEntity.noContent().build();
+    }
+
+    private void validateCreateMyItemBody(MyFridgeItemRequest body) {
+        if ((body.productId() == null || body.productId().trim().isEmpty())
+                && (body.productName() == null || body.productName().trim().isEmpty())) {
+            throw new IllegalArgumentException("Debes indicar productId o productName");
+        }
     }
 }
 

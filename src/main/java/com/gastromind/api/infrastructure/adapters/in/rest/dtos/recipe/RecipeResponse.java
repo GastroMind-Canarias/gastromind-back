@@ -21,7 +21,9 @@ public record RecipeResponse(
         int servings,
         @Schema(example = "60", description = "Tiempo de preparacion en minutos")
         int prep_time,
-        @Schema(example = "HORNO", description = "Electrodomestico usado", allowableValues = {"HORNO", "MICROONDAS", "AIR_FRYER", "VITROCERAMICA", "ROBOT_COCINA", "BATIDORA"})
+        @Schema(example = "HORNO", description = "Electrodomestico usado", allowableValues = {
+                "HORNO", "MICROONDAS", "AIR_FRYER", "VITROCERAMICA", "ROBOT_COCINA", "BATIDORA",
+                "OLLA_EXPRESS", "FREIDORA", "GRILL"})
         Appliance appliance_needed,
         @Schema(example = "Media")
         String difficulty,

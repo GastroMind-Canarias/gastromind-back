@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Define el contrato de persistencia o integracion para product.
+ * Catálogo global de productos con filtros por categoría y esencialidad.
  */
 public interface ProductRepository {
     Product save(Product product);

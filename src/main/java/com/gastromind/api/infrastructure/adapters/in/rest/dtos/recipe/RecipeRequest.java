@@ -28,7 +28,9 @@ public record RecipeRequest(
         @NotNull(message = "El tiempo de preparacion es obligatorio")
         @Positive(message = "La cantidad de minutos debe ser positiva")
         int prep_time,
-        @Schema(example = "HORNO", description = "Electrodomestico usado", allowableValues = {"HORNO", "MICROONDAS", "AIR_FRYER", "VITROCERAMICA", "ROBOT_COCINA", "BATIDORA"})
+        @Schema(example = "HORNO", description = "Electrodomestico usado", allowableValues = {
+                "HORNO", "MICROONDAS", "AIR_FRYER", "VITROCERAMICA", "ROBOT_COCINA", "BATIDORA",
+                "OLLA_EXPRESS", "FREIDORA", "GRILL"})
         Appliance appliance_needed,
         @Schema(example = "Media")
         @NotBlank(message = "La dificultad debe estar")

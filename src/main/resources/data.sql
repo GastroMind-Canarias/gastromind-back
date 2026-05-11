@@ -1,5 +1,6 @@
 -- Habilitar extensiAn para UUIDs si no existe
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
+CREATE EXTENSION IF NOT EXISTS "unaccent";
 
 -- Semilla idempotente (WHERE NOT EXISTS). Los UNIQUE en entidades JPA evitan duplicados logicos en runtime.
 -- Si Hibernate acaba de crear la tabla, ON CONFLICT(name) puede fallar hasta que exista el Andice Anico.
@@ -86,3 +87,50 @@ WHERE p.name = 'Leche Entera'
     SELECT 1 FROM product_allergens pa
     WHERE pa.product_id = p.id AND pa.allergen_id = a.id
   );
+
+-- 8. STORES (basicos Espana + Canarias)
+INSERT INTO store (id, name, name_norm)
+SELECT gen_random_uuid(), v.name, v.name_norm
+FROM (VALUES
+    ('Mercadona', 'mercadona'),
+    ('Carrefour', 'carrefour'),
+    ('Lidl', 'lidl'),
+    ('Dia', 'dia'),
+    ('Spar', 'spar'),
+    ('Alcampo', 'alcampo'),
+    ('Eroski', 'eroski'),
+    ('Consum', 'consum'),
+    ('El Corte Ingles', 'corte ingles el'),
+    ('Hipercor', 'hipercor'),
+    ('Ahorramas', 'ahorramas'),
+    ('Hiperdino', 'hiperdino')
+) AS v(name, name_norm)
+WHERE NOT EXISTS (SELECT 1 FROM store s WHERE lower(s.name) = lower(v.name));
+
+UPDATE store
+SET name_norm = lower(regexp_replace(unaccent(name), '[^a-z0-9 ]', ' ', 'g'))
+WHERE name_norm IS NULL;
+
+-- 9. STORE ALIASES utiles
+INSERT INTO store_alias (id, store_id, alias, alias_norm)
+SELECT gen_random_uuid(), s.id, v.alias, v.alias_norm
+FROM (VALUES
+    ('LIDL SUPERMERCADOS S.A.U.', 'lidl'),
+    ('CARREFOUR MARKET', 'carrefour market'),
+    ('SUPERMERCADOS DINO', 'dino'),
+    ('HIPER DINO', 'dino hiper'),
+    ('EL CORTE INGLES SUPERMERCADO', 'corte ingles el supermercado')
+) AS v(alias, alias_norm)
+JOIN store s ON lower(s.name) = lower(
+    CASE
+        WHEN v.alias_norm LIKE 'lidl%' THEN 'Lidl'
+        WHEN v.alias_norm LIKE 'carrefour%' THEN 'Carrefour'
+        WHEN v.alias_norm LIKE '%dino%' THEN 'Hiperdino'
+        ELSE 'El Corte Ingles'
+    END
+)
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM store_alias sa
+    WHERE sa.store_id = s.id AND lower(sa.alias_norm) = lower(v.alias_norm)
+);

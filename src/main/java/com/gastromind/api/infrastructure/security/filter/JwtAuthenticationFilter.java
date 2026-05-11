@@ -5,9 +5,12 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -20,6 +23,7 @@ import java.io.IOException;
  * Representa jwt authentication filter dentro del dominio de la aplicacion.
  */
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
+    private static final Logger log = LoggerFactory.getLogger(JwtAuthenticationFilter.class);
 
     private final IJwtService jwtService;
     private final UserDetailsService userDetailsService;
@@ -48,7 +52,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         String authHeader = request.getHeader("Authorization");
 
-        // DEBUG 1: Llega el header
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
@@ -58,15 +61,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             String username = jwtService.extractUsername(token);
-            System.out.println("DEBUG: Username en Token -> " + username);
 
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-
-                // Aqui suele fallar: si el nombre no coincide exacto con la DB
                 UserDetails user = userDetailsService.loadUserByUsername(username);
-                System.out.println("DEBUG: Usuario encontrado en DB -> " + user.getUsername());
-                System.out.println("DEBUG: Autoridades -> " + user.getAuthorities());
-
                 if (jwtService.isTokenValid(token, user)) {
                     UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                             user,
@@ -75,14 +72,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     );
                     auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(auth);
-                    System.out.println("DEBUG: Autenticacion establecida con exito!");
-                } else {
-                    System.out.println("DEBUG: El token no es valido para este usuario");
+                } else if (log.isDebugEnabled()) {
+                    log.debug("JWT invalido para usuario {}", username);
                 }
             }
-        } catch (Exception e) {
-            System.out.println("DEBUG: ERROR EN FILTRO -> " + e.getMessage());
-            e.printStackTrace();
+        } catch (UsernameNotFoundException e) {
+            log.warn("JWT con usuario inexistente: {}", e.getMessage());
+        } catch (RuntimeException e) {
+            log.warn("Error validando JWT: {}", e.getMessage(), e);
         }
 
         filterChain.doFilter(request, response);

@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Optional;
 
 /**
- * Define el contrato de persistencia o integracion para usual purchase.
+ * Patrones de recompra por usuario ligados al catálogo de productos.
  */
 public interface UsualPurchaseRepository {
 
