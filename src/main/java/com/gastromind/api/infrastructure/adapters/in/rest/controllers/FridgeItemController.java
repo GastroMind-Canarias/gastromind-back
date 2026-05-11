@@ -3,6 +3,7 @@ package com.gastromind.api.infrastructure.adapters.in.rest.controllers;
 import com.gastromind.api.application.services.FridgeItemServiceImpl;
 import com.gastromind.api.application.usecases.ConsumeMyFridgeItemUseCase;
 import com.gastromind.api.application.usecases.ConsumeMyFridgeItemsBatchUseCase;
+import com.gastromind.api.application.usecases.ConsumeMyFridgeItemsFromRecipeUseCase;
 import com.gastromind.api.application.usecases.CreateMyFridgeItemUseCase;
 import com.gastromind.api.application.usecases.DeleteMyFridgeItemUseCase;
 import com.gastromind.api.application.usecases.ListMyExpiringFridgeItemsUseCase;
@@ -12,10 +13,15 @@ import com.gastromind.api.application.usecases.MarkMyFridgeItemConsumedUseCase;
 import com.gastromind.api.application.usecases.UpdateMyFridgeItemUseCase;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiPostDoc;
 import com.gastromind.api.infrastructure.adapters.in.rest.doc.ApiStandardDoc;
+import com.gastromind.api.domain.models.ConsumeRecipeOutcome;
 import com.gastromind.api.domain.models.FridgeItemConsumeLine;
+import com.gastromind.api.domain.models.RecipeIngredientUsage;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.ConsumeFromRecipeResponse;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.ConsumeRecipeRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.FridgeItemConsumeBatchRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.FridgeItemRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.FridgeItemResponse;
+import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.IgnoredIngredientResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.MyFridgeItemBatchRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.MyFridgeItemRequest;
 import com.gastromind.api.infrastructure.adapters.in.rest.mappers.FridgeItemRestMapper;
@@ -58,6 +64,8 @@ public class FridgeItemController {
     private ConsumeMyFridgeItemUseCase consumeMyFridgeItemUseCase;
     @Autowired
     private ConsumeMyFridgeItemsBatchUseCase consumeMyFridgeItemsBatchUseCase;
+    @Autowired
+    private ConsumeMyFridgeItemsFromRecipeUseCase consumeMyFridgeItemsFromRecipeUseCase;
     @Autowired
     private MarkMyFridgeItemConsumedUseCase markMyFridgeItemConsumedUseCase;
     @Autowired
@@ -277,6 +285,40 @@ public class FridgeItemController {
             @RequestBody java.math.BigDecimal quantity) {
         return ResponseEntity.ok(fridgeItemRestMapper.toResponse(
                 consumeMyFridgeItemUseCase.execute(authentication.getName(), itemId, quantity)));
+    }
+
+    /**
+     * Marca una receta como cocinada y descuenta del inventario del hogar lo necesario.
+     * Reparte cada ingrediente entre los items disponibles del mismo producto empezando
+     * por los caducados y luego por los que caducan antes; si a algun ingrediente le
+     * falta stock no se aplica nada, asi el inventario nunca queda a medias. Los
+     * ingredientes que llegan sin productId (basicos como sal o agua) se devuelven en
+     * la lista {@code ignored} pero no fallan la peticion. Los miembros del hogar
+     * pueden usarlo igual que el propietario.
+     *
+     * @param authentication usuario autenticado (Owner, Member o Admin)
+     * @param body receta con los ingredientes a descontar
+     * @return items afectados y lista de ingredientes que no se han aplicado con su motivo
+     */
+    @Operation(summary = "Consumir nevera al cocinar una receta (Owner, Member y Admin)",
+            description = "Descuenta el inventario del hogar usando los ingredientsUsed de una receta. Reparte por items mismo producto priorizando EXPIRED y luego por caducidad. Todo o nada: si algun ingrediente no tiene stock, falla la peticion sin tocar nada.")
+    @ApiStandardDoc
+    @PutMapping("/me/consume-from-recipe")
+    @PreAuthorize("hasAnyRole('OWNER','MEMBER','ADMIN')")
+    public ResponseEntity<ConsumeFromRecipeResponse> consumeFromRecipe(Authentication authentication,
+            @Valid @RequestBody ConsumeRecipeRequest body) {
+        List<RecipeIngredientUsage> ingredients = body.ingredientsUsed().stream()
+                .map(i -> new RecipeIngredientUsage(i.productId(), i.productName(), i.quantityUsed(), null))
+                .collect(Collectors.toList());
+
+        ConsumeRecipeOutcome outcome = consumeMyFridgeItemsFromRecipeUseCase.execute(
+                authentication.getName(), ingredients);
+
+        List<FridgeItemResponse> consumed = fridgeItemRestMapper.toResponseList(outcome.consumed());
+        List<IgnoredIngredientResponse> ignored = outcome.ignored().stream()
+                .map(ig -> new IgnoredIngredientResponse(ig.productId(), ig.productName(), ig.reason()))
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(new ConsumeFromRecipeResponse(consumed, ignored));
     }
     /**
      * Realiza mark as consumed.

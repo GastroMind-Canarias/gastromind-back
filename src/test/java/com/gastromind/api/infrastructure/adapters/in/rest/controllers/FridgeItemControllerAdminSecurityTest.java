@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gastromind.api.application.services.FridgeItemServiceImpl;
 import com.gastromind.api.application.usecases.ConsumeMyFridgeItemUseCase;
 import com.gastromind.api.application.usecases.ConsumeMyFridgeItemsBatchUseCase;
+import com.gastromind.api.application.usecases.ConsumeMyFridgeItemsFromRecipeUseCase;
 import com.gastromind.api.application.usecases.CreateMyFridgeItemUseCase;
 import com.gastromind.api.application.usecases.DeleteMyFridgeItemUseCase;
 import com.gastromind.api.application.usecases.ListMyExpiringFridgeItemsUseCase;
@@ -83,6 +84,8 @@ class FridgeItemControllerAdminSecurityTest {
     private ConsumeMyFridgeItemUseCase consumeMyFridgeItemUseCase;
     @MockBean
     private ConsumeMyFridgeItemsBatchUseCase consumeMyFridgeItemsBatchUseCase;
+    @MockBean
+    private ConsumeMyFridgeItemsFromRecipeUseCase consumeMyFridgeItemsFromRecipeUseCase;
     @MockBean
     private MarkMyFridgeItemConsumedUseCase markMyFridgeItemConsumedUseCase;
     @MockBean

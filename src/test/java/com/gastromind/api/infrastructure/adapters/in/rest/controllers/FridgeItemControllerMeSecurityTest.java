@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gastromind.api.application.services.FridgeItemServiceImpl;
 import com.gastromind.api.application.usecases.ConsumeMyFridgeItemUseCase;
 import com.gastromind.api.application.usecases.ConsumeMyFridgeItemsBatchUseCase;
+import com.gastromind.api.application.usecases.ConsumeMyFridgeItemsFromRecipeUseCase;
 import com.gastromind.api.application.usecases.CreateMyFridgeItemUseCase;
 import com.gastromind.api.application.usecases.DeleteMyFridgeItemUseCase;
 import com.gastromind.api.application.usecases.ListMyExpiringFridgeItemsUseCase;
@@ -11,6 +12,7 @@ import com.gastromind.api.application.usecases.ListMyFridgeItemsByCategoryUseCas
 import com.gastromind.api.application.usecases.ListMyFridgeItemsUseCase;
 import com.gastromind.api.application.usecases.MarkMyFridgeItemConsumedUseCase;
 import com.gastromind.api.application.usecases.UpdateMyFridgeItemUseCase;
+import com.gastromind.api.domain.models.ConsumeRecipeOutcome;
 import com.gastromind.api.domain.models.FridgeItem;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.FridgeItemResponse;
 import com.gastromind.api.infrastructure.adapters.in.rest.dtos.fridgeItem.MyFridgeItemRequest;
@@ -82,6 +84,8 @@ class FridgeItemControllerMeSecurityTest {
     @MockBean
     private ConsumeMyFridgeItemsBatchUseCase consumeMyFridgeItemsBatchUseCase;
     @MockBean
+    private ConsumeMyFridgeItemsFromRecipeUseCase consumeMyFridgeItemsFromRecipeUseCase;
+    @MockBean
     private MarkMyFridgeItemConsumedUseCase markMyFridgeItemConsumedUseCase;
     @MockBean
     private ListMyExpiringFridgeItemsUseCase listMyExpiringFridgeItemsUseCase;
@@ -135,6 +139,10 @@ class FridgeItemControllerMeSecurityTest {
                         Map.of("itemId", "item-1", "quantity", "1.0"),
                         Map.of("itemId", "item-2", "quantity", "0.5")
                 )));
+        String consumeRecipeBody = objectMapper.writeValueAsString(Map.of(
+                "ingredientsUsed", List.of(
+                        Map.of("productId", "product-1", "productName", "Tomate", "quantityUsed", "0.75")
+                )));
 
         when(fridgeItemRestMapper.toDomain(any(MyFridgeItemRequest.class))).thenReturn(domain);
         when(fridgeItemRestMapper.toResponse(any())).thenReturn(response);
@@ -168,6 +176,8 @@ class FridgeItemControllerMeSecurityTest {
         when(updateMyFridgeItemUseCase.execute(any(), eq("item-1"), any())).thenReturn(domain);
         when(consumeMyFridgeItemUseCase.execute(any(), eq("item-1"), eq(new BigDecimal("1.0")))).thenReturn(domain);
         when(consumeMyFridgeItemsBatchUseCase.execute(any(), any())).thenReturn(List.of(domain));
+        when(consumeMyFridgeItemsFromRecipeUseCase.execute(any(), any()))
+                .thenReturn(new ConsumeRecipeOutcome(List.of(domain), List.of()));
         when(listMyExpiringFridgeItemsUseCase.execute(any(), eq(5))).thenReturn(List.of(domain));
         when(listMyFridgeItemsByCategoryUseCase.execute(any(), eq("cat-1"))).thenReturn(List.of(domain));
 
@@ -210,6 +220,12 @@ class FridgeItemControllerMeSecurityTest {
             mockMvc.perform(put("/api/v1/fridge-items/me/batch/consume")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(consumeBatchBody)
+                            .with(user("user1").authorities(new SimpleGrantedAuthority(role))))
+                    .andExpect(status().isOk());
+
+            mockMvc.perform(put("/api/v1/fridge-items/me/consume-from-recipe")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(consumeRecipeBody)
                             .with(user("user1").authorities(new SimpleGrantedAuthority(role))))
                     .andExpect(status().isOk());
 
@@ -262,6 +278,9 @@ class FridgeItemControllerMeSecurityTest {
                 .andExpect(status().isForbidden());
         mockMvc.perform(put("/api/v1/fridge-items/me/batch/consume").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Map.of(
                 "items", List.of(Map.of("itemId", "item-1", "quantity", "1.0"))
+        ))).with(unauthorized)).andExpect(status().isForbidden());
+        mockMvc.perform(put("/api/v1/fridge-items/me/consume-from-recipe").contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(Map.of(
+                "ingredientsUsed", List.of(Map.of("productId", "product-1", "quantityUsed", "0.5"))
         ))).with(unauthorized)).andExpect(status().isForbidden());
         mockMvc.perform(put("/api/v1/fridge-items/me/item-1/mark-consumed").with(unauthorized)).andExpect(status().isForbidden());
         mockMvc.perform(delete("/api/v1/fridge-items/me/item-1").with(unauthorized)).andExpect(status().isForbidden());
@@ -321,6 +340,42 @@ class FridgeItemControllerMeSecurityTest {
         String invalidBody = objectMapper.writeValueAsString(Map.of("items", List.of()));
 
         mockMvc.perform(post("/api/v1/fridge-items/me/batch")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidBody)
+                        .with(user("user1").authorities(new SimpleGrantedAuthority("ROLE_OWNER"))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void consumeFromRecipe_shouldReturnBadRequestWhenEmptyIngredients() throws Exception {
+        String invalidBody = objectMapper.writeValueAsString(Map.of("ingredientsUsed", List.of()));
+
+        mockMvc.perform(put("/api/v1/fridge-items/me/consume-from-recipe")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidBody)
+                        .with(user("user1").authorities(new SimpleGrantedAuthority("ROLE_OWNER"))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void consumeFromRecipe_shouldReturnBadRequestWhenQuantityMissing() throws Exception {
+        String invalidBody = objectMapper.writeValueAsString(Map.of(
+                "ingredientsUsed", List.of(Map.of("productId", "product-1", "productName", "Tomate"))));
+
+        mockMvc.perform(put("/api/v1/fridge-items/me/consume-from-recipe")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidBody)
+                        .with(user("user1").authorities(new SimpleGrantedAuthority("ROLE_OWNER"))))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void consumeFromRecipe_shouldReturnBadRequestWhenQuantityNonPositive() throws Exception {
+        String invalidBody = objectMapper.writeValueAsString(Map.of(
+                "ingredientsUsed", List.of(Map.of(
+                        "productId", "product-1", "productName", "Tomate", "quantityUsed", "0"))));
+
+        mockMvc.perform(put("/api/v1/fridge-items/me/consume-from-recipe")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(invalidBody)
                         .with(user("user1").authorities(new SimpleGrantedAuthority("ROLE_OWNER"))))
