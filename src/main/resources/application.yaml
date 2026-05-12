@@ -74,6 +74,8 @@ app:
       - "http://localhost:3000"
       - "http://localhost:4200"
       - "http://localhost:8081"
+      - "https://gastroadmin.guillermosh.com"
+      - "http://192.168.88.10:4200"
 
 management:
   endpoints:
