@@ -40,6 +40,7 @@ Los nombres exactos pueden variar con la versión de Boot; inspecciona `/actuato
 ## Seguridad: estado actual
 
 - En [`src/main/resources/application.yaml`](../src/main/resources/application.yaml), la lista `gastromind.security.public-urls` incluye **`/actuator/**`**. El filtro JWT no exige token para esas rutas.
+- La misma lista incluye **`/soap/**`** (servicios SOAP de catálogo en el mismo puerto **8081** que la API). Las peticiones SOAP cuentan en las métricas HTTP de Micrometer como el resto del tráfico Tomcat.
 - Prometheus en desarrollo publica **`9090:9090`** en el host: cualquier proceso en la máquina puede abrir la UI de Prometheus si no hay firewall local.
 
 Esto facilita el scrape y la depuración en local; **no es un modelo listo para exponer a Internet sin capas adicionales.**
